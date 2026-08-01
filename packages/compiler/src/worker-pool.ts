@@ -24,6 +24,7 @@ export interface SerializedTheme {
   opacity: Array<[string, string]>;
   cssVariables: Array<[string, string]>;
   source: string;
+  tailwindVersion?: 3 | 4;
 }
 
 /**
@@ -138,6 +139,7 @@ export function serializeTheme(theme: {
   height: { values: Map<string, string> };
   cssVariables: Map<string, string>;
   source: string;
+  tailwindVersion?: 3 | 4;
 }): SerializedTheme {
   return {
     spacingUnit: theme.spacingUnit,
@@ -152,6 +154,7 @@ export function serializeTheme(theme: {
     opacity: [...theme.opacity.values],
     cssVariables: [...theme.cssVariables],
     source: theme.source,
+    tailwindVersion: theme.tailwindVersion,
   };
 }
 
@@ -170,6 +173,7 @@ export function reviveTheme(s: SerializedTheme): {
   height: { values: Map<string, string> };
   cssVariables: Map<string, string>;
   source: string;
+  tailwindVersion?: 3 | 4;
 } {
   const spacing = { values: new Map(s.spacing) };
   return {
@@ -187,5 +191,6 @@ export function reviveTheme(s: SerializedTheme): {
     height: { values: new Map(s.spacing) },
     cssVariables: new Map(s.cssVariables),
     source: s.source,
+    tailwindVersion: s.tailwindVersion ?? 4,
   };
 }

@@ -7,5 +7,14 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@tailwind-canonicalize/vscode", "tailwind-canonicalize-action"]
+  "ignore": [
+    "@tailwind-canonicalize/parser",
+    "@tailwind-canonicalize/resolver",
+    "@tailwind-canonicalize/transformer",
+    "@tailwind-canonicalize/compiler",
+    "@tailwind-canonicalize/tokens",
+    "tailwind-canonicalize-vscode",
+    "tailwind-canonicalize-action",
+    "docs"
+  ]
 }

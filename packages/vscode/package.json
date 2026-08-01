@@ -1,5 +1,6 @@
 {
   "name": "tailwind-canonicalize-vscode",
+  "private": true,
   "displayName": "Tailwind Canonicalize",
   "description": "Diagnostics and Quick Fix to convert arbitrary Tailwind utilities to canonical theme classes",
   "version": "0.1.0",

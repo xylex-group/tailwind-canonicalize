@@ -24,6 +24,7 @@ export function loadThemeFromCss(css: string, base: Theme = createDefaultTheme()
     height: cloneScale(base.height),
     cssVariables: new Map(base.cssVariables),
     source: "merged",
+    tailwindVersion: base.tailwindVersion ?? 4,
   };
 
   // Collect @theme blocks

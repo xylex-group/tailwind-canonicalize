@@ -1,6 +1,6 @@
 {
   "name": "tailwind-canonicalize",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Semantic canonicalizer for Tailwind CSS utility classes — rewrite only when provably identical",
   "license": "MIT",
   "type": "module",
@@ -40,16 +40,27 @@
   },
   "homepage": "https://github.com/xylex-group/tailwind-canonicalize#readme",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@tailwind-canonicalize/compiler": "workspace:*",
-    "@tailwind-canonicalize/resolver": "workspace:*",
-    "@tailwind-canonicalize/tokens": "workspace:*"
+    "magic-string": "^0.30.17",
+    "oxc-parser": "^0.82.1"
+  },
+  "peerDependencies": {
+    "tailwindcss": ">=3.4.0 || >=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@tailwind-canonicalize/compiler": "workspace:*",
+    "@tailwind-canonicalize/resolver": "workspace:*",
+    "@tailwind-canonicalize/tokens": "workspace:*",
+    "tsup": "^8.5.0",
     "typescript": "^5.9.2"
   },
   "publishConfig": {

@@ -1,5 +1,6 @@
 {
   "name": "@tailwind-canonicalize/parser",
+  "private": true,
   "version": "0.1.0",
   "description": "AST-based class string extraction for tailwind-canonicalize",
   "license": "MIT",

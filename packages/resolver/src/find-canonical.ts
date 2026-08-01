@@ -120,10 +120,14 @@ function findCanonicalUncached(
 
   // Continuous spacing: any exact multiple of --spacing (e.g. w-[140px] → w-35)
   // Prefer discrete/named theme hits above; only fall back when none matched.
+  // v4-only: v3 themes populate spacingUnit but lack continuous bare keys.
+  // Border widths use raw px numbers, not --spacing multipliers.
   if (
     unique.length === 0 &&
     theme.spacingUnit &&
-    scaleForNamespace(parts.namespace, theme) === theme.spacing
+    theme.tailwindVersion !== 3 &&
+    scaleForNamespace(parts.namespace, theme) === theme.spacing &&
+    allowsContinuousSpacingInvert(parts.namespace)
   ) {
     const mult = invertSpacingMultiplier(
       inner,
@@ -132,7 +136,14 @@ function findCanonicalUncached(
     );
     if (mult !== null) {
       const key = formatScaleKey(mult);
-      unique = [key];
+      const explicit = theme.spacing.values.get(key);
+      // Reject when theme defines this key to a different absolute length.
+      if (
+        explicit === undefined ||
+        valuesEqual(inner, explicit, rootFontSizePx)
+      ) {
+        unique = [key];
+      }
     }
   }
 
@@ -336,4 +347,16 @@ export function canonicalizeClasses(
   options: FindCanonicalOptions = {},
 ): string[] {
   return tokens.map((t) => canonicalizeClass(t, options));
+}
+
+/** Namespaces whose bare numeric utilities are --spacing multipliers (not border px widths). */
+function allowsContinuousSpacingInvert(namespace: string): boolean {
+  if (namespace === "border-spacing" || namespace.startsWith("border-spacing-")) {
+    return true;
+  }
+  // border / border-t / border-x etc. bare numbers are pixel widths in Tailwind.
+  if (namespace === "border" || namespace.startsWith("border-")) {
+    return false;
+  }
+  return true;
 }

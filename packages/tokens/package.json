@@ -1,5 +1,6 @@
 {
   "name": "@tailwind-canonicalize/tokens",
+  "private": true,
   "version": "0.1.0",
   "description": "Semantic design-token analysis and migration for tailwind-canonicalize",
   "license": "MIT",

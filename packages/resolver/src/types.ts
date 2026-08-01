@@ -29,6 +29,11 @@ export interface Theme {
   cssVariables: Map<string, string>;
   /** Source of the theme for diagnostics. */
   source: "default" | "css" | "merged";
+  /**
+   * Major Tailwind version this theme targets.
+   * Continuous spacing-key synthesis is v4-only (v3 has a discrete scale).
+   */
+  tailwindVersion: 3 | 4;
 }
 
 export interface UtilityParts {

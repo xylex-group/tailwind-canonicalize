@@ -142,6 +142,7 @@ function mergeV3Config(base: Theme, config: Record<string, unknown>): Theme {
   }
 
   base.source = "merged";
+  base.tailwindVersion = 3;
   return base;
 }
 

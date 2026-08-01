@@ -1,5 +1,6 @@
 {
   "name": "@tailwind-canonicalize/compiler",
+  "private": true,
   "version": "0.1.0",
   "description": "Public API and project orchestration for tailwind-canonicalize",
   "license": "MIT",
