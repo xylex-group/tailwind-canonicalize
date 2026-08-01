@@ -1,0 +1,36 @@
+---
+title: Safety
+description: Zero false positives — the core product contract.
+---
+
+## Contract
+
+A rewrite is applied only when **exactly one** theme candidate matches after value normalization (or a registered migration / approved mapping applies).
+
+| Situation | Behavior |
+|-----------|----------|
+| 0 candidates | Leave untouched |
+| 1 candidate | Rewrite |
+| \>1 candidates | Leave untouched (unless documented preference, e.g. `1/2` over `2/4`) |
+| `calc` / `var` / `min` / `max` / `clamp` | Never |
+| Arbitrary properties `[mask-image:…]` | Never |
+| Semantic palette → token | Never without approved manifest |
+
+## Modes
+
+| Mode | Flag | Applies |
+|------|------|---------|
+| Safe | `--safe` (default) | Exact canonical + safe migrations + approved tokens + dups |
+| Review | `--review` | Report/diff only |
+| Aggressive | `--aggressive` | Explicit; may include review migrations / high-confidence inference |
+
+## Idempotence
+
+```bash
+tailwind-canonicalize . --write
+tailwind-canonicalize . --write   # zero changes
+```
+
+## Unsafe counter
+
+CLI always reports `unsafe: 0` — the engine refuses ambiguous rewrites rather than guessing.

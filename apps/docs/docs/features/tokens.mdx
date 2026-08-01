@@ -1,0 +1,34 @@
+---
+title: Semantic tokens
+description: Two-phase palette → design-token migration.
+---
+
+Semantic replacements are **architectural**, not purely canonical. The same `bg-amber-200` may mean warning, selection, or decoration — so inference never auto-writes.
+
+## Phase 1 — Analyze
+
+```bash
+pnpm exec tailwind-canonicalize tokens analyze . --out proposed.json
+```
+
+No source edits. Outputs proposals, conflicts, duplicate token reports, cycles.
+
+## Phase 2 — Apply
+
+```bash
+pnpm exec tailwind-canonicalize tokens apply tailwind-tokens.json --write
+```
+
+Only explicit mappings, pairs, and recipes in the manifest.
+
+## Dark pairs
+
+```tsx
+bg-white dark:bg-slate-950  →  bg-background
+```
+
+when the pair is approved and dual-theme values exist.
+
+## Theme CSS
+
+Generates Tailwind v4 `@theme` / `@theme inline` with optional `:root` + `.dark` app variables. Prefers aliasing existing `--warning-subtle` over inventing duplicates.

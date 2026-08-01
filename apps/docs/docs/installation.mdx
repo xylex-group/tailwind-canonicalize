@@ -1,0 +1,81 @@
+---
+title: Installation
+description: Install tailwind-canonicalize and run your first canonicalize.
+---
+
+## Requirements
+
+- Node.js **20+**
+- ESM project (or consume the CLI as a binary)
+
+## Install
+
+```package-install
+pnpm add -D tailwind-canonicalize
+```
+
+```bash
+# npm
+npm i -D tailwind-canonicalize
+
+# yarn
+yarn add -D tailwind-canonicalize
+```
+
+## First run
+
+```bash
+# Report only
+pnpm exec tailwind-canonicalize . --check
+
+# Apply safe rewrites
+pnpm exec tailwind-canonicalize . --write --safe
+```
+
+## package.json scripts
+
+```json
+{
+  "scripts": {
+    "canonicalize": "tailwind-canonicalize . --write --safe",
+    "canonicalize:check": "tailwind-canonicalize . --check --json"
+  }
+}
+```
+
+## Optional peer: Tailwind compile verification
+
+```package-install
+pnpm add -D tailwindcss
+```
+
+```bash
+pnpm exec tailwind-canonicalize . --strict-compile --write
+```
+
+## Config file (optional)
+
+```ts
+// tailwind-canonicalize.config.ts
+import { defineConfig } from "tailwind-canonicalize";
+
+export default defineConfig({
+  tailwind: {
+    version: 4,
+    stylesheet: "./src/styles/globals.css",
+  },
+  canonicalize: {
+    arbitraryValues: true,
+    deprecatedClasses: true,
+    duplicateClasses: true,
+  },
+  migrations: {
+    gradients: true,
+    tailwindV4: true,
+  },
+});
+```
+
+## Wire formatters
+
+Canonicalize does **not** replace Biome/ESLint. See [Integrations](/docs/integrations).

@@ -1,0 +1,59 @@
+---
+title: Introduction
+description: Semantic canonicalizer for Tailwind CSS — rewrite utilities only when provably equivalent.
+---
+
+**tailwind-canonicalize** is a production-grade CLI and library that rewrites Tailwind utility classes into their theme-canonical form — **only when the result is provably identical**.
+
+It is **not** a linter and **not** a general formatter. It sits beside Biome, ESLint, Oxlint, and Prettier without fighting them.
+
+```tsx
+// before
+<div className="w-[40px] min-w-[10rem] h-[10px] p-[16px] gap-[8px]" />
+
+// after
+<div className="w-10 min-w-40 h-2.5 p-4 gap-2" />
+```
+
+```package-install
+pnpm add -D tailwind-canonicalize
+```
+
+```bash
+pnpm exec tailwind-canonicalize . --write --safe
+pnpm exec tailwind-canonicalize . --check
+```
+
+## Three transformation categories
+
+| Category | What | Safety |
+|----------|------|--------|
+| **Canonical class** | Arbitrary values → theme tokens | Automatic when exact |
+| **Tailwind migration** | e.g. `bg-gradient-to-br` → `bg-linear-to-br` | Versioned registry |
+| **Semantic tokens** | `bg-white` → `bg-background` | Analyze + **approved** manifest only |
+
+## Goals
+
+### Zero false positives
+
+Unknown values, `calc()`, `var()`, and multi-match ambiguity are **never** rewritten. Coverage is secondary to safety.
+
+### Theme-driven
+
+Loads project `@theme` (v4) or `tailwind.config.*` (v3). Never hardcodes your design system.
+
+### Format-preserving
+
+Uses MagicString and a real AST (oxc). Comments, multiline class strings, and non-class code stay intact.
+
+### Ecosystem-friendly
+
+[First-class integration guides](/docs/integrations) for Biome, ESLint, Oxlint, Prettier, and CI.
+
+## Next steps
+
+- [Installation](/docs/installation)
+- [CLI reference](/docs/cli)
+- [Interactive examples](/docs/examples)
+- [Safety contract](/docs/safety)
+- [Semantic tokens](/docs/features/tokens)

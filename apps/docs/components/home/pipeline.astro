@@ -1,0 +1,48 @@
+---
+import SectionIntro from "./section-intro.astro";
+
+const steps = [
+  {
+    title: "Parse",
+    body: "oxc AST — className, clsx, cn, cva, tw``, Vue, Astro, HTML.",
+  },
+  {
+    title: "Resolve",
+    body: "Project @theme / v3 config. Generate candidates. Compare values.",
+  },
+  {
+    title: "Migrate",
+    body: "Versioned registry (bg-gradient-to-* → bg-linear-to-*).",
+  },
+  {
+    title: "Tokens",
+    body: "Approved manifest only. Analyze first — never auto-semantic.",
+  },
+  {
+    title: "Rewrite",
+    body: "MagicString. Preserve format, comments, variants, important.",
+  },
+];
+---
+
+<div class="grid gap-8">
+  <SectionIntro
+    description="Five independent layers. Unit-tested. Idempotent. Zero unsafe rewrites."
+    title="How it works"
+  />
+  <div
+    class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5"
+  >
+    {
+      steps.map((step, i) => (
+        <div class="flex flex-col gap-2 rounded-2xl border p-5">
+          <span class="font-mono text-cyan-600 text-xs dark:text-cyan-400">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <p class="font-medium tracking-tight">{step.title}</p>
+          <p class="text-muted-foreground text-sm">{step.body}</p>
+        </div>
+      ))
+    }
+  </div>
+</div>

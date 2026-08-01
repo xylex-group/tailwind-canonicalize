@@ -1,0 +1,41 @@
+---
+import SectionIntro from "./section-intro.astro";
+import { prettierLogo, providerLogos, editorLogos } from "../../lib/logos";
+
+const logos = [
+  { name: "Biome", src: providerLogos.biome },
+  { name: "ESLint", src: providerLogos.eslint },
+  { name: "Oxlint", src: providerLogos.oxlint },
+  { name: "Prettier", src: prettierLogo },
+  { name: "VS Code", src: editorLogos.vscode },
+  { name: "Cursor", src: editorLogos.cursor },
+  { name: "Zed", src: editorLogos.zed },
+  { name: "Windsurf", src: editorLogos.windsurf },
+].filter((l) => l.src);
+---
+
+<div class="grid gap-8">
+  <SectionIntro
+    description="Compose with the tools you already run — never a second formatter war."
+    maxWidth="max-w-xl"
+    title="Built for real toolchains"
+  />
+  <div
+    class="grid grid-cols-2 divide-x divide-y border-t border-l sm:grid-cols-4"
+  >
+    {
+      logos.map((logo) => (
+        <div class="flex aspect-[2/1] w-full flex-col items-center justify-center gap-2 p-6 last:border-r last:border-b sm:p-8">
+          <img
+            alt={logo.name}
+            class="size-10 rounded-full object-cover ring-2 ring-border"
+            height="40"
+            src={logo.src}
+            width="40"
+          />
+          <span class="text-muted-foreground text-xs">{logo.name}</span>
+        </div>
+      ))
+    }
+  </div>
+</div>

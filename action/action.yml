@@ -1,0 +1,33 @@
+name: tailwind-canonicalize
+description: Check that Tailwind utility classes are in canonical form
+author: tailwind-canonicalize
+branding:
+  icon: wind
+  color: blue
+inputs:
+  path:
+    description: Path(s) to scan (space-separated)
+    required: false
+    default: "."
+  write:
+    description: Write changes instead of only checking
+    required: false
+    default: "false"
+runs:
+  using: composite
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+    - name: Install tailwind-canonicalize
+      shell: bash
+      run: npm install -g tailwind-canonicalize@^0.1.0 || npx --yes tailwind-canonicalize@latest --version
+    - name: Run tailwind-canonicalize
+      shell: bash
+      run: |
+        if [ "${{ inputs.write }}" = "true" ]; then
+          npx --yes tailwind-canonicalize@latest ${{ inputs.path }} --write --json
+        else
+          npx --yes tailwind-canonicalize@latest ${{ inputs.path }} --check --json
+        fi

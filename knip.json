@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["vitest.config.ts", "benchmarks/**/*.ts", "tests/**/*.ts"],
+      "project": ["**/*.{ts,tsx}"]
+    },
+    "packages/*": {
+      "entry": ["src/index.ts", "src/cli.ts", "src/bin.ts"],
+      "project": ["src/**/*.ts"]
+    }
+  },
+  "ignore": ["packages/vscode/**", "action/**", "fixtures/**"]
+}

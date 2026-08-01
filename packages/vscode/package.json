@@ -1,0 +1,67 @@
+{
+  "name": "tailwind-canonicalize-vscode",
+  "displayName": "Tailwind Canonicalize",
+  "description": "Diagnostics and Quick Fix to convert arbitrary Tailwind utilities to canonical theme classes",
+  "version": "0.1.0",
+  "publisher": "tailwind-canonicalize",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": ["Formatters", "Linters", "Other"],
+  "activationEvents": [
+    "onLanguage:typescriptreact",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:html",
+    "onLanguage:vue",
+    "onLanguage:astro",
+    "onLanguage:svelte",
+    "onLanguage:mdx"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tailwind-canonicalize.canonicalizeDocument",
+        "title": "Tailwind Canonicalize: Document"
+      },
+      {
+        "command": "tailwind-canonicalize.canonicalizeSelection",
+        "title": "Tailwind Canonicalize: Selection"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "tailwind-canonicalize.canonicalizeDocument",
+          "group": "1_modification",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Tailwind Canonicalize",
+      "properties": {
+        "tailwindCanonicalize.enableDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show diagnostics for arbitrary utilities that have a safe canonical form"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@tailwind-canonicalize/compiler": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.9.2"
+  }
+}

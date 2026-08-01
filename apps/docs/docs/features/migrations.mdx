@@ -1,0 +1,20 @@
+---
+title: Migrations
+description: Versioned Tailwind class renames (v3 → v4).
+---
+
+```bash
+pnpm exec tailwind-canonicalize . --migrate --from-tailwind 3 --to-tailwind 4 --write
+pnpm exec tailwind-canonicalize . --migrations-only --write
+```
+
+Registry: single auditable source in the package (`TAILWIND_MIGRATIONS`).
+
+```tsx
+bg-gradient-to-br          → bg-linear-to-br
+hover:bg-gradient-to-br    → hover:bg-linear-to-br
+dark:md:bg-gradient-to-br  → dark:md:bg-linear-to-br
+bg-gradient-to-br!         → bg-linear-to-br!
+```
+
+Each entry has `fromVersion`, `toVersion`, `safety`, and notes.

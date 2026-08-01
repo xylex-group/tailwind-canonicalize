@@ -1,0 +1,85 @@
+---
+title: CLI
+description: Commands, flags, exit codes for tailwind-canonicalize.
+---
+
+## Usage
+
+```bash
+tailwind-canonicalize [paths...] [options]
+tailwind-canonicalize tokens analyze [paths...] [--out manifest.json]
+tailwind-canonicalize tokens apply <manifest.json> [paths...] [--write]
+```
+
+## Core options
+
+| Flag | Description |
+|------|-------------|
+| `--write` | Write rewrites to disk |
+| `--check` | Exit 1 if changes would be made |
+| `--stdin` | Read source from stdin → stdout |
+| `--json` | Machine-readable summary |
+| `--verbose` | Categorized rewrite details |
+| `--diff` | Line diffs |
+| `--safe` | Exact/safe only (default mode) |
+| `--review` | Report only; never write |
+| `--aggressive` | Review-level migrations / high-confidence inference |
+
+## Migrations
+
+| Flag | Description |
+|------|-------------|
+| `--migrate` | Apply versioned class renames |
+| `--migrations-only` | Skip arbitrary canonicalization |
+| `--from-tailwind <n>` | Source major (e.g. 3) |
+| `--to-tailwind <n>` | Target major (e.g. 4) |
+
+## Performance
+
+| Flag | Description |
+|------|-------------|
+| `--watch` | Watch mode (+ incremental) |
+| `--incremental` | Hash cache skip |
+| `--workers` | Force worker pool |
+| `--concurrency <n>` | Parallelism (default 8) |
+
+## Compile verification
+
+| Flag | Description |
+|------|-------------|
+| `--strict-compile` | Require Tailwind compile equality |
+| `--compile-css` | CSS entry for compiler |
+
+## Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Success |
+| `1` | Changes required (`--check`) |
+| `2` | Error |
+
+## Example output
+
+```
+✓ 1,523 files
+✓ 9,421 replacements
+✓ 0 unsafe rewrites
+Completed in 1.82s
+```
+
+## JSON shape
+
+```json
+{
+  "files": 1523,
+  "filesChanged": 412,
+  "filesSkipped": 0,
+  "rewrites": 9421,
+  "unsafe": 0,
+  "elapsedMs": 1821,
+  "transformationsByCategory": {
+    "canonical-class": 9000,
+    "tailwind-migration": 421
+  }
+}
+```

@@ -1,0 +1,96 @@
+---
+import CodeBlock from "blume/components/content/CodeBlock.astro";
+import Tab from "blume/components/content/Tab.astro";
+import Tabs from "blume/components/content/Tabs.astro";
+import { prettierLogo, providerLogos } from "../../lib/logos";
+import { integrations } from "../../lib/integrations";
+import SectionIntro from "./section-intro.astro";
+
+const logoFor: Record<string, string> = {
+  biome: providerLogos.biome ?? "",
+  eslint: providerLogos.eslint ?? "",
+  oxlint: providerLogos.oxlint ?? "",
+  prettier: prettierLogo,
+};
+
+const defaultId = integrations[0]?.id ?? "biome";
+---
+
+<div class="grid gap-8">
+  <SectionIntro
+    description="Not a linter. Not a formatter. A semantic layer that sits <em>beside</em> Biome, ESLint, Oxlint, and Prettier — zero fights over who owns className."
+    maxWidth="max-w-2xl"
+    title="First-class with your lint stack"
+  />
+
+  <div class="flex flex-col items-center justify-center gap-3">
+    <span class="text-muted-foreground text-sm">I'm using</span>
+    <div class="flex flex-wrap items-center justify-center gap-2">
+      {
+        integrations.map((item) => (
+          <button
+            aria-selected={item.id === defaultId}
+            class="hp-provider flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors"
+            data-provider={item.id}
+            type="button"
+          >
+            {logoFor[item.id] && (
+              <img
+                alt=""
+                class="size-4 rounded-full"
+                height="16"
+                src={logoFor[item.id]}
+                width="16"
+              />
+            )}
+            <span>{item.name}</span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="mx-auto w-full max-w-3xl">
+    {
+      integrations.map((item) => (
+        <div data-hp-panel={item.id} hidden={item.id !== defaultId}>
+          <Tabs hash={false} sync={false}>
+            <Tab class="hp-code p-0!" title="package.json / hooks">
+              <CodeBlock code={item.snippet} icons={false} lang="json" />
+            </Tab>
+          </Tabs>
+          <p class="mt-3 text-center text-muted-foreground text-xs">
+            {item.role}.{" "}
+            <a class="underline hover:text-foreground" href={item.href}
+              >Full {item.name} guide →</a
+            >
+          </p>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const panels = document.querySelectorAll<HTMLElement>("[data-hp-panel]");
+  const providerButtons =
+    document.querySelectorAll<HTMLButtonElement>(".hp-provider");
+
+  const showProvider = (id: string) => {
+    for (const button of providerButtons) {
+      button.setAttribute(
+        "aria-selected",
+        String(button.dataset.provider === id),
+      );
+    }
+    for (const panel of panels) {
+      panel.hidden = panel.dataset.hpPanel !== id;
+    }
+  };
+
+  for (const button of providerButtons) {
+    button.addEventListener("click", () =>
+      showProvider(button.dataset.provider ?? ""),
+    );
+  }
+</script>

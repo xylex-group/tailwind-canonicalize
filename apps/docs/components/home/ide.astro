@@ -1,0 +1,139 @@
+---
+import CodeBlock from "blume/components/content/CodeBlock.astro";
+import Icon from "./icon.astro";
+import SectionIntro from "./section-intro.astro";
+
+const mockCode = `export function Card() {
+  return (
+    <div
+      className="
+        w-[40px]
+        min-w-[10rem]
+        h-[10px]
+        p-[16px]
+        gap-[8px]
+      "
+    />
+  );
+}`;
+
+const indicators = [
+  {
+    className: "xl:mt-5",
+    description:
+      "Hint diagnostics for arbitrary utilities that have a safe canonical form.",
+    title: "Diagnostics",
+  },
+  {
+    className: "xl:mt-10",
+    description:
+      'Quick Fix: "Convert to canonical Tailwind class w-10".',
+    title: "Quick Fix",
+  },
+  {
+    className: "xl:mt-24",
+    description:
+      "Command palette: Tailwind Canonicalize: Document.",
+    title: "Whole file",
+  },
+];
+---
+
+<div class="grid gap-8">
+  <SectionIntro
+    description="VS Code extension surfaces safe rewrites as hints — zero unsafe suggestions."
+    title="Editor-ready"
+  />
+  <div class="grid items-start gap-8 xl:grid-cols-[200px_1fr_200px]">
+    <div
+      class="order-1 grid gap-8 sm:grid-cols-2 md:grid-cols-3 xl:order-0 xl:grid-cols-1 xl:gap-0"
+    >
+      {
+        indicators.map((indicator) => (
+          <div class:list={["flex flex-col gap-1", indicator.className]}>
+            <div class="flex items-center gap-2">
+              <p class="shrink-0 font-medium xl:text-sm">{indicator.title}</p>
+              <div class="hidden h-px flex-1 bg-foreground/10 xl:block" />
+            </div>
+            <p class="text-muted-foreground xl:text-xs">
+              {indicator.description}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+
+    <div
+      class="hidden aspect-video grid-cols-[180px_1fr] divide-x overflow-hidden rounded-2xl border bg-background md:grid"
+    >
+      <div
+        class="flex flex-col gap-1 px-2 py-4 font-mono text-muted-foreground text-xs"
+      >
+        <div class="flex items-center gap-2 rounded-md px-2 py-1">
+          <Icon class="size-3 shrink-0" name="folder" />
+          <p class="font-medium">src</p>
+        </div>
+        <div class="ml-2 flex items-center gap-2 rounded-md bg-muted px-2 py-1">
+          <Icon class="size-3 shrink-0" name="react" />
+          <p class="font-medium text-foreground">Card.tsx</p>
+        </div>
+        <div class="ml-2 flex items-center gap-2 rounded-md px-2 py-1">
+          <Icon class="size-3 shrink-0" name="css" />
+          <p class="font-medium">globals.css</p>
+        </div>
+        <div class="flex items-center gap-2 rounded-md px-2 py-1">
+          <Icon class="size-3 shrink-0" name="typescript" />
+          <p class="font-medium">tailwind-tokens.json</p>
+        </div>
+      </div>
+
+      <div class="grid grid-rows-[2fr_1fr] overflow-hidden">
+        <div class="hp-code overflow-auto p-2 text-sm">
+          <CodeBlock code={mockCode} icons={false} lang="tsx" />
+        </div>
+        <div
+          class="flex flex-col gap-2 overflow-y-auto border-t p-4 text-muted-foreground text-xs"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <p class="font-medium">Problems</p>
+            <div class="-mx-1 -mt-1 rounded-full bg-muted px-2.5 py-1">
+              <p>tailwind-canonicalize</p>
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-2">
+              <Icon class="size-3" name="react" />
+              <p class="text-foreground">Card.tsx</p>
+            </div>
+            <div class="ml-4 flex items-center gap-2">
+              <Icon class="size-3" name="x-circle" />
+              <p class="truncate">Can canonicalize to 'w-10'</p>
+            </div>
+            <div class="ml-4 flex items-center gap-2">
+              <Icon class="size-3" name="x-circle" />
+              <p class="truncate">Can canonicalize to 'min-w-40'</p>
+            </div>
+            <div class="ml-4 flex items-center gap-2">
+              <Icon class="size-3" name="x-circle" />
+              <p class="truncate">Can canonicalize to 'p-4'</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-1 xl:gap-0 xl:text-right"
+    >
+      <div class="flex flex-col gap-1 xl:mt-72">
+        <div class="flex items-center gap-2 xl:flex-row-reverse">
+          <p class="shrink-0 font-medium xl:text-sm">Hint only</p>
+          <div class="hidden h-px flex-1 bg-foreground/10 xl:block"></div>
+        </div>
+        <p class="text-muted-foreground xl:text-xs">
+          Never suggests calc(), var(), or non-theme values.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

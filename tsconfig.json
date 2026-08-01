@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/parser" },
+    { "path": "./packages/resolver" },
+    { "path": "./packages/transformer" },
+    { "path": "./packages/tokens" },
+    { "path": "./packages/compiler" },
+    { "path": "./packages/cli" }
+  ]
+}

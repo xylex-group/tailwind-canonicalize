@@ -128,6 +128,17 @@ dist
 # pnpm
 .pnpm-store
 
+# monorepo build
+packages/*/dist
+action/dist
+*.tsbuildinfo
+
+# changesets
+.changeset/pre.json
+
+# husky
+.husky/_
+
 # yarn v3
 .pnp.*
 .yarn/*
@@ -141,3 +152,7 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# xbp secrets (local only — never commit)
+.env.*.local
+.env.local

@@ -1,0 +1,31 @@
+---
+title: Integrations
+description: Compose tailwind-canonicalize with Biome, ESLint, Oxlint, Prettier, and CI.
+---
+
+Canonicalize owns **semantic class rewrites**. Formatters and linters own everything else.
+
+```text
+1. tailwind-canonicalize --write/--check
+2. biome | eslint | oxlint | prettier
+3. typecheck / tests
+```
+
+| Tool | Guide |
+|------|-------|
+| Biome / Ultracite | [Biome](/docs/integrations/biome) |
+| ESLint | [ESLint](/docs/integrations/eslint) |
+| Oxlint | [Oxlint](/docs/integrations/oxlint) |
+| Prettier | [Prettier](/docs/integrations/prettier) |
+| CI & hooks | [CI](/docs/integrations/ci) |
+
+### lint-staged
+
+```json
+{
+  "*.{js,jsx,ts,tsx,vue,astro,html,mdx}": [
+    "tailwind-canonicalize --write",
+    "biome check --write --no-errors-on-unmatched"
+  ]
+}
+```

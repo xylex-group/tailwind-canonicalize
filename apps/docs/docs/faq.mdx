@@ -1,0 +1,28 @@
+---
+title: FAQ
+description: Common questions about tailwind-canonicalize.
+---
+
+### Is this a linter?
+
+No. It rewrites Tailwind utilities when equivalence is proven. Use Biome/ESLint/Oxlint for lint.
+
+### Will it break my design?
+
+Only rewrites that match your theme (or approved token map) apply. Ambiguous cases are left alone.
+
+### Does it sort classes?
+
+No. Use prettier-plugin-tailwindcss or eslint-plugin-tailwindcss for ordering.
+
+### Can it invent semantic tokens automatically?
+
+Analyze proposes; **apply** requires an approved manifest. Default mode never auto-applies semantics.
+
+### v3 and v4?
+
+v4 `@theme` first. v3 `tailwind.config.*` is loaded when no CSS theme is found. Migrations cover common v3→v4 renames.
+
+### Monorepo?
+
+Yes — pass package paths, use `--workers`, and per-package scripts. Theme discovery uses project CSS/config near cwd.

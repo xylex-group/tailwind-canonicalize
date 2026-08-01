@@ -1,0 +1,30 @@
+---
+title: CI & hooks
+description: GitHub Actions, pre-commit, monorepos.
+---
+
+## GitHub Actions
+
+```yaml
+- name: Tailwind canonicalize
+  run: pnpm exec tailwind-canonicalize . --check --json --safe
+
+- name: Biome
+  run: pnpm exec biome ci .
+```
+
+## Composite action
+
+```yaml
+- uses: tailwind-canonicalize/action@v1
+  with:
+    path: src
+```
+
+## Pre-commit
+
+```sh
+pnpm exec lint-staged
+```
+
+CI should still run full-tree `--check`. Prefer not caching `.tailwind-canonicalize-cache.json` across PRs.

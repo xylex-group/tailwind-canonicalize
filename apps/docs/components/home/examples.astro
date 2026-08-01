@@ -1,0 +1,93 @@
+---
+import CodeBlock from "blume/components/content/CodeBlock.astro";
+import { examples } from "../../lib/examples";
+import SectionIntro from "./section-intro.astro";
+
+const featured = examples.filter((e) =>
+  ["spacing", "gradient", "tokens", "safety", "clsx"].includes(e.id),
+);
+const defaultId = featured[0]?.id ?? "spacing";
+---
+
+<div class="grid gap-8">
+  <SectionIntro
+    description="Live patterns from real projects. Every rewrite is theme-proven or approved — never a guess."
+    maxWidth="max-w-2xl"
+    title="Examples you can ship"
+  />
+
+  <div class="flex flex-wrap items-center justify-center gap-2">
+    {
+      featured.map((ex) => (
+        <button
+          aria-selected={ex.id === defaultId}
+          class="hp-example flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors"
+          data-example={ex.id}
+          type="button"
+        >
+          <span>{ex.title}</span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="mx-auto w-full max-w-4xl">
+    {
+      featured.map((ex) => (
+        <div data-hp-ex={ex.id} hidden={ex.id !== defaultId}>
+          <p class="mb-4 text-center text-muted-foreground text-sm">
+            {ex.description}
+          </p>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="overflow-hidden rounded-xl border">
+              <div class="border-b bg-muted/50 px-3 py-2 font-mono text-muted-foreground text-xs">
+                before
+              </div>
+              <div class="hp-code p-0">
+                <CodeBlock code={ex.before} icons={false} lang={ex.lang} />
+              </div>
+            </div>
+            <div class="overflow-hidden rounded-xl border border-cyan-500/30">
+              <div class="border-b bg-cyan-500/10 px-3 py-2 font-mono text-cyan-700 text-xs dark:text-cyan-300">
+                after · {ex.category}
+              </div>
+              <div class="hp-code p-0">
+                <CodeBlock code={ex.after} icons={false} lang={ex.lang} />
+              </div>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+    <p class="mt-4 text-center text-muted-foreground text-xs">
+      More in the{" "}
+      <a class="underline hover:text-foreground" href="/docs/examples"
+        >examples guide</a
+      >.
+    </p>
+  </div>
+</div>
+
+<script>
+  const panels = document.querySelectorAll<HTMLElement>("[data-hp-ex]");
+  const buttons =
+    document.querySelectorAll<HTMLButtonElement>(".hp-example");
+
+  const show = (id: string) => {
+    for (const button of buttons) {
+      button.setAttribute(
+        "aria-selected",
+        String(button.dataset.example === id),
+      );
+    }
+    for (const panel of panels) {
+      panel.hidden = panel.dataset.hpEx !== id;
+    }
+  };
+
+  for (const button of buttons) {
+    button.addEventListener("click", () =>
+      show(button.dataset.example ?? ""),
+    );
+  }
+</script>

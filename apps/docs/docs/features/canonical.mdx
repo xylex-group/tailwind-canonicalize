@@ -1,0 +1,25 @@
+---
+title: Canonical classes
+description: Arbitrary values rewritten to theme scale keys when exact.
+---
+
+## What rewrites
+
+Spacing, sizing, radius, font size, keywords, fractions — with variants and `!` preserved.
+
+```tsx
+max-w-[160px]        → max-w-40
+hover:md:w-[40px]!   → hover:md:w-10!
+rounded-[8px]        → rounded-lg
+text-[16px]          → text-base
+```
+
+## How equivalence works
+
+1. Parse utility structure  
+2. Resolve active theme (`@theme` or defaults)  
+3. Normalize lengths (px ↔ rem at root 16)  
+4. Match scale keys  
+5. Require a single safe candidate  
+
+Optional: `--strict-compile` uses Tailwind’s `compile()` API when installed.

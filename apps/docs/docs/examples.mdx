@@ -1,0 +1,100 @@
+---
+title: Examples
+description: Before/after examples for canonical rewrites, migrations, tokens, and safety.
+---
+
+Every rewrite is either **theme-exact**, a **registered migration**, or an **approved token mapping**.
+
+## Arbitrary spacing
+
+```tsx
+// before
+<div className="w-[40px] min-w-[10rem] h-[10px] p-[16px] gap-[8px]" />
+
+// after
+<div className="w-10 min-w-40 h-2.5 p-4 gap-2" />
+```
+
+## Variants & important
+
+```tsx
+// before
+<div className="hover:md:w-[40px] dark:p-[16px] max-w-[160px]!" />
+
+// after
+<div className="hover:md:w-10 dark:p-4 max-w-40!" />
+```
+
+## Keywords & fractions
+
+```tsx
+// before
+<div className="w-[100%] h-[100vh] max-w-[50%]" />
+
+// after
+<div className="w-full h-screen max-w-1/2" />
+```
+
+## Tailwind v4 gradient migration
+
+```bash
+pnpm exec tailwind-canonicalize . --migrate --from-tailwind 3 --to-tailwind 4 --write
+```
+
+```tsx
+// before
+<div className="hover:bg-gradient-to-br" />
+
+// after
+<div className="hover:bg-linear-to-br" />
+```
+
+## clsx / cn / cva
+
+```tsx
+// before
+cn("w-[40px] p-[16px]", cond && "h-[10px]", { "gap-[8px]": ok })
+
+// after
+cn("w-10 p-4", cond && "h-2.5", { "gap-2": ok })
+```
+
+## Semantic tokens (approved only)
+
+```bash
+pnpm exec tailwind-canonicalize tokens analyze .
+# review proposed.json → save as tailwind-tokens.json
+pnpm exec tailwind-canonicalize tokens apply tailwind-tokens.json --write
+```
+
+```tsx
+// before
+<div className="bg-white text-slate-800 border-slate-200" />
+
+// after
+<div className="bg-background text-foreground border-border" />
+```
+
+## Safety — never rewritten
+
+```tsx
+// unchanged
+<div className="w-[13px] w-[calc(100%-1rem)] w-[var(--x)] [mask-image:url(/a)]" />
+```
+
+## Duplicate collapse
+
+```tsx
+// before
+<div className="max-w-40 max-w-[160px]" />
+
+// after
+<div className="max-w-40" />
+```
+
+## Conflict (no silent pick)
+
+```tsx
+// unchanged + diagnostic
+<div className="max-w-40 max-w-44" />
+```

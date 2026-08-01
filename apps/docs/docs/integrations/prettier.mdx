@@ -1,0 +1,11 @@
+---
+title: Prettier
+description: Order of operations with Prettier and prettier-plugin-tailwindcss.
+---
+
+```bash
+tailwind-canonicalize . --write --safe
+prettier --write .
+```
+
+`prettier-plugin-tailwindcss` **sorts** classes; canonicalize **semantically rewrites** them. Both are complementary.

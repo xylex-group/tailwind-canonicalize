@@ -1,0 +1,17 @@
+---
+title: Performance
+description: Incremental cache, workers, watch mode.
+---
+
+```bash
+# Incremental hashing
+pnpm exec tailwind-canonicalize . --incremental --write
+
+# Worker threads (auto when many files)
+pnpm exec tailwind-canonicalize . --workers --concurrency 16
+
+# Watch
+pnpm exec tailwind-canonicalize . --watch --write
+```
+
+Cache file: `.tailwind-canonicalize-cache.json` (options hash invalidates on config change).

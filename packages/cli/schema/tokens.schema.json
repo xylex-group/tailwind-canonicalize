@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tailwind-canonicalize.dev/schema/tokens.schema.json",
+  "title": "tailwind-canonicalize token manifest",
+  "type": "object",
+  "required": ["version", "mappings"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 1 },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "target"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Source utility base without variants, e.g. bg-amber-200"
+          },
+          "target": {
+            "type": "string",
+            "description": "Target utility base, e.g. bg-warning-subtle"
+          },
+          "token": {
+            "type": "string",
+            "description": "CSS variable, e.g. --color-warning-subtle"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["semantic-color-token", "semantic-spacing-token"]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "pairs": {
+      "type": "array",
+      "description": "Light/dark utility pairs that collapse to one semantic token",
+      "items": {
+        "type": "object",
+        "required": ["light", "dark", "target"],
+        "properties": {
+          "light": { "type": "string" },
+          "dark": { "type": "string" },
+          "target": { "type": "string" },
+          "token": { "type": "string" },
+          "proven": { "type": "boolean" }
+        }
+      }
+    },
+    "recipes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "utilities": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "sources": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      }
+    },
+    "generateTheme": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string" },
+        "preferAppAliases": { "type": "boolean" },
+        "dualTheme": { "type": "boolean" },
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "light": { "type": "string" },
+              "dark": { "type": "string" },
+              "default": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

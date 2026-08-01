@@ -1,0 +1,91 @@
+---
+title: API
+description: Public TypeScript API for tailwind-canonicalize.
+---
+
+```ts
+import {
+  canonicalizeClass,
+  canonicalizeClasses,
+  canonicalizeFile,
+  canonicalizeProject,
+  canonicalizeSource,
+  findCanonicalEquivalent,
+  defineConfig,
+  createDefaultTheme,
+  loadProjectTheme,
+  createTailwindCompileEqual,
+  watchProject,
+} from "tailwind-canonicalize";
+```
+
+## findCanonicalEquivalent
+
+```ts
+const match = findCanonicalEquivalent("w-[40px]");
+// { canonical: "w-10", reason: "theme-exact", ... } | null
+```
+
+## canonicalizeClass / canonicalizeClasses
+
+```ts
+canonicalizeClass("w-[40px]"); // "w-10"
+canonicalizeClasses(["w-[40px]", "flex"]); // ["w-10", "flex"]
+```
+
+## canonicalizeSource
+
+```ts
+const result = canonicalizeSource(source, {
+  filePath: "Card.tsx",
+  migrations: true,
+});
+// { code, changed, transformations, diagnostics }
+```
+
+## canonicalizeProject
+
+```ts
+const summary = await canonicalizeProject({
+  paths: ["src"],
+  write: true,
+  mode: "safe",
+  incremental: true,
+  workers: "auto",
+});
+```
+
+## Theme loading
+
+```ts
+const { theme, source } = await loadProjectTheme(process.cwd());
+// source: "css" | "v3-config" | "default"
+```
+
+## defineConfig
+
+```ts
+import { defineConfig } from "tailwind-canonicalize";
+
+export default defineConfig({
+  tailwind: { version: 4 },
+  canonicalize: { arbitraryValues: true },
+});
+```
+
+## Transformation records
+
+Every rewrite includes:
+
+```ts
+{
+  category: "canonical-class" | "tailwind-migration" | "semantic-color-token" | ...,
+  original: string,
+  replacement: string,
+  confidence: "exact" | "high" | "medium" | "low",
+  safety: "safe" | "review" | "aggressive",
+  token?: string,
+  file?: string,
+  line?: number,
+}
+```

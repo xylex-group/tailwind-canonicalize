@@ -1,0 +1,81 @@
+---
+import { prettierLogo, providerLogos } from "../../lib/logos";
+import Icon from "./icon.astro";
+import Installer from "./installer.astro";
+
+interface Props {
+  description: string;
+  version: string;
+}
+
+const { description, version } = Astro.props;
+
+const logos = [
+  { name: "Biome", src: providerLogos.biome },
+  { name: "ESLint", src: providerLogos.eslint },
+  { name: "Oxlint", src: providerLogos.oxlint },
+  { name: "Prettier", src: prettierLogo },
+];
+---
+
+<div class="grid gap-8 sm:gap-20">
+  <div class="grid justify-items-center gap-4 text-center">
+    <a
+      class="group flex w-fit items-center gap-2 text-muted-foreground text-sm transition-colors hover:text-foreground"
+      href="/docs"
+    >
+      <span
+        aria-hidden="true"
+        class="size-2 shrink-0 rounded-full bg-cyan-500"></span>
+      <span>Semantic Tailwind rewrites — v{version}</span>
+      <Icon
+        class="size-4 transition-transform group-hover:translate-x-0.5"
+        name="arrow-right"
+      />
+    </a>
+
+    <h1
+      class="mb-0 max-w-3xl text-balance font-medium text-4xl leading-none tracking-tight md:text-5xl lg:text-6xl"
+    >
+      The canonicalizer for{" "}
+      <span class="text-cyan-600 dark:text-cyan-400">Tailwind</span>
+      {" "}utilities
+    </h1>
+
+    <p
+      class="max-w-xl text-balance text-muted-foreground tracking-tight sm:text-lg"
+    >
+      {description}
+    </p>
+
+    <p class="text-muted-foreground text-sm">
+      Plays nice with{" "}
+      <span class="inline-flex translate-y-0.5 items-center -space-x-1">
+        {
+          logos.map((logo) => (
+            <span class="hp-tt inline-flex" tabindex="0">
+              <img
+                alt={logo.name}
+                class="size-6 overflow-hidden rounded-full object-cover ring-2 ring-background md:size-7"
+                height="28"
+                src={logo.src}
+                width="28"
+              />
+              <span data-tt>{logo.name}</span>
+            </span>
+          ))
+        }
+      </span>
+      {" "}— not a linter, not a formatter.
+    </p>
+
+    <div class="flex w-full max-w-md flex-col items-center gap-2 sm:flex-row">
+      <Installer
+        agent="pnpm add -D tailwind-canonicalize"
+        human="pnpm add -D tailwind-canonicalize"
+      />
+    </div>
+  </div>
+
+  <slot />
+</div>

@@ -1,0 +1,56 @@
+{
+  "name": "tailwind-canonicalize",
+  "version": "0.1.0",
+  "description": "Semantic canonicalizer for Tailwind CSS utility classes — rewrite only when provably identical",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "tailwind-canonicalize": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "tailwind",
+    "tailwindcss",
+    "canonicalize",
+    "formatter",
+    "css",
+    "utilities",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xylex-group/tailwind-canonicalize.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xylex-group/tailwind-canonicalize/issues"
+  },
+  "homepage": "https://github.com/xylex-group/tailwind-canonicalize#readme",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@tailwind-canonicalize/compiler": "workspace:*",
+    "@tailwind-canonicalize/resolver": "workspace:*",
+    "@tailwind-canonicalize/tokens": "workspace:*"
+  },
+  "files": ["dist", "schema"],
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,30 @@
+---
+title: Troubleshooting
+description: Fix common setup and rewrite issues.
+---
+
+### No rewrites happen
+
+- Confirm classes are in supported positions (`className`, `clsx`, `cn`, …)
+- Check theme load (`--verbose` or JSON `themeSource`)
+- Values like `w-[13px]` have no scale match — intentional
+
+### CI fails with exit 1
+
+```bash
+pnpm exec tailwind-canonicalize . --write --safe
+# or inspect
+pnpm exec tailwind-canonicalize . --check --verbose --diff
+```
+
+### Cache seems stale
+
+Delete `.tailwind-canonicalize-cache.json` or change options (options hash invalidates).
+
+### Conflicts with Biome/Prettier
+
+Run canonicalize **then** format. Don’t enable two tools that rewrite the same class strings.
+
+### Semantic tokens not applied
+
+Ensure `tokens apply` + manifest path, or config `tokens.enabled` + `manifest`. Safe mode never invents mappings.

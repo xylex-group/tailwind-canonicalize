@@ -1,0 +1,35 @@
+---
+title: Architecture
+description: Package layers and transformation pipeline.
+---
+
+```text
+Parser  →  Extract class candidates (oxc AST)
+        →  Resolver (theme + candidates + compare)
+        →  Migrations / tokens / recipes
+        →  MagicString rewrite
+        →  Print
+```
+
+## Packages
+
+| Package | Role |
+|---------|------|
+| `@tailwind-canonicalize/parser` | AST extraction |
+| `@tailwind-canonicalize/resolver` | Theme, migrations, pipeline |
+| `@tailwind-canonicalize/tokens` | Semantic analyze / apply |
+| `@tailwind-canonicalize/transformer` | MagicString |
+| `@tailwind-canonicalize/compiler` | Project scan, workers, watch |
+| `tailwind-canonicalize` | CLI |
+
+## Pipeline order
+
+1. Tailwind migrations  
+2. Arbitrary canonicalization  
+3. Recipe overrides  
+4. Semantic mappings (approved / aggressive)  
+5. Dark-pair collapse  
+6. Duplicate removal  
+7. Conflict diagnostics  
+
+See monorepo `docs/architecture/` for deeper design notes.

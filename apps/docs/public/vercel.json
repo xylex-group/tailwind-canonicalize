@@ -1,0 +1,22 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    { "source": "/setup", "destination": "/docs/installation", "permanent": true },
+    { "source": "/usage", "destination": "/docs/cli", "permanent": true },
+    { "source": "/configuration", "destination": "/docs/installation", "permanent": true },
+    { "source": "/introduction", "destination": "/docs", "permanent": true },
+    { "source": "/examples", "destination": "/docs/examples", "permanent": true },
+    { "source": "/support", "destination": "/docs/troubleshooting", "permanent": true },
+    { "source": "/faq", "destination": "/docs/faq", "permanent": true },
+    {
+      "source": "/integrations/:path*",
+      "destination": "/docs/integrations/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/provider/:path*",
+      "destination": "/docs/integrations/:path*",
+      "permanent": true
+    }
+  ]
+}

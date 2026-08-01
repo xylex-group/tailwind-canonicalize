@@ -1,0 +1,28 @@
+---
+title: Biome
+description: First-class Biome and Ultracite integration.
+---
+
+Biome formats and lints. Canonicalize rewrites Tailwind semantics. Run both.
+
+```json
+{
+  "scripts": {
+    "fix": "tailwind-canonicalize . --write --safe && biome check --write .",
+    "check": "tailwind-canonicalize . --check && biome ci ."
+  }
+}
+```
+
+With Ultracite:
+
+```json
+{
+  "scripts": {
+    "fix": "tailwind-canonicalize . --write --safe && ultracite fix",
+    "check": "tailwind-canonicalize . --check && ultracite check"
+  }
+}
+```
+
+Recommended order: **canonicalize first**, then Biome, so format runs on canonical classes.
