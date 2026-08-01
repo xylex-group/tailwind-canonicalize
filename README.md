@@ -150,7 +150,13 @@ Parser  →  Extract class candidates
         →  Print
 ```
 
-Monorepo packages:
+Published package:
+
+| Package | Role |
+|---------|------|
+| **`tailwind-canonicalize`** | CLI + library API (single npm package) |
+
+Internal monorepo packages (not published; bundled into the CLI package):
 
 | Package | Role |
 |---------|------|
@@ -159,7 +165,6 @@ Monorepo packages:
 | `@tailwind-canonicalize/tokens` | Semantic token analyze/apply/registry |
 | `@tailwind-canonicalize/transformer` | MagicString rewrites |
 | `@tailwind-canonicalize/compiler` | Public orchestration API + config |
-| `tailwind-canonicalize` | CLI |
 | `packages/vscode` | Editor diagnostics + Quick Fix |
 
 See [docs/architecture](./docs/architecture/overview.md), [transformations](./docs/architecture/transformations.md), [migrations](./docs/guides/migrations.md), [tokens](./docs/guides/tokens.md).

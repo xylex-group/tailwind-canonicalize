@@ -1,5 +1,6 @@
 {
   "name": "@tailwind-canonicalize/transformer",
+  "private": true,
   "version": "0.1.0",
   "description": "Source rewriting with MagicString for tailwind-canonicalize",
   "license": "MIT",
