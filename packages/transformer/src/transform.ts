@@ -90,9 +90,9 @@ export function transformSource(
         occurrence,
         transformations: pipeline.transformations,
       });
-      if (!options.dryRun) {
-        ms.overwrite(occurrence.start, occurrence.end, pipeline.result);
-      }
+      // Always compute the would-be source so --check --diff shows real hunks.
+      // Disk writes are gated by canonicalizeFile(write), not dryRun here.
+      ms.overwrite(occurrence.start, occurrence.end, pipeline.result);
     }
 
     const { line, column } = offsetToLineCol(source, occurrence.start);
@@ -110,7 +110,7 @@ export function transformSource(
   rewrites.sort((a, b) => a.start - b.start);
 
   const changed = rewrites.length > 0;
-  const code = options.dryRun || !changed ? source : ms.toString();
+  const code = changed ? ms.toString() : source;
 
   let map: TransformResult["map"] = null;
   if (options.sourceMap && changed && !options.dryRun) {

@@ -43,6 +43,20 @@ describe("formatDiagnosticSummary", () => {
     expect(out).toContain("border ↔ border-border");
     expect(out).not.toMatch(/No automatic resolution applied\./);
   });
+
+  it("collapses identical parse-error spam", () => {
+    const diags: ClassStringDiagnostic[] = Array.from({ length: 50 }, () => ({
+      kind: "info" as const,
+      message: "parse error: Cannot assign to this expression",
+      utilities: [] as string[],
+    }));
+    const out = formatDiagnosticSummary(diags, undefined, 12);
+    expect(out).toContain("50");
+    expect(out).toContain("parse");
+    expect(out).toContain("Cannot assign to this expression");
+    // Must not print 50 separate lines
+    expect(out.split("\n").length).toBeLessThan(15);
+  });
 });
 
 describe("formatTransformationBlock", () => {

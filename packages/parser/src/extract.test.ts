@@ -55,4 +55,76 @@ describe("extractClassOccurrences", () => {
     const raws = occurrences.map((o) => o.raw);
     expect(raws).toEqual(expect.arrayContaining(["w-[40px]", "h-[10px]", "h-[20px]", "m-[4px]"]));
   });
+
+  it("extracts MDX className without oxc parse-error flood", () => {
+    const src = `---
+title: Docs
+---
+
+# Hello
+
+Markdown is **not** TSX. {1 + 2}
+
+<Card className="w-[40px] p-4" title="x" />
+
+\`\`\`tsx
+export const A = () => <div className="min-h-[100px]" />
+\`\`\`
+`;
+    const { occurrences, errors, language } = extractClassOccurrences(src, {
+      filePath: "page.mdx",
+    });
+    expect(language).toBe("mdx");
+    expect(errors).toHaveLength(0);
+    const raws = occurrences.map((o) => o.raw);
+    expect(raws.some((r) => r.includes("w-[40px]"))).toBe(true);
+    expect(raws.some((r) => r.includes("min-h-[100px]"))).toBe(true);
+  });
+
+  it("does not treat pure markdown MDX as parse failure", () => {
+    const src = `---
+title: Athena
+---
+
+Athena is a gateway.
+
+## Section
+
+- item one
+- item two
+`;
+    const { errors, occurrences } = extractClassOccurrences(src, {
+      filePath: "index.mdx",
+    });
+    expect(errors).toHaveLength(0);
+    expect(occurrences).toHaveLength(0);
+  });
+
+  it("extracts Astro class attributes without script parse-error flood", () => {
+    const src = `---
+const title = "Hi";
+---
+
+<div class="w-[40px] object-cover object-center">
+  <span class="font-medium font-display">x</span>
+</div>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org"}
+</script>
+
+<script>
+  // incomplete fragment that would oxc-error if parsed as module body
+  return 1;
+</script>
+`;
+    const { occurrences, errors, language } = extractClassOccurrences(src, {
+      filePath: "Card.astro",
+    });
+    expect(language).toBe("astro");
+    expect(errors).toHaveLength(0);
+    const raws = occurrences.map((o) => o.raw);
+    expect(raws.some((r) => r.includes("w-[40px]"))).toBe(true);
+    expect(raws.some((r) => r.includes("object-cover"))).toBe(true);
+  });
 });

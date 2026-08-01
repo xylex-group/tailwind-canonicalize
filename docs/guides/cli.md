@@ -8,12 +8,20 @@ tailwind-canonicalize [paths...] [options]
 
 | Flag | Description |
 |------|-------------|
-| `--write` | Write rewrites to disk |
+| `--write` / `-w` | Write rewrites to disk |
 | `--check` | Fail if any rewrite would apply |
 | `--stdin` | Read source from stdin, write to stdout |
 | `--json` | Print summary JSON |
 | `--verbose` | Per-rewrite −/+ blocks and full diagnostic list |
 | `--diff` | Print line diffs |
+| `-o, --report <file>` | Also write the human report (plain text) to a file |
+| `--safe` / `--review` / `--aggressive` | Pipeline mode (default: safe) |
+| `--cwd <dir>` | Working directory |
+| `--concurrency <n>` | Parallelism |
+| `--root-font-size <n>` | px per rem |
+| `--ignore <name>` | Extra ignore (repeatable) |
+| `-h, --help` | Help |
+| `-v, --version` | Version |
 
 ## Output
 
@@ -23,12 +31,8 @@ Default human output (stderr) is colorized when the terminal supports it (`NO_CO
 - Grouped conflict diagnostics (full list with `--verbose`)
 - Tree-style rewrites with `--verbose` / a short sample under `--check` / `--review`
 - Summary counts and category breakdown
-| `--cwd <dir>` | Working directory |
-| `--concurrency <n>` | Parallelism |
-| `--root-font-size <n>` | px per rem |
-| `--ignore <name>` | Extra ignore (repeatable) |
-| `-h, --help` | Help |
-| `-v, --version` | Version |
+
+Use `-o report.txt` (or `--report report.txt`) to persist the same plain-text report for CI artifacts or PR threads. With `--json`, the file receives pretty-printed JSON instead.
 
 ## JSON shape
 

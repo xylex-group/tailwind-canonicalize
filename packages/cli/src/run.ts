@@ -27,7 +27,7 @@ import {
   printProjectReport,
 } from "./report.js";
 
-const VERSION = "0.1.3";
+const VERSION = "0.1.8";
 
 export async function run(argv: string[] = process.argv.slice(2)): Promise<number> {
   let args: CliArgs;
@@ -91,6 +91,7 @@ async function runTokensAnalyze(args: CliArgs): Promise<number> {
           cycles: result.cycles,
           proposedManifestPath: out,
           mappingCount: result.proposedManifest.mappings.length,
+          filesAnalyzed: files.length,
         },
         null,
         2,
@@ -103,14 +104,36 @@ async function runTokensAnalyze(args: CliArgs): Promise<number> {
     console.error(`✓ ${result.duplicates.length} duplicate-value token groups`);
     console.error(`✓ ${result.cycles.length} alias cycle(s)`);
     console.error(`Wrote proposal manifest: ${out}`);
-    console.error("Review and copy approved mappings before: tokens apply");
+    if (files.length === 0) {
+      console.error("");
+      console.error(
+        "! No source files matched — palette proposals need TS/TSX/JS/HTML/Vue/… under the given paths.",
+      );
+      console.error(
+        `  Paths: ${args.paths.join(", ") || "."}`,
+      );
+      console.error(
+        "  Tip: Next.js App Router projects usually use app/ (not src/). Try:",
+      );
+      console.error(
+        "    tailwind-canonicalize tokens analyze . --out tailwind-tokens.json",
+      );
+      console.error(
+        "    tailwind-canonicalize tokens analyze app components --out tailwind-tokens.json",
+      );
+      console.error(
+        "  Note: duplicate-value groups can still appear from CSS @theme / variables even with 0 source files.",
+      );
+    } else {
+      console.error("Review and copy approved mappings before: tokens apply");
+    }
   }
 
   if (result.cycles.length > 0) {
     console.error("error: alias cycles detected — fix before applying tokens");
     return 2;
   }
-  return 0;
+  return files.length === 0 ? 1 : 0;
 }
 
 async function runTokensApply(args: CliArgs): Promise<number> {
@@ -165,7 +188,7 @@ async function runTokensApply(args: CliArgs): Promise<number> {
     ignore: args.ignore.filter(Boolean),
   });
 
-  return printSummary(args, summary);
+  return await printSummary(args, summary);
 }
 
 async function runStdin(args: CliArgs): Promise<number> {
@@ -260,7 +283,7 @@ async function runPaths(args: CliArgs): Promise<number> {
     }),
   });
 
-  return printSummary(args, summary);
+  return await printSummary(args, summary);
 }
 
 async function runWatch(args: CliArgs): Promise<number> {
@@ -361,10 +384,10 @@ function resolveMigrations(
   };
 }
 
-function printSummary(
+async function printSummary(
   args: CliArgs,
   summary: Awaited<ReturnType<typeof canonicalizeProject>>,
-): number {
+): Promise<number> {
   if (args.json) {
     const payload = {
       files: summary.files,
@@ -385,6 +408,13 @@ function printSummary(
         : undefined,
     };
     console.log(JSON.stringify(payload, null, args.verbose ? 2 : 0));
+    if (args.reportPath) {
+      const outPath = path.isAbsolute(args.reportPath)
+        ? args.reportPath
+        : path.join(args.cwd, args.reportPath);
+      await writeFile(outPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+      console.error(`✓ Wrote report: ${outPath}`);
+    }
     if (summary.errors > 0) {
       return 2;
     }
@@ -419,7 +449,7 @@ function printSummary(
     })),
   };
 
-  printProjectReport(relativized, {
+  const reportOpts = {
     cwd: args.cwd,
     verbose: args.verbose,
     path: summary.themePath
@@ -432,7 +462,31 @@ function printSummary(
         : args.mode === "review" || args.check
           ? 8
           : 0,
-  });
+  };
+
+  printProjectReport(relativized, { ...reportOpts, version: VERSION });
+
+  if (args.reportPath) {
+    const outPath = path.isAbsolute(args.reportPath)
+      ? args.reportPath
+      : path.join(args.cwd, args.reportPath);
+    const chunks: string[] = [];
+    const sink = {
+      write(chunk: string) {
+        chunks.push(chunk);
+        return true;
+      },
+      isTTY: false,
+    } as unknown as NodeJS.WriteStream;
+    printProjectReport(relativized, {
+      ...reportOpts,
+      version: VERSION,
+      stream: sink,
+      color: false,
+    });
+    await writeFile(outPath, chunks.join(""), "utf8");
+    console.error(`✓ Wrote report: ${outPath}`);
+  }
 
   if (summary.errors > 0) {
     return 2;
@@ -465,5 +519,4 @@ function readStdin(): Promise<string> {
   });
 }
 
-// silence unused writeFile if not used
-void writeFile;
+

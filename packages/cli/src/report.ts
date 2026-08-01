@@ -56,8 +56,15 @@ export type ReportOptions = {
   listAllDiagnostics?: boolean;
   /** Max grouped diagnostic lines when summarizing. Default 12. */
   diagnosticGroups?: number;
+  /**
+   * In verbose mode, max sample lines per identical diagnostic message.
+   * Remaining duplicates are collapsed to a count. Default 8.
+   */
+  verboseSamplePerGroup?: number;
   /** Optional theme CSS / config path for the banner. */
   path?: string | null;
+  /** CLI package version printed in the footer (helps detect stale installs). */
+  version?: string;
   color?: boolean;
   stream?: NodeJS.WriteStream;
 };
@@ -116,17 +123,14 @@ export function printProjectReport(
   // ── Diagnostics ────────────────────────────────────────
   const diags = summary.diagnostics ?? [];
   if (diags.length > 0) {
+    write(c.dim("│"));
     if (options.verbose || options.listAllDiagnostics) {
-      write(c.dim("│"));
-      for (const d of diags) {
-        write(formatDiagnosticLine(d, c));
-      }
-      write(c.dim("│"));
+      // Even verbose: collapse identical parse-error spam (MDX-as-TSX floods).
+      write(formatDiagnosticVerbose(diags, c, options.verboseSamplePerGroup ?? 8));
     } else {
-      write(c.dim("│"));
       write(formatDiagnosticSummary(diags, c, options.diagnosticGroups ?? 12));
-      write(c.dim("│"));
     }
+    write(c.dim("│"));
   }
 
   // ── Summary ────────────────────────────────────────────
@@ -179,7 +183,8 @@ export function printProjectReport(
   }
 
   const elapsed = (summary.elapsedMs / 1000).toFixed(2);
-  write(`${c.dim("Completed in")} ${c.bold(`${elapsed}s`)}`);
+  const ver = options.version ? c.dim(` · v${options.version}`) : "";
+  write(`${c.dim("Completed in")} ${c.bold(`${elapsed}s`)}${ver}`);
 }
 
 export function formatTransformationBlock(
@@ -236,7 +241,7 @@ function formatDiagnosticLine(
 }
 
 /**
- * Collapse flood of identical conflict messages into counts + top pairs.
+ * Collapse flood of identical conflict / parse-error messages into counts.
  */
 export function formatDiagnosticSummary(
   diags: ClassStringDiagnostic[],
@@ -244,13 +249,24 @@ export function formatDiagnosticSummary(
   maxGroups = 12,
 ): string {
   const conflicts = diags.filter((d) => d.kind === "conflict");
-  const other = diags.filter((d) => d.kind !== "conflict");
+  const parseLike = diags.filter(
+    (d) => d.kind === "info" && d.message.startsWith("parse error:"),
+  );
+  const other = diags.filter(
+    (d) =>
+      d.kind !== "conflict" &&
+      !(d.kind === "info" && d.message.startsWith("parse error:")),
+  );
 
   const lines: string[] = [];
   lines.push(
     `  ${c.yellow("!")} ${c.bold(formatNum(diags.length))} ${c.dim("diagnostics")}${
       conflicts.length
         ? c.dim(` · ${formatNum(conflicts.length)} conflicts`)
+        : ""
+    }${
+      parseLike.length
+        ? c.dim(` · ${formatNum(parseLike.length)} parse errors`)
         : ""
     }`,
   );
@@ -298,6 +314,26 @@ export function formatDiagnosticSummary(
     );
   }
 
+  // Collapse parse-error spam by exact message
+  if (parseLike.length > 0) {
+    const byMsg = new Map<string, number>();
+    for (const d of parseLike) {
+      byMsg.set(d.message, (byMsg.get(d.message) ?? 0) + 1);
+    }
+    const msgSorted = [...byMsg.entries()].sort((a, b) => b[1] - a[1]);
+    for (const [msg, n] of msgSorted.slice(0, 5)) {
+      const short = msg.replace(/^parse error:\s*/i, "");
+      lines.push(
+        `  ${c.dim("·")} ${c.yellow("parse")} ${c.bold(String(n))} ${c.dim(short)}`,
+      );
+    }
+    if (msgSorted.length > 5) {
+      lines.push(
+        `  ${c.dim(`· … ${msgSorted.length - 5} more parse-error messages`)}`,
+      );
+    }
+  }
+
   if (other.length > 0) {
     const byKind = new Map<string, number>();
     for (const d of other) {
@@ -308,11 +344,57 @@ export function formatDiagnosticSummary(
     }
   }
 
-  lines.push(
-    `  ${c.dim("(no automatic resolution · use --verbose for full list)")}`,
-  );
+  if (conflicts.length > 0) {
+    lines.push(
+      `  ${c.dim("(conflicts: no automatic resolution · --verbose for samples)")}`,
+    );
+  }
+  if (parseLike.length > 0) {
+    lines.push(
+      `  ${c.dim("(parse errors: file left untouched · often MDX/markdown not TSX)")}`,
+    );
+  }
 
   return lines.join("\n");
+}
+
+/**
+ * Verbose diagnostics with per-message sampling (never print 800 identical lines).
+ */
+export function formatDiagnosticVerbose(
+  diags: ClassStringDiagnostic[],
+  c = makePaint(useColor()),
+  samplePerGroup = 8,
+): string {
+  const lines: string[] = [];
+  const byMessage = new Map<string, ClassStringDiagnostic[]>();
+  for (const d of diags) {
+    const list = byMessage.get(d.message) ?? [];
+    list.push(d);
+    byMessage.set(d.message, list);
+  }
+
+  const sorted = [...byMessage.entries()].sort(
+    (a, b) => b[1].length - a[1].length,
+  );
+
+  for (const [, group] of sorted) {
+    const sample = group.slice(0, samplePerGroup);
+    for (const d of sample) {
+      lines.push(formatDiagnosticLine(d, c));
+    }
+    if (group.length > samplePerGroup) {
+      lines.push(
+        `  ${c.dim(`… and ${formatNum(group.length - samplePerGroup)} more identical: ${truncateMsg(group[0]!.message, 72)}`)}`,
+      );
+    }
+  }
+
+  return lines.join("\n");
+}
+
+function truncateMsg(msg: string, max: number): string {
+  return msg.length <= max ? msg : `${msg.slice(0, max - 1)}…`;
 }
 
 function parseConflictMessage(

@@ -306,6 +306,16 @@ function applyTokenMapping(
 }
 
 function rebuildPreservingWhitespace(originalParts: string[], newTokens: string[]): string {
+  const oldTokens = originalParts.filter((p) => p !== "" && !/^\s+$/.test(p));
+  // Zero token mutations → keep source class string byte-for-byte (incl. trailing spaces).
+  // Avoids no-op whitespace-only rewrites when diagnostics fire but nothing changed.
+  if (
+    oldTokens.length === newTokens.length &&
+    oldTokens.every((t, i) => t === newTokens[i])
+  ) {
+    return originalParts.join("");
+  }
+
   const out: string[] = [];
   let ti = 0;
   for (const part of originalParts) {
@@ -314,9 +324,8 @@ function rebuildPreservingWhitespace(originalParts: string[], newTokens: string[
     }
     if (/^\s+$/.test(part)) {
       if (ti >= newTokens.length) {
-        if (out.length === 0) {
-          out.push(part);
-        } else if (ti === newTokens.length && part.includes("\n")) {
+        // After token removals, keep only significant trailing newlines (pretty multi-line)
+        if (out.length === 0 || part.includes("\n")) {
           out.push(part);
         }
         continue;

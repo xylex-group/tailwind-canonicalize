@@ -15,12 +15,13 @@ tailwind-canonicalize tokens apply <manifest.json> [paths...] [--write]
 
 | Flag | Description |
 |------|-------------|
-| `--write` | Write rewrites to disk |
+| `--write` / `-w` | Write rewrites to disk |
 | `--check` | Exit 1 if changes would be made |
 | `--stdin` | Read source from stdin → stdout |
 | `--json` | Machine-readable summary |
-| `--verbose` | Categorized rewrite details |
+| `--verbose` | Full −/+ rewrite blocks + diagnostics |
 | `--diff` | Line diffs |
+| `-o, --report <file>` | Write human report (plain text) to a file |
 | `--safe` | Exact/safe only (default mode) |
 | `--review` | Report only; never write |
 | `--aggressive` | Review-level migrations / high-confidence inference |

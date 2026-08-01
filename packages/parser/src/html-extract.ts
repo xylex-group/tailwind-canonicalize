@@ -6,6 +6,52 @@ import type { ClassOccurrence, ExtractError } from "./types.js";
  * Uses a small state-machine tokenizer over attributes rather than a full HTML
  * DOM, so broken markup still yields safe partial results.
  */
+/** True for ld+json / importmap / etc. — not class-string sources. */
+function isNonJsScript(attrs: string): boolean {
+  const type = /\btype\s*=\s*["']([^"']+)["']/i.exec(attrs)?.[1]?.toLowerCase();
+  if (!type) {
+    return false;
+  }
+  if (
+    type.includes("json") ||
+    type.includes("importmap") ||
+    type === "text/html" ||
+    type.includes("template")
+  ) {
+    return true;
+  }
+  // Explicit non-JS MIME
+  if (!type.includes("javascript") && !type.includes("ecmascript") && type !== "module" && !type.includes("typescript")) {
+    // type="ts" / "text/typescript" handled above via typescript
+    if (type === "ts" || type === "tsx" || type === "jsx") {
+      return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Heuristic: worth feeding to oxc as a module. Reject bare expression fragments
+ * that commonly trigger "return outside function" in Astro/Vue islands.
+ */
+function looksLikeScriptModule(src: string): boolean {
+  const t = src.trim();
+  if (!t) {
+    return false;
+  }
+  // JSON-like
+  if (t.startsWith("{") && t.endsWith("}") && !t.includes("import") && !t.includes("export") && !t.includes("const ") && !t.includes("let ") && !t.includes("function")) {
+    return false;
+  }
+  return (
+    /\b(import|export|const|let|var|function|class|async|await|interface|type)\b/.test(t) ||
+    t.includes("className") ||
+    /class\s*=/.test(t) ||
+    /\b(clsx|cn|cva|twMerge)\s*\(/.test(t)
+  );
+}
+
 export function extractFromHtml(
   source: string,
 ): { occurrences: ClassOccurrence[]; errors: ExtractError[] } {
@@ -41,6 +87,57 @@ export function extractFromHtml(
   }
 
   return { occurrences, errors };
+}
+
+/**
+ * MDX is not valid TSX — oxc floods "Cannot assign to this expression" on
+ * markdown. Extract className/class attributes (JSX-in-MDX) plus fenced
+ * ```tsx / ```jsx islands parsed as real JS when possible.
+ */
+export function extractFromMdx(
+  source: string,
+  extractJs: (
+    src: string,
+  ) => { occurrences: ClassOccurrence[]; errors: ExtractError[] },
+): { occurrences: ClassOccurrence[]; errors: ExtractError[] } {
+  const occurrences: ClassOccurrence[] = [];
+  const errors: ExtractError[] = [];
+
+  // 1) Attribute scan on full document (frontmatter + markdown + JSX tags)
+  const html = extractFromHtml(source);
+  occurrences.push(...html.occurrences);
+
+  // 2) Fenced code islands that are real TSX/JSX (docs often embed examples)
+  const fenceRe = /```(?:tsx|jsx|ts|js|javascript|typescript)\r?\n([\s\S]*?)```/gi;
+  let fence: RegExpExecArray | null = fenceRe.exec(source);
+  while (fence) {
+    const inner = fence[1] ?? "";
+    const innerStart = (fence.index ?? 0) + fence[0].indexOf(inner);
+    const js = extractJs(inner);
+    for (const o of js.occurrences) {
+      occurrences.push({
+        ...o,
+        start: o.start + innerStart,
+        end: o.end + innerStart,
+      });
+    }
+    // Do not propagate fence parse errors to the host MDX file — example
+    // snippets are often incomplete (missing imports) by design.
+    fence = fenceRe.exec(source);
+  }
+
+  // Deduplicate spans
+  const seen = new Set<string>();
+  const unique = occurrences.filter((o) => {
+    const key = `${o.start}:${o.end}:${o.raw}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+
+  return { occurrences: unique, errors };
 }
 
 /**
@@ -83,23 +180,30 @@ export function extractFromSfc(
     errors.push(...html.errors);
   } else {
     // Astro: frontmatter --- ... --- then markup
-    const fm = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+    // Accept optional trailing newline after closing ---
+    const fm = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
     let markup = source;
     let markupOffset = 0;
     if (fm) {
-      const js = extractJs(fm[1] ?? "", 4); // after ---\n roughly; recompute
-      const fmStart = source.indexOf(fm[1] ?? "");
-      for (const o of js.occurrences) {
-        occurrences.push({
-          ...o,
-          start: o.start + fmStart,
-          end: o.end + fmStart,
-        });
+      const fmBody = fm[1] ?? "";
+      const fmStart = source.indexOf(fmBody);
+      // Only AST-walk frontmatter that looks like a script module. Incomplete
+      // snippets / expression-only bodies produce "return outside function".
+      if (looksLikeScriptModule(fmBody)) {
+        const js = extractJs(fmBody, fmStart);
+        for (const o of js.occurrences) {
+          occurrences.push({
+            ...o,
+            start: o.start + fmStart,
+            end: o.end + fmStart,
+          });
+        }
+        // Soft: never block markup rewrites on frontmatter parse noise
       }
-      errors.push(...js.errors);
       markup = source.slice(fm[0].length);
       markupOffset = fm[0].length;
     }
+    // Attribute scan on markup (and full file as fallback for class outside fm)
     const html = extractFromHtml(markup);
     for (const o of html.occurrences) {
       occurrences.push({
@@ -108,14 +212,27 @@ export function extractFromSfc(
         end: o.end + markupOffset,
       });
     }
-    errors.push(...html.errors);
+    // Also scan full source for className/class in case fm regex missed
+    if (html.occurrences.length === 0) {
+      const fullHtml = extractFromHtml(source);
+      occurrences.push(...fullHtml.occurrences);
+    }
   }
 
-  // Script blocks
-  const scriptRe = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
+  // Script blocks — skip non-JS types; never fail the whole SFC on script errors
+  const scriptRe = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
   let sm: RegExpExecArray | null = scriptRe.exec(source);
   while (sm) {
-    const inner = sm[1] ?? "";
+    const attrs = sm[1] ?? "";
+    const inner = sm[2] ?? "";
+    if (isNonJsScript(attrs)) {
+      sm = scriptRe.exec(source);
+      continue;
+    }
+    if (!looksLikeScriptModule(inner) && !inner.includes("className") && !inner.includes("class=")) {
+      sm = scriptRe.exec(source);
+      continue;
+    }
     const innerStart = (sm.index ?? 0) + sm[0].indexOf(inner);
     const js = extractJs(inner, innerStart);
     for (const o of js.occurrences) {
@@ -125,7 +242,7 @@ export function extractFromSfc(
         end: o.end + innerStart,
       });
     }
-    errors.push(...js.errors);
+    // Soft errors: SFC markup rewrites must not be blocked by a bad <script>
     sm = scriptRe.exec(source);
   }
 
