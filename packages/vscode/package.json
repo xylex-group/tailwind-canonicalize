@@ -9,7 +9,11 @@
   "engines": {
     "vscode": "^1.90.0"
   },
-  "categories": ["Formatters", "Linters", "Other"],
+  "categories": [
+    "Formatters",
+    "Linters",
+    "Other"
+  ],
   "activationEvents": [
     "onLanguage:typescriptreact",
     "onLanguage:javascriptreact",
