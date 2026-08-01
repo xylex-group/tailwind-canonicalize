@@ -9,7 +9,8 @@
     "audit": "blume audit",
     "deploy": "pnpm run build && wrangler deploy --config ./wrangler.jsonc",
     "deploy:worker": "wrangler deploy --config ./wrangler.jsonc",
-    "cf-typegen": "wrangler types"
+    "deploy:dry-run": "wrangler deploy --config ./wrangler.jsonc --dry-run",
+    "cf-typegen": "wrangler types --config ./wrangler.jsonc"
   },
   "dependencies": {
     "blume": "^1.1.1"
