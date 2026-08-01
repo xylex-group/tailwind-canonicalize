@@ -79,6 +79,20 @@ describe("generated matrix (thousands)", () => {
     expect(ok).toBe(checked);
   });
 
+  it("continuous spacing keys beyond discrete table resolve", () => {
+    const continuous = [3.25, 25, 35, 50, 62.5, 65, 75, 120, 140, 160, 310];
+    for (const ns of ["w", "max-w", "min-w", "h", "max-h"]) {
+      for (const key of continuous) {
+        const css = resolveSpacingMultiplier(key, unit);
+        const token = `${ns}-[${css}]`;
+        expect(
+          findCanonicalEquivalent(token, { theme })?.canonical,
+          token,
+        ).toBe(`${ns}-${key}`);
+      }
+    }
+  });
+
   it("variant prefix preservation matrix", () => {
     let n = 0;
     for (const v of variants) {
@@ -164,10 +178,10 @@ describe("generated matrix (thousands)", () => {
     }
   });
 
-  it("safety: never rewrite calc/var/unknown (matrix)", () => {
+  it("safety: never rewrite calc/var/incompatible units (matrix)", () => {
     const leave = [
-      "w-[13px]",
-      "w-[39px]",
+      "w-[10vh]",
+      "w-[10vw]",
       "w-[calc(100%-1rem)]",
       "w-[var(--x)]",
       "w-[min(1px,2px)]",

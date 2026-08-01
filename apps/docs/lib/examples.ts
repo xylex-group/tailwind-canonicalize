@@ -106,12 +106,12 @@ export const examples: CodeExample[] = [
   {
     id: "safety",
     title: "Never rewritten (safety)",
-    description: "calc, var, unknown values, and arbitrary properties stay put.",
+    description: "calc, var, incompatible units, and arbitrary properties stay put.",
     category: "safety",
     lang: "tsx",
     before: `<div
   className="
-    w-[13px]
+    w-[10vh]
     w-[calc(100%-1rem)]
     w-[var(--sidebar)]
     [mask-image:url(/a.png)]
@@ -119,7 +119,7 @@ export const examples: CodeExample[] = [
 />`,
     after: `<div
   className="
-    w-[13px]
+    w-[10vh]
     w-[calc(100%-1rem)]
     w-[var(--sidebar)]
     [mask-image:url(/a.png)]

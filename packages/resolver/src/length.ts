@@ -173,9 +173,59 @@ export function resolveSpacingMultiplier(
   return `${trimNum(spacingUnit.value * multiplier)}${spacingUnit.unit === "number" ? "" : spacingUnit.unit}`;
 }
 
+/**
+ * Inverse of resolveSpacingMultiplier: if `raw` is an exact multiple of the
+ * spacing unit, return that multiplier; otherwise null.
+ *
+ * Mirrors Tailwind v4 IntelliSense continuous scale (any N where value =
+ * calc(var(--spacing) * N)), not only the classic discrete key table.
+ */
+export function invertSpacingMultiplier(
+  raw: string,
+  spacingUnit: ParsedLength,
+  rootFontSizePx = 16,
+): number | null {
+  const len = parseLength(raw);
+  if (!len) {
+    return null;
+  }
+  const valuePx = toPx(len, rootFontSizePx);
+  const unitPx = toPx(spacingUnit, rootFontSizePx);
+  if (valuePx === null || unitPx === null || unitPx === 0) {
+    return null;
+  }
+  // Zero length is always multiplier 0
+  if (valuePx === 0) {
+    return 0;
+  }
+  const mult = valuePx / unitPx;
+  if (!Number.isFinite(mult) || mult < 0) {
+    return null;
+  }
+  // Snap to 6 decimal places then verify exact reconstruction
+  const snapped = round(mult, 6);
+  const reconstructed = unitPx * snapped;
+  const absTol = 1e-6;
+  const relTol = 1e-9 * Math.max(Math.abs(valuePx), Math.abs(reconstructed), 1);
+  if (Math.abs(reconstructed - valuePx) > absTol + relTol) {
+    return null;
+  }
+  return snapped;
+}
+
+/** Format a spacing scale key without trailing zeros (`3.25`, `62.5`, `40`). */
+export function formatScaleKey(multiplier: number): string {
+  return trimNum(multiplier);
+}
+
 function trimNum(n: number): string {
   if (Number.isInteger(n)) {
     return String(n);
   }
-  return String(round(n, 6));
+  // Avoid scientific notation; strip trailing zeros from fixed decimals
+  const s = String(round(n, 6));
+  if (!s.includes(".")) {
+    return s;
+  }
+  return s.replace(/\.?0+$/, "");
 }

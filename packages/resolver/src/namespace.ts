@@ -240,4 +240,22 @@ export const KEYWORD_MAP: Record<string, Record<string, string>> = {
     auto: "auto",
     "100%": "full",
   },
+  // Transition timing — match after normalizeEaseValue (no spaces)
+  ease: {
+    linear: "linear",
+    "cubic-bezier(0.4,0,0.2,1)": "in-out",
+    "cubic-bezier(0.4,0,1,1)": "in",
+    "cubic-bezier(0,0,0.2,1)": "out",
+  },
+  z: {
+    auto: "auto",
+  },
 };
+
+/**
+ * Normalize timing-function strings for keyword lookup
+ * (lowercase, strip whitespace inside cubic-bezier).
+ */
+export function normalizeEaseValue(raw: string): string {
+  return raw.trim().toLowerCase().replace(/\s+/g, "");
+}

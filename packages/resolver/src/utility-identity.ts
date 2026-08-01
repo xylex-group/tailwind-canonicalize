@@ -96,6 +96,34 @@ export function propertyGroupForNamespace(namespace: string): string {
   if (namespace.startsWith("bg-gradient") || namespace.startsWith("bg-linear")) {
     return "background-image-gradient";
   }
+  // Multi-segment color utilities parse as e.g. namespace `text-muted` + value
+  // `foreground` or `text-red` + `500`. Collapse to the same cascade slot as
+  // bare `text-*` / `bg-*` so cssConflict matches IntelliSense.
+  if (namespace === "text" || namespace.startsWith("text-")) {
+    return "color-or-font-size";
+  }
+  if (namespace === "bg" || namespace.startsWith("bg-")) {
+    return "background-color";
+  }
+  if (namespace === "from" || namespace.startsWith("from-")) {
+    return "gradient-from";
+  }
+  if (namespace === "via" || namespace.startsWith("via-")) {
+    return "gradient-via";
+  }
+  if (namespace === "to" || namespace.startsWith("to-")) {
+    return "gradient-to";
+  }
+  if (namespace === "fill" || namespace.startsWith("fill-")) {
+    return "fill";
+  }
+  if (namespace === "stroke" || namespace.startsWith("stroke-")) {
+    return "stroke";
+  }
+  if (namespace === "ring" || namespace.startsWith("ring-")) {
+    // ring-2 is width; ring-red-500 is color — keep coarse group for conflicts
+    return namespace.startsWith("ring-offset") ? namespace : "ring-color";
+  }
   return namespace || "unknown";
 }
 
