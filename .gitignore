@@ -156,3 +156,12 @@ vite.config.ts.timestamp-*
 # xbp secrets (local only — never commit)
 .env.*.local
 .env.local
+
+# xbp deploy runtime
+.xbp/deployments/
+.xbp/deploy-lock.json
+.xbp/jobs/
+
+# Cloudflare Wrangler local state
+**/.wrangler/
+**/worker-configuration.d.ts

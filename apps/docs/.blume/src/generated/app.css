@@ -3,7 +3,7 @@
 @plugin "@tailwindcss/typography";
 
 /* Scan Blume's components and the user's project for utility classes. */
-@source "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/node_modules/.pnpm/blume@1.2.1_@astrojs+markdown-remark@7.2.2_@emnapi+core@1.11.1_@emnapi+runtime@1.11.1_@shikij_gsk2cgaxbmhftj3idg3rzgv4oq/node_modules/blume/src/**/*.{astro,ts,tsx}";
+@source "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/node_modules/.pnpm/blume@1.2.1_@astrojs+markdown-remark@7.2.2_@emnapi+core@1.11.1_@emnapi+runtime@1.11.1_@shikij_rksmgnpoy5fzg4cmj45eaublsy/node_modules/blume/src/**/*.{astro,ts,tsx}";
 @source "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/**/*.{astro,mdx,ts,tsx}";
 
 /* Dark mode is driven by data-theme on the <html> element. */

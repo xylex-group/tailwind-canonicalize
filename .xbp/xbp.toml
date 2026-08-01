@@ -146,6 +146,8 @@ build = "pnpm run build"
 start = "npm run start"
 dev = "pnpm run dev"
 audit = "npm run audit"
+deploy = "pnpm run deploy"
+"deploy:worker" = "pnpm run deploy:worker"
 lint = "npm run lint"
 test = "npm test"
 
@@ -159,19 +161,17 @@ platforms = ["linux/amd64"]
 [services.oci.build_args]
 
 [services.deploy]
-provider = "kubernetes"
+provider = "cloudflare-worker"
 
-[services.deploy.destinations]
+[services.deploy.destinations.cloudflare]
+provider = "cloudflare-worker"
+script_name = "tailwind-canonicalize-docs"
+health_urls = ["https://tailwind-canonicalize.xbp.app/"]
 
 [services.deploy.envs.production]
 namespace = "tailwind-canonicalize"
 replicas = 1
-health = []
-
-[services.deploy.envs.production.kubernetes]
-workload = "docs"
-service = "docs"
-selector = "app=docs"
+health = ["https://tailwind-canonicalize.xbp.app/"]
 
 [[services]]
 name = "public"
@@ -574,6 +574,14 @@ use_wsl = false
 generate_npmrc = true
 access = "public"
 no_verify_retry_packages = []
+
+[[workers]]
+name = "tailwind-canonicalize-docs"
+root = "apps/docs"
+script_name = "tailwind-canonicalize-docs"
+service = "docs"
+
+[workers.deploy]
 
 [discord]
 enabled = true
