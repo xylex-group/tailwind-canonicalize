@@ -27,6 +27,8 @@ versioning_disabled = [
     "apps/docs/public",
     "tailwind-canonicalize-action",
     "action",
+    "tailwind-canonicalize-compiler",
+    "packages/compiler",
 ]
 release_disabled = []
 
@@ -281,8 +283,9 @@ restart_policy = "on_failure"
 restart_policy_max_failure_count = 10
 start_wrapper = "pm2"
 force_run_from_root = false
-version_targets = ["packages/compiler/package.json"]
 watch_paths = ["packages/compiler"]
+versioning = false
+release = false
 
 [services.commands]
 install = "pnpm install"
