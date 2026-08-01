@@ -189,6 +189,30 @@ export function invertSpacingMultiplier(
   if (!len) {
     return null;
   }
+  // Context-relative em cannot be equated to absolute/root-relative lengths
+  // (e.g. --spacing: 0.25em vs w-[140px] is not a fixed multiplier).
+  if ((len.unit === "em") !== (spacingUnit.unit === "em")) {
+    return null;
+  }
+  // Both em: compare in em space without rootFontSizePx conversion
+  if (len.unit === "em" && spacingUnit.unit === "em") {
+    if (spacingUnit.value === 0) {
+      return null;
+    }
+    const mult = len.value / spacingUnit.value;
+    if (!Number.isFinite(mult) || mult < 0) {
+      return null;
+    }
+    const snapped = round(mult, 6);
+    const reconstructed = spacingUnit.value * snapped;
+    const absTol = 1e-6;
+    const relTol =
+      1e-9 * Math.max(Math.abs(len.value), Math.abs(reconstructed), 1);
+    if (Math.abs(reconstructed - len.value) > absTol + relTol) {
+      return null;
+    }
+    return snapped;
+  }
   const valuePx = toPx(len, rootFontSizePx);
   const unitPx = toPx(spacingUnit, rootFontSizePx);
   if (valuePx === null || unitPx === null || unitPx === 0) {

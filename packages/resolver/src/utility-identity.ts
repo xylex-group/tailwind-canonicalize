@@ -63,7 +63,6 @@ const PROPERTY_GROUPS: Record<string, string> = {
   "border-l": "border-left",
   "border-x": "border-x",
   "border-y": "border-y",
-  ring: "ring-color",
   fill: "fill",
   stroke: "stroke",
   outline: "outline-color",
@@ -146,10 +145,78 @@ function textPropertyGroup(namespace: string, value: string): string {
   return "text-color";
 }
 
+
+const RING_WIDTH_KEYS = new Set(["0", "1", "2", "4", "8"]);
+
+function ringPropertyGroup(namespace: string, value: string): string {
+  if (namespace.startsWith("ring-offset")) {
+    if (namespace === "ring-offset") {
+      if (
+        value === "" ||
+        RING_WIDTH_KEYS.has(value) ||
+        /^\d+(\.\d+)?$/.test(value)
+      ) {
+        return "ring-offset-width";
+      }
+      if (value.startsWith("[") && value.endsWith("]")) {
+        const inner = value.slice(1, -1).trim().toLowerCase();
+        if (
+          /^[-+]?\d/.test(inner) ||
+          inner.endsWith("px") ||
+          inner.endsWith("rem") ||
+          inner.endsWith("em")
+        ) {
+          return "ring-offset-width";
+        }
+      }
+      return "ring-offset-color";
+    }
+    return "ring-offset-color";
+  }
+  if (namespace === "ring") {
+    if (value === "inset") {
+      return "ring-inset";
+    }
+    if (
+      value === "" ||
+      RING_WIDTH_KEYS.has(value) ||
+      /^\d+(\.\d+)?$/.test(value)
+    ) {
+      return "ring-width";
+    }
+    if (value.startsWith("[") && value.endsWith("]")) {
+      const inner = value.slice(1, -1).trim().toLowerCase();
+      if (
+        inner.startsWith("#") ||
+        inner.startsWith("rgb") ||
+        inner.startsWith("hsl") ||
+        inner.startsWith("oklch") ||
+        inner.startsWith("oklab") ||
+        inner.startsWith("color(")
+      ) {
+        return "ring-color";
+      }
+      if (
+        /^[-+]?\d/.test(inner) ||
+        inner.endsWith("px") ||
+        inner.endsWith("rem") ||
+        inner.endsWith("em")
+      ) {
+        return "ring-width";
+      }
+    }
+    return "ring-color";
+  }
+  // Multi-segment: ring-blue + 500, ring-red, etc.
+  return "ring-color";
+}
 export function propertyGroupForNamespace(namespace: string, value = ""): string {
   // text-* needs value-aware classification before the coarse map
   if (namespace === "text" || namespace.startsWith("text-")) {
     return textPropertyGroup(namespace, value);
+  }
+  if (namespace === "ring" || namespace.startsWith("ring-")) {
+    return ringPropertyGroup(namespace, value);
   }
   if (PROPERTY_GROUPS[namespace]) {
     return PROPERTY_GROUPS[namespace]!;
@@ -190,10 +257,6 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   }
   if (namespace === "stroke" || namespace.startsWith("stroke-")) {
     return "stroke";
-  }
-  if (namespace === "ring" || namespace.startsWith("ring-")) {
-    // ring-2 is width; ring-red-500 is color — keep coarse group for conflicts
-    return namespace.startsWith("ring-offset") ? namespace : "ring-color";
   }
   return namespace || "unknown";
 }

@@ -94,11 +94,18 @@ function findCanonicalUncached(
       : inner.toLowerCase();
   const keywordSuffix = KEYWORD_MAP[parts.namespace]?.[keywordLookup];
   if (keywordSuffix) {
-    return buildMatch(partsForFormat, keywordSuffix, "keyword", [keywordSuffix]);
+    // Named easing must match the active theme when --ease-* is overridden.
+    if (
+      parts.namespace !== "ease" ||
+      easeKeywordMatchesTheme(keywordSuffix, keywordLookup, theme)
+    ) {
+      return buildMatch(partsForFormat, keywordSuffix, "keyword", [keywordSuffix]);
+    }
   }
 
-  // z-[5] → z-5 (bare unitless integer; Tailwind v4 IntelliSense)
-  if (parts.namespace === "z") {
+  // z-[5] → z-5 (bare unitless integer; Tailwind v4 IntelliSense only —
+  // v3 scale has no bare integer keys like 5).
+  if (parts.namespace === "z" && theme.tailwindVersion === 4) {
     const zBare = matchBareZIndex(inner);
     if (zBare !== null) {
       return buildMatch(partsForFormat, zBare, "keyword", [zBare]);
@@ -277,6 +284,20 @@ function isUnsafeValue(inner: string): boolean {
     return true;
   }
   return false;
+}
+
+
+/** True when hard-coded ease keyword is safe for this theme (no conflicting --ease-* override). */
+function easeKeywordMatchesTheme(
+  suffix: string,
+  normalizedInner: string,
+  theme: Theme,
+): boolean {
+  const fromTheme = theme.cssVariables.get(`--ease-${suffix}`);
+  if (fromTheme === undefined) {
+    return true;
+  }
+  return normalizeEaseValue(fromTheme) === normalizedInner;
 }
 
 /** Bare unitless z-index integers (and reject non-integers / lengths). */
