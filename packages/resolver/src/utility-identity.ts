@@ -55,7 +55,7 @@ const PROPERTY_GROUPS: Record<string, string> = {
   blur: "blur",
   "backdrop-blur": "backdrop-blur",
   bg: "background-color",
-  text: "color-or-font-size",
+  // text handled in propertyGroupForNamespace (align vs size vs color)
   border: "border-color-or-width",
   "border-t": "border-top",
   "border-r": "border-right",
@@ -79,7 +79,78 @@ const PROPERTY_GROUPS: Record<string, string> = {
   "scroll-p": "scroll-padding",
 };
 
-export function propertyGroupForNamespace(namespace: string): string {
+const TEXT_ALIGN = new Set(["left", "center", "right", "justify", "start", "end"]);
+const TEXT_WRAP = new Set(["wrap", "nowrap", "balance", "pretty"]);
+const TEXT_OVERFLOW = new Set(["ellipsis", "clip"]);
+const FONT_SIZE_KEYS = new Set([
+  "xs",
+  "sm",
+  "base",
+  "lg",
+  "xl",
+  "2xl",
+  "3xl",
+  "4xl",
+  "5xl",
+  "6xl",
+  "7xl",
+  "8xl",
+  "9xl",
+]);
+
+/**
+ * Split text-* utilities into independent cascade slots.
+ */
+function textPropertyGroup(namespace: string, value: string): string {
+  if (namespace.startsWith("text-") && namespace !== "text") {
+    // text-red-500, text-muted-foreground → color family
+    return "text-color";
+  }
+  // bare text-* (namespace === "text")
+  if (TEXT_ALIGN.has(value)) {
+    return "text-align";
+  }
+  if (TEXT_WRAP.has(value)) {
+    return "text-wrap";
+  }
+  if (TEXT_OVERFLOW.has(value)) {
+    return "text-overflow";
+  }
+  if (FONT_SIZE_KEYS.has(value)) {
+    return "font-size";
+  }
+  if (value.startsWith("[") && value.endsWith("]")) {
+    const inner = value.slice(1, -1).trim().toLowerCase();
+    if (
+      inner.startsWith("#") ||
+      inner.startsWith("rgb") ||
+      inner.startsWith("hsl") ||
+      inner.startsWith("oklch") ||
+      inner.startsWith("oklab") ||
+      inner.startsWith("color(") ||
+      (inner.startsWith("var(") && inner.includes("color"))
+    ) {
+      return "text-color";
+    }
+    // lengths → font-size
+    if (
+      /^[-+]?\d/.test(inner) ||
+      inner.endsWith("px") ||
+      inner.endsWith("rem") ||
+      inner.endsWith("em")
+    ) {
+      return "font-size";
+    }
+  }
+  // text-black, text-foreground, text-transparent, etc.
+  return "text-color";
+}
+
+export function propertyGroupForNamespace(namespace: string, value = ""): string {
+  // text-* needs value-aware classification before the coarse map
+  if (namespace === "text" || namespace.startsWith("text-")) {
+    return textPropertyGroup(namespace, value);
+  }
   if (PROPERTY_GROUPS[namespace]) {
     return PROPERTY_GROUPS[namespace]!;
   }
@@ -95,12 +166,6 @@ export function propertyGroupForNamespace(namespace: string): string {
   // Gradients / multi-segment bases
   if (namespace.startsWith("bg-gradient") || namespace.startsWith("bg-linear")) {
     return "background-image-gradient";
-  }
-  // Multi-segment color utilities parse as e.g. namespace `text-muted` + value
-  // `foreground` or `text-red` + `500`. Collapse to the same cascade slot as
-  // bare `text-*` / `bg-*` so cssConflict matches IntelliSense.
-  if (namespace === "text" || namespace.startsWith("text-")) {
-    return "color-or-font-size";
   }
   if (namespace === "bg" || namespace.startsWith("bg-")) {
     return "background-color";
@@ -136,12 +201,15 @@ export function utilityIdentity(token: string): UtilityIdentity {
     ? parts.variants.slice(0, -1)
     : parts.variants;
   const variants = variantStr ? variantStr.split(":").filter(Boolean) : [];
-  const propertyGroup = propertyGroupForNamespace(parts.namespace || parts.base);
   const value = parts.isArbitrary
     ? parts.value
     : parts.value
       ? parts.value
       : parts.base;
+  const propertyGroup = propertyGroupForNamespace(
+    parts.namespace || parts.base,
+    parts.value || "",
+  );
 
   const normalized = [
     variants.join(":"),

@@ -193,5 +193,6 @@ export function createDefaultTheme(): Theme {
       ["--spacing", "0.25rem"],
     ]),
     source: "default",
+    tailwindVersion: 4,
   };
 }
