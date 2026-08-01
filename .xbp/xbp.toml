@@ -35,6 +35,8 @@ versioning_disabled = [
     "packages/resolver",
     "tailwind-canonicalize-tokens",
     "packages/tokens",
+    "tailwind-canonicalize-transformer",
+    "packages/transformer",
 ]
 release_disabled = []
 
@@ -477,8 +479,9 @@ restart_policy = "on_failure"
 restart_policy_max_failure_count = 10
 start_wrapper = "pm2"
 force_run_from_root = false
-version_targets = ["packages/transformer/package.json"]
 watch_paths = ["packages/transformer"]
+versioning = false
+release = false
 
 [services.commands]
 install = "pnpm install"
