@@ -118,7 +118,7 @@ function findCanonicalUncached(
 
   let unique = [...new Set(matchedSuffixes)];
 
-  // Continuous spacing: any exact multiple of --spacing (e.g. w-[140px] ? w-35)
+  // Continuous spacing: any exact multiple of --spacing (e.g. w-[140px] → w-35)
   // Prefer discrete/named theme hits above; only fall back when none matched.
   // v4-only: v3 themes populate spacingUnit but lack continuous bare keys.
   // Border widths use raw px numbers, not --spacing multipliers.

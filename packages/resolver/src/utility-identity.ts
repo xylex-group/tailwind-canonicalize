@@ -167,6 +167,12 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   if (namespace.startsWith("bg-gradient") || namespace.startsWith("bg-linear")) {
     return "background-image-gradient";
   }
+  // Multi-segment color utilities parse as e.g. namespace `text-muted` + value
+  // `foreground` or `text-red` + `500`. Collapse to the same cascade slot as
+  // bare `text-*` / `bg-*` so cssConflict matches IntelliSense.
+  if (namespace === "text" || namespace.startsWith("text-")) {
+    return "color-or-font-size";
+  }
   if (namespace === "bg" || namespace.startsWith("bg-")) {
     return "background-color";
   }
