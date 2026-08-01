@@ -15,7 +15,10 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "schema"
+  ],
   "engines": {
     "node": ">=20"
   },
@@ -46,7 +49,6 @@
     "@tailwind-canonicalize/resolver": "workspace:*",
     "@tailwind-canonicalize/tokens": "workspace:*"
   },
-  "files": ["dist", "schema"],
   "devDependencies": {
     "typescript": "^5.9.2"
   },
