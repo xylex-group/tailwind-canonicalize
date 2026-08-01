@@ -1,0 +1,89 @@
+scope_kind = "service"
+scope_label = "docs"
+scope_slug = "service-docs"
+version = "0.0.1"
+tag_name = "docs-0.0.1"
+xbp_version = "10.61.0"
+branch_name = "releases/docs-0.0.1"
+cloudflare_evidence = []
+status = "Completed"
+created_at = "2026-08-01T17:07:42.597436500Z"
+updated_at = "2026-08-01T17:07:58.494828Z"
+completed_at = "2026-08-01T17:07:58.494828Z"
+
+[baseline]
+source = "initial-release"
+
+[selection]
+changed_files = []
+publish_targets = []
+
+[[selection.version_targets]]
+path = "apps/docs/package.json"
+
+[steps.commit_release_docs]
+status = "Completed"
+started_at = "2026-08-01T17:07:53.183648700Z"
+completed_at = "2026-08-01T17:07:58.325967900Z"
+
+[steps.commit_release_docs.details]
+paths = [
+    "CHANGELOG.md",
+    "SECURITY.md",
+]
+
+[steps.github_release]
+status = "Completed"
+started_at = "2026-08-01T17:07:49.175965Z"
+completed_at = "2026-08-01T17:07:49.947730400Z"
+
+[steps.github_release.details]
+release_id = 363579024
+release_url = "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/docs-0.0.1"
+
+[steps.publish_linear]
+status = "Completed"
+started_at = "2026-08-01T17:07:49.960806800Z"
+completed_at = "2026-08-01T17:07:52.641072300Z"
+
+[[steps.publish_linear.details.initiatives]]
+id = "fd28f67f-8dc8-44b2-bf14-3821ce389145"
+name = "Changelog"
+url = "https://linear.app/suits-formations/initiative/fd28f67f-8dc8-44b2-bf14-3821ce389145"
+
+[steps.push_tag]
+status = "Completed"
+started_at = "2026-08-01T17:07:45.077249Z"
+completed_at = "2026-08-01T17:07:48.654551Z"
+
+[steps.push_tag.details]
+tag_name = "docs-0.0.1"
+branch_name = "releases/docs-0.0.1"
+
+[steps.sync_release_docs]
+status = "Completed"
+started_at = "2026-08-01T17:07:53.159580Z"
+completed_at = "2026-08-01T17:07:53.182698100Z"
+
+[steps.sync_release_docs.details]
+paths = [
+    "CHANGELOG.md",
+    "SECURITY.md",
+]
+
+[steps.sync_version]
+status = "Completed"
+started_at = "2026-08-01T17:07:42.802786Z"
+completed_at = "2026-08-01T17:07:42.888726700Z"
+
+[steps.sync_version.details]
+updated_paths = ["apps/docs/package.json"]
+
+[steps.upload_openapi_assets]
+status = "Completed"
+started_at = "2026-08-01T17:07:49.959083600Z"
+completed_at = "2026-08-01T17:07:49.959848800Z"
+
+[steps.upload_openapi_assets.details]
+uploaded_assets = []
+prepared_assets = []

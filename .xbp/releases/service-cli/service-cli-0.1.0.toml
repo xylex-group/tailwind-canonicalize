@@ -1,0 +1,99 @@
+scope_kind = "service"
+scope_label = "cli"
+scope_slug = "service-cli"
+version = "0.1.0"
+tag_name = "cli-0.1.0"
+xbp_version = "10.61.0"
+branch_name = "releases/cli-0.1.0"
+cloudflare_evidence = []
+status = "Completed"
+created_at = "2026-08-01T17:07:20.372422600Z"
+updated_at = "2026-08-01T17:07:40.633176900Z"
+completed_at = "2026-08-01T17:07:40.633176900Z"
+
+[baseline]
+source = "initial-release"
+
+[selection]
+changed_files = []
+
+[[selection.version_targets]]
+path = "packages/cli/README.md"
+
+[[selection.version_targets]]
+path = "packages/cli/package.json"
+
+[[selection.publish_targets]]
+kind = "npm"
+manifest_path = "packages/cli/package.json"
+package_name = "tailwind-canonicalize"
+
+[steps.commit_release_docs]
+status = "Completed"
+started_at = "2026-08-01T17:07:36.576569800Z"
+completed_at = "2026-08-01T17:07:40.632242Z"
+
+[steps.commit_release_docs.details]
+paths = [
+    "CHANGELOG.md",
+    "SECURITY.md",
+]
+
+[steps.github_release]
+status = "Completed"
+started_at = "2026-08-01T17:07:32.319221700Z"
+completed_at = "2026-08-01T17:07:33.193233700Z"
+
+[steps.github_release.details]
+release_id = 363578941
+release_url = "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/cli-0.1.0"
+
+[steps.publish_linear]
+status = "Completed"
+started_at = "2026-08-01T17:07:33.206184900Z"
+completed_at = "2026-08-01T17:07:36.010199300Z"
+
+[[steps.publish_linear.details.initiatives]]
+id = "fd28f67f-8dc8-44b2-bf14-3821ce389145"
+name = "Changelog"
+url = "https://linear.app/suits-formations/initiative/fd28f67f-8dc8-44b2-bf14-3821ce389145"
+
+[steps.push_tag]
+status = "Completed"
+started_at = "2026-08-01T17:07:27.855137800Z"
+completed_at = "2026-08-01T17:07:31.663476500Z"
+
+[steps.push_tag.details]
+tag_name = "cli-0.1.0"
+branch_name = "releases/cli-0.1.0"
+
+[steps.sync_release_docs]
+status = "Completed"
+started_at = "2026-08-01T17:07:36.535887600Z"
+completed_at = "2026-08-01T17:07:36.575116100Z"
+
+[steps.sync_release_docs.details]
+paths = [
+    "CHANGELOG.md",
+    "SECURITY.md",
+]
+
+[steps.sync_version]
+status = "Completed"
+started_at = "2026-08-01T17:07:20.568293900Z"
+completed_at = "2026-08-01T17:07:25.693627500Z"
+
+[steps.sync_version.details]
+updated_paths = [
+    "packages/cli/README.md",
+    "packages/cli/package.json",
+]
+
+[steps.upload_openapi_assets]
+status = "Completed"
+started_at = "2026-08-01T17:07:33.204948100Z"
+completed_at = "2026-08-01T17:07:33.205609Z"
+
+[steps.upload_openapi_assets.details]
+uploaded_assets = []
+prepared_assets = []

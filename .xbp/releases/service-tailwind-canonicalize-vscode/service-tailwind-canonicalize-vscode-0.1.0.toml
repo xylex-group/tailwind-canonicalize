@@ -1,0 +1,89 @@
+scope_kind = "service"
+scope_label = "tailwind-canonicalize-vscode"
+scope_slug = "service-tailwind-canonicalize-vscode"
+version = "0.1.0"
+tag_name = "tailwind-canonicalize-vscode-0.1.0"
+xbp_version = "10.61.0"
+branch_name = "releases/tailwind-canonicalize-vscode-0.1.0"
+cloudflare_evidence = []
+status = "Completed"
+created_at = "2026-08-01T17:08:23.001474200Z"
+updated_at = "2026-08-01T17:08:41.058255800Z"
+completed_at = "2026-08-01T17:08:41.058255800Z"
+
+[baseline]
+source = "initial-release"
+
+[selection]
+changed_files = []
+publish_targets = []
+
+[[selection.version_targets]]
+path = "packages/vscode/package.json"
+
+[steps.commit_release_docs]
+status = "Completed"
+started_at = "2026-08-01T17:08:37.232391500Z"
+completed_at = "2026-08-01T17:08:41.056847400Z"
+
+[steps.commit_release_docs.details]
+paths = [
+    "CHANGELOG.md",
+    "SECURITY.md",
+]
+
+[steps.github_release]
+status = "Completed"
+started_at = "2026-08-01T17:08:32.576928700Z"
+completed_at = "2026-08-01T17:08:33.401253900Z"
+
+[steps.github_release.details]
+release_id = 363579170
+release_url = "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/tailwind-canonicalize-vscode-0.1.0"
+
+[steps.publish_linear]
+status = "Completed"
+started_at = "2026-08-01T17:08:33.414036600Z"
+completed_at = "2026-08-01T17:08:36.653215200Z"
+
+[[steps.publish_linear.details.initiatives]]
+id = "fd28f67f-8dc8-44b2-bf14-3821ce389145"
+name = "Changelog"
+url = "https://linear.app/suits-formations/initiative/fd28f67f-8dc8-44b2-bf14-3821ce389145"
+
+[steps.push_tag]
+status = "Completed"
+started_at = "2026-08-01T17:08:25.777739Z"
+completed_at = "2026-08-01T17:08:31.887031Z"
+
+[steps.push_tag.details]
+tag_name = "tailwind-canonicalize-vscode-0.1.0"
+branch_name = "releases/tailwind-canonicalize-vscode-0.1.0"
+
+[steps.sync_release_docs]
+status = "Completed"
+started_at = "2026-08-01T17:08:37.208378Z"
+completed_at = "2026-08-01T17:08:37.231362500Z"
+
+[steps.sync_release_docs.details]
+paths = [
+    "CHANGELOG.md",
+    "SECURITY.md",
+]
+
+[steps.sync_version]
+status = "Completed"
+started_at = "2026-08-01T17:08:23.212482300Z"
+completed_at = "2026-08-01T17:08:23.301266200Z"
+
+[steps.sync_version.details]
+updated_paths = ["packages/vscode/package.json"]
+
+[steps.upload_openapi_assets]
+status = "Completed"
+started_at = "2026-08-01T17:08:33.412408200Z"
+completed_at = "2026-08-01T17:08:33.413190Z"
+
+[steps.upload_openapi_assets.details]
+uploaded_assets = []
+prepared_assets = []

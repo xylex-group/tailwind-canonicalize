@@ -1,0 +1,103 @@
+scope_kind = "service"
+scope_label = "tailwind-canonicalize"
+scope_slug = "service-tailwind-canonicalize"
+version = "0.1.0"
+tag_name = "tailwind-canonicalize-0.1.0"
+xbp_version = "10.61.0"
+branch_name = "releases/tailwind-canonicalize-0.1.0"
+cloudflare_evidence = []
+status = "Completed"
+created_at = "2026-08-01T17:08:00.562487200Z"
+updated_at = "2026-08-01T17:08:20.494866200Z"
+completed_at = "2026-08-01T17:08:20.494866200Z"
+
+[baseline]
+source = "initial-release"
+
+[selection]
+changed_files = []
+
+[[selection.version_targets]]
+path = "README.md"
+
+[[selection.version_targets]]
+path = "package.json"
+
+[[selection.version_targets]]
+path = ".xbp/xbp.toml"
+
+[[selection.publish_targets]]
+kind = "npm"
+manifest_path = "packages/cli/package.json"
+package_name = "tailwind-canonicalize"
+
+[steps.commit_release_docs]
+status = "Completed"
+started_at = "2026-08-01T17:08:16.299156100Z"
+completed_at = "2026-08-01T17:08:20.493885300Z"
+
+[steps.commit_release_docs.details]
+paths = [
+    "CHANGELOG.md",
+    "SECURITY.md",
+]
+
+[steps.github_release]
+status = "Completed"
+started_at = "2026-08-01T17:08:10.925521300Z"
+completed_at = "2026-08-01T17:08:11.779354800Z"
+
+[steps.github_release.details]
+release_id = 363579101
+release_url = "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/tailwind-canonicalize-0.1.0"
+
+[steps.publish_linear]
+status = "Completed"
+started_at = "2026-08-01T17:08:11.792306800Z"
+completed_at = "2026-08-01T17:08:15.137266200Z"
+
+[[steps.publish_linear.details.initiatives]]
+id = "fd28f67f-8dc8-44b2-bf14-3821ce389145"
+name = "Changelog"
+url = "https://linear.app/suits-formations/initiative/fd28f67f-8dc8-44b2-bf14-3821ce389145"
+
+[steps.push_tag]
+status = "Completed"
+started_at = "2026-08-01T17:08:07.161374700Z"
+completed_at = "2026-08-01T17:08:10.178543900Z"
+
+[steps.push_tag.details]
+tag_name = "tailwind-canonicalize-0.1.0"
+branch_name = "releases/tailwind-canonicalize-0.1.0"
+
+[steps.sync_release_docs]
+status = "Completed"
+started_at = "2026-08-01T17:08:16.273408Z"
+completed_at = "2026-08-01T17:08:16.298076500Z"
+
+[steps.sync_release_docs.details]
+paths = [
+    "CHANGELOG.md",
+    "SECURITY.md",
+]
+
+[steps.sync_version]
+status = "Completed"
+started_at = "2026-08-01T17:08:00.755370200Z"
+completed_at = "2026-08-01T17:08:04.539832800Z"
+
+[steps.sync_version.details]
+updated_paths = [
+    "README.md",
+    "package.json",
+    ".xbp/xbp.toml",
+]
+
+[steps.upload_openapi_assets]
+status = "Completed"
+started_at = "2026-08-01T17:08:11.790479500Z"
+completed_at = "2026-08-01T17:08:11.791444Z"
+
+[steps.upload_openapi_assets.details]
+uploaded_assets = []
+prepared_assets = []
