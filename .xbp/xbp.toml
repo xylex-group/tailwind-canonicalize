@@ -22,7 +22,10 @@ version_targets = [
 version_domains = []
 ignore_paths = []
 watch_ignore_paths = []
-versioning_disabled = []
+versioning_disabled = [
+    "public",
+    "apps/docs/public",
+]
 release_disabled = []
 
 [[services]]
@@ -43,12 +46,12 @@ build = "pnpm run build"
 benchmark = "pnpm run benchmark"
 changeset = "pnpm run changeset"
 check = "pnpm run check"
+"deploy:docs" = "pnpm run deploy:docs"
 "docs:build" = "pnpm run docs:build"
-"docs:dev" = "pnpm run docs:dev"
+"docs:cf-typegen" = "pnpm run docs:cf-typegen"
 "docs:deploy" = "pnpm run docs:deploy"
 "docs:deploy:worker" = "pnpm run docs:deploy:worker"
-"docs:cf-typegen" = "pnpm run docs:cf-typegen"
-"deploy:docs" = "pnpm run deploy:docs"
+"docs:dev" = "pnpm run docs:dev"
 fix = "pnpm run fix"
 format = "pnpm run format"
 knip = "pnpm run knip"
@@ -150,10 +153,10 @@ build = "pnpm run build"
 start = "npm run start"
 dev = "pnpm run dev"
 audit = "npm run audit"
-deploy = "pnpm run deploy"
-"deploy:worker" = "pnpm run deploy:worker"
-"deploy:dry-run" = "pnpm run deploy:dry-run"
 cf-typegen = "pnpm run cf-typegen"
+deploy = "pnpm run deploy"
+"deploy:dry-run" = "pnpm run deploy:dry-run"
+"deploy:worker" = "pnpm run deploy:worker"
 lint = "npm run lint"
 test = "npm test"
 
@@ -171,8 +174,6 @@ provider = "cloudflare-worker"
 
 [services.deploy.destinations.cloudflare]
 provider = "cloudflare-worker"
-script_name = "tailwind-canonicalize-docs"
-health_urls = ["https://tailwind-canonicalize.xbp.app/"]
 
 [services.deploy.envs.production]
 namespace = "tailwind-canonicalize"
@@ -190,6 +191,8 @@ restart_policy_max_failure_count = 10
 start_wrapper = "pm2"
 force_run_from_root = false
 watch_paths = ["apps/docs/public"]
+versioning = false
+release = false
 
 [services.commands]
 install = "pnpm install"
@@ -541,6 +544,14 @@ workload = "tailwind-canonicalize-vscode"
 service = "tailwind-canonicalize-vscode"
 selector = "app=tailwind-canonicalize-vscode"
 
+[[workers]]
+name = "tailwind-canonicalize-docs"
+root = "apps/docs"
+script_name = "tailwind-canonicalize-docs"
+service = "docs"
+
+[workers.deploy]
+
 [oci]
 default_registry = "registry.xbp.app"
 owner = "xylex-group"
@@ -580,14 +591,6 @@ use_wsl = false
 generate_npmrc = true
 access = "public"
 no_verify_retry_packages = []
-
-[[workers]]
-name = "tailwind-canonicalize-docs"
-root = "apps/docs"
-script_name = "tailwind-canonicalize-docs"
-service = "docs"
-
-[workers.deploy]
 
 [discord]
 enabled = true
