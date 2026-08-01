@@ -1,7 +1,6 @@
 # tailwind-canonicalize
 
 current version: `0.1.0`
-
 **Semantic canonicalizer** for Tailwind CSS utility classes.
 
 Not a linter. Not a general formatter. A zero-false-positive rewriter that turns arbitrary values into theme tokens **only when the resulting utility is provably equivalent**.
