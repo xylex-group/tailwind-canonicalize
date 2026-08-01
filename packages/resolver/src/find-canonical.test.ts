@@ -62,9 +62,67 @@ describe("findCanonicalEquivalent", () => {
     expect(findCanonicalEquivalent("w-[var(--sidebar)]", { theme })).toBeNull();
   });
 
-  it("never rewrites unknown values", () => {
-    expect(findCanonicalEquivalent("w-[13px]", { theme })).toBeNull();
-    expect(findCanonicalEquivalent("w-[39px]", { theme })).toBeNull();
+  it("never rewrites incompatible units or unsafe values", () => {
+    // Integer px always divide --spacing (4px); refuse non-px-compatible units
+    expect(findCanonicalEquivalent("w-[10vh]", { theme })).toBeNull();
+    expect(findCanonicalEquivalent("w-[10vw]", { theme })).toBeNull();
+    expect(findCanonicalEquivalent("w-[10cqw]", { theme })).toBeNull();
+  });
+
+  it("continuous invert accepts any exact px multiple (39px → 9.75)", () => {
+    expect(findCanonicalEquivalent("w-[39px]", { theme })?.canonical).toBe(
+      "w-9.75",
+    );
+    expect(findCanonicalEquivalent("w-[1.5px]", { theme })?.canonical).toBe(
+      "w-0.375",
+    );
+  });
+
+  it("rewrites continuous spacing multipliers (v4 IntelliSense parity)", () => {
+    const cases: Array<[string, string]> = [
+      ["sm:max-w-[160px]", "sm:max-w-40"],
+      ["max-w-[560px]", "max-w-140"],
+      ["h-[13px]", "h-3.25"],
+      ["w-[13px]", "w-3.25"],
+      ["w-[140px]", "w-35"],
+      ["w-[100px]", "w-25"],
+      ["sm:w-[480px]", "sm:w-120"],
+      ["max-w-[240px]", "max-w-60"],
+      ["max-w-[100px]", "max-w-25"],
+      ["min-w-[640px]", "min-w-160"],
+      ["w-[200px]", "w-50"],
+      ["max-w-[300px]", "max-w-75"],
+      ["max-h-[260px]", "max-h-65"],
+      ["max-w-[1240px]", "max-w-310"],
+      ["md:min-w-[250px]", "md:min-w-62.5"],
+    ];
+    for (const [from, to] of cases) {
+      expect(findCanonicalEquivalent(from, { theme })?.canonical, from).toBe(to);
+    }
+  });
+
+  it("rewrites ease cubic-bezier to named timing", () => {
+    expect(
+      findCanonicalEquivalent("ease-[cubic-bezier(0.4,0,0.2,1)]", { theme })
+        ?.canonical,
+    ).toBe("ease-in-out");
+    expect(
+      findCanonicalEquivalent("ease-[cubic-bezier(0.4, 0, 0.2, 1)]", { theme })
+        ?.canonical,
+    ).toBe("ease-in-out");
+    expect(
+      findCanonicalEquivalent("hover:ease-[cubic-bezier(0.4,0,0.2,1)]", {
+        theme,
+      })?.canonical,
+    ).toBe("hover:ease-in-out");
+  });
+
+  it("rewrites bare z-index integers", () => {
+    expect(findCanonicalEquivalent("z-[5]", { theme })?.canonical).toBe("z-5");
+    expect(findCanonicalEquivalent("z-[auto]", { theme })?.canonical).toBe(
+      "z-auto",
+    );
+    expect(findCanonicalEquivalent("z-[5px]", { theme })).toBeNull();
   });
 
   it("matches colors only when exact", () => {

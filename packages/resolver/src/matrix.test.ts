@@ -80,6 +80,31 @@ describe("keyword matrix", () => {
   }
 });
 
+describe("continuous spacing matrix", () => {
+  const theme = createDefaultTheme();
+  const unit = theme.spacingUnit;
+  if (!unit) {
+    throw new Error("missing spacing unit");
+  }
+
+  // Keys beyond the classic discrete table — exact --spacing multiples only
+  const continuousKeys = [
+    3.25, 25, 35, 50, 62.5, 65, 75, 120, 140, 160, 310,
+  ];
+  const namespaces = ["w", "h", "min-w", "max-w", "max-h", "size"];
+
+  for (const ns of namespaces) {
+    for (const key of continuousKeys) {
+      const css = resolveSpacingMultiplier(key, unit);
+      const token = `${ns}-[${css}]`;
+      it(`${token} → ${ns}-${key}`, () => {
+        const match = findCanonicalEquivalent(token, { theme });
+        expect(match?.canonical).toBe(`${ns}-${key}`);
+      });
+    }
+  }
+});
+
 describe("variant matrix", () => {
   const theme = createDefaultTheme();
   const variants = [
@@ -111,8 +136,8 @@ describe("variant matrix", () => {
 describe("safety matrix", () => {
   const theme = createDefaultTheme();
   const leave = [
-    "w-[13px]",
-    "w-[39px]",
+    "w-[10vh]",
+    "w-[10vw]",
     "w-[calc(100%-1rem)]",
     "w-[var(--x)]",
     "w-[min(100%,40px)]",

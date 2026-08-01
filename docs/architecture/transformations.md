@@ -15,7 +15,7 @@ type TransformationCategory =
 ## Pipeline order
 
 1. **tailwind-migration** — versioned registry renames (`bg-gradient-to-br` → `bg-linear-to-br`)
-2. **canonical-class** — arbitrary values → theme tokens when exactly equivalent
+2. **canonical-class** — arbitrary values → theme tokens when exactly equivalent (spacing uses continuous `--spacing` multipliers, e.g. `w-[140px]` → `w-35`, not only the classic discrete key table)
 3. **semantic-color-token / semantic-spacing-token** — **approved manifest only**
 4. **duplicate-token-removal** — exact dups and equivalent competitors (`max-w-40 max-w-[160px]`)
 5. **conflict diagnostics** — competing different values (no silent pick)

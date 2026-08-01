@@ -48,4 +48,16 @@ describe("tailwind migrations", () => {
     expect(r.result).toContain("bg-linear-to-br");
     expect(r.result).toContain("max-w-[160px]");
   });
+
+  it("migrates break-words → wrap-break-word", () => {
+    expect(migrateUtility("break-words", { enabled: true }).token).toBe(
+      "wrap-break-word",
+    );
+    expect(
+      migrateUtility("sm:break-words!", { enabled: true }).token,
+    ).toBe("sm:wrap-break-word!");
+    const again = migrateUtility("wrap-break-word", { enabled: true });
+    expect(again.token).toBe("wrap-break-word");
+    expect(again.transformation).toBeNull();
+  });
 });

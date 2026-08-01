@@ -1,6 +1,15 @@
 import { createDefaultTheme } from "./default-theme.js";
-import { valuesEqual } from "./length.js";
-import { alternateScales, KEYWORD_MAP, scaleForNamespace } from "./namespace.js";
+import {
+  formatScaleKey,
+  invertSpacingMultiplier,
+  valuesEqual,
+} from "./length.js";
+import {
+  alternateScales,
+  KEYWORD_MAP,
+  normalizeEaseValue,
+  scaleForNamespace,
+} from "./namespace.js";
 import { arbitraryInner, formatUtility, parseUtility } from "./parse-utility.js";
 import type {
   CanonicalMatch,
@@ -78,17 +87,25 @@ function findCanonicalUncached(
     negative: forceNegative,
   };
 
-  // Keyword map (exact string match on inner)
-  const keywordSuffix = KEYWORD_MAP[parts.namespace]?.[inner.toLowerCase()];
+  // Keyword map (exact string match on inner; ease uses normalized bezier)
+  const keywordLookup =
+    parts.namespace === "ease"
+      ? normalizeEaseValue(inner)
+      : inner.toLowerCase();
+  const keywordSuffix = KEYWORD_MAP[parts.namespace]?.[keywordLookup];
   if (keywordSuffix) {
     return buildMatch(partsForFormat, keywordSuffix, "keyword", [keywordSuffix]);
   }
 
-  const scales = collectScales(parts.namespace, theme);
-  if (scales.length === 0) {
-    return null;
+  // z-[5] → z-5 (bare unitless integer; Tailwind v4 IntelliSense)
+  if (parts.namespace === "z") {
+    const zBare = matchBareZIndex(inner);
+    if (zBare !== null) {
+      return buildMatch(partsForFormat, zBare, "keyword", [zBare]);
+    }
   }
 
+  const scales = collectScales(parts.namespace, theme);
   const matchedSuffixes: string[] = [];
 
   for (const scale of scales) {
@@ -100,6 +117,24 @@ function findCanonicalUncached(
   }
 
   let unique = [...new Set(matchedSuffixes)];
+
+  // Continuous spacing: any exact multiple of --spacing (e.g. w-[140px] → w-35)
+  // Prefer discrete/named theme hits above; only fall back when none matched.
+  if (
+    unique.length === 0 &&
+    theme.spacingUnit &&
+    scaleForNamespace(parts.namespace, theme) === theme.spacing
+  ) {
+    const mult = invertSpacingMultiplier(
+      inner,
+      theme.spacingUnit,
+      rootFontSizePx,
+    );
+    if (mult !== null) {
+      const key = formatScaleKey(mult);
+      unique = [key];
+    }
+  }
 
   // Optional strict compile verification: drop candidates that don't compile equal
   if (options.compileEqual && unique.length > 0) {
@@ -231,6 +266,19 @@ function isUnsafeValue(inner: string): boolean {
     return true;
   }
   return false;
+}
+
+/** Bare unitless z-index integers (and reject non-integers / lengths). */
+function matchBareZIndex(inner: string): string | null {
+  const trimmed = inner.trim().toLowerCase();
+  if (trimmed === "auto") {
+    return "auto";
+  }
+  // Only pure integers — not 5px, not 1.5, not calc
+  if (!/^-?\d+$/.test(trimmed)) {
+    return null;
+  }
+  return String(Number(trimmed));
 }
 
 function buildMatch(

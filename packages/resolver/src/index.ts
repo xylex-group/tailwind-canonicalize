@@ -26,6 +26,8 @@ export {
   findCanonicalEquivalent,
 } from "./find-canonical.js";
 export {
+  formatScaleKey,
+  invertSpacingMultiplier,
   normalizeCssValue,
   parseLength,
   resolveSpacingMultiplier,
@@ -48,7 +50,12 @@ export {
   type MigrationSafety,
   type TailwindMigration,
 } from "./migrations/registry.js";
-export { alternateScales, KEYWORD_MAP, scaleForNamespace } from "./namespace.js";
+export {
+  alternateScales,
+  KEYWORD_MAP,
+  normalizeEaseValue,
+  scaleForNamespace,
+} from "./namespace.js";
 export {
   DEFAULT_COLOR_PALETTE,
   defaultColorScale,

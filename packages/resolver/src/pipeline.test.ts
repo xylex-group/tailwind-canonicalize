@@ -87,6 +87,23 @@ describe("pipeline categories", () => {
     expect(r.diagnostics.some((d) => d.kind === "conflict")).toBe(true);
   });
 
+  it("reports conflict for text-foreground vs text-muted-foreground without rewriting", () => {
+    const r = transformClassString("text-foreground text-muted-foreground", {
+      theme,
+    });
+    expect(r.result).toContain("text-foreground");
+    expect(r.result).toContain("text-muted-foreground");
+    expect(r.diagnostics.some((d) => d.kind === "conflict")).toBe(true);
+    expect(
+      r.diagnostics.some(
+        (d) =>
+          d.kind === "conflict" &&
+          d.utilities?.includes("text-foreground") &&
+          d.utilities?.includes("text-muted-foreground"),
+      ),
+    ).toBe(true);
+  });
+
   it("does not collapse different variants", () => {
     const r = transformClassString("bg-white hover:bg-white", {
       theme,

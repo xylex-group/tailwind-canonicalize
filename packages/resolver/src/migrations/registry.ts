@@ -114,6 +114,15 @@ export const TAILWIND_MIGRATIONS: readonly TailwindMigration[] = [
     canonicalClass: "box-decoration-clone",
     safety: "safe",
   },
+  {
+    id: "break-words-to-wrap-break-word",
+    fromVersion: "<4",
+    toVersion: ">=4",
+    deprecatedClass: "break-words",
+    canonicalClass: "wrap-break-word",
+    safety: "safe",
+    notes: "Tailwind v4 renames break-words to wrap-break-word",
+  },
 ] as const;
 
 /** Exact base → migration (safe entries preferred when duplicates). */

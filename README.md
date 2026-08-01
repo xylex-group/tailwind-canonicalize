@@ -107,7 +107,7 @@ Completed in 1.82s
 
 - Arbitrary properties: `[mask-image:…]`
 - `calc()`, `var()`, `min()`, `max()`, `clamp()`
-- Unknown / non-theme values (`w-[13px]`)
+- Incompatible units (`w-[10vh]`) and `calc()` / `var()` / min/max/clamp
 - Ambiguous multi-matches (safety)
 - Non-exact color matches
 
@@ -128,7 +128,8 @@ import {
 } from "tailwind-canonicalize";
 
 canonicalizeClass("w-[40px]"); // "w-10"
-findCanonicalEquivalent("w-[13px]"); // null
+canonicalizeClass("w-[140px]"); // "w-35" (continuous --spacing multiplier)
+findCanonicalEquivalent("w-[10vh]"); // null
 
 const summary = await canonicalizeProject({
   paths: ["src"],
