@@ -1,8 +1,13 @@
 # tailwind-canonicalize
 
-current version: `0.1.0`
+[![npm](https://img.shields.io/npm/v/tailwind-canonicalize.svg)](https://www.npmjs.com/package/tailwind-canonicalize)
+[![license](https://img.shields.io/npm/l/tailwind-canonicalize.svg)](./LICENSE)
+[![node](https://img.shields.io/node/v/tailwind-canonicalize.svg)](https://www.npmjs.com/package/tailwind-canonicalize)
 
 **Semantic canonicalizer** for Tailwind CSS utility classes.
+
+> **Docs:** [https://tailwind-canonicalize.xbp.app](https://tailwind-canonicalize.xbp.app)  
+> **npm:** [tailwind-canonicalize](https://www.npmjs.com/package/tailwind-canonicalize) · **current:** `0.1.2`
 
 Not a linter. Not a general formatter. A zero-false-positive rewriter that turns arbitrary values into theme tokens **only when the resulting utility is provably equivalent**.
 
@@ -13,6 +18,17 @@ Not a linter. Not a general formatter. A zero-false-positive rewriter that turns
 // after
 <div className="w-10 min-w-40 h-2.5 p-4 gap-2" />
 ```
+
+---
+
+## Links
+
+| | |
+|--|--|
+| **Homepage / docs** | [https://tailwind-canonicalize.xbp.app](https://tailwind-canonicalize.xbp.app) |
+| **npm package** | [npmjs.com/package/tailwind-canonicalize](https://www.npmjs.com/package/tailwind-canonicalize) |
+| **Repository** | [github.com/xylex-group/tailwind-canonicalize](https://github.com/xylex-group/tailwind-canonicalize) |
+| **Issues** | [GitHub Issues](https://github.com/xylex-group/tailwind-canonicalize/issues) |
 
 ---
 
@@ -30,13 +46,19 @@ Arbitrary values are useful while exploring UI. Over time they accumulate noise,
 pnpm add -D tailwind-canonicalize
 # or
 npm i -D tailwind-canonicalize
+# or
+yarn add -D tailwind-canonicalize
 ```
 
 Node **20+**. ESM only.
 
+```bash
+npx tailwind-canonicalize --help
+```
+
 ---
 
-## CLI
+## Quick start
 
 ```bash
 # scan (report)
@@ -47,26 +69,10 @@ tailwind-canonicalize . --write --safe
 
 # CI gate
 tailwind-canonicalize . --check
-
-# Tailwind v3 → v4 class migrations
-tailwind-canonicalize . --migrate --from-tailwind 3 --to-tailwind 4 --write
-tailwind-canonicalize . --migrations-only --write
-
-# Semantic tokens (two-phase)
-tailwind-canonicalize tokens analyze . --out tailwind-tokens.proposed.json
-tailwind-canonicalize tokens apply tailwind-tokens.json --write
-
-# machine-readable / review
-tailwind-canonicalize . --json --verbose
-tailwind-canonicalize . --review --diff
-
-# performance
-tailwind-canonicalize . --watch --write
-tailwind-canonicalize . --incremental --workers --concurrency 16
-
-# optional Tailwind compile verification (peer: tailwindcss)
-tailwind-canonicalize . --strict-compile --write
 ```
+
+More CLI examples, migrations, tokens, and performance flags:  
+[CLI guide](https://tailwind-canonicalize.xbp.app/docs/cli) · [Installation](https://tailwind-canonicalize.xbp.app/docs/installation)
 
 ### Exit codes
 
@@ -107,9 +113,11 @@ Completed in 1.82s
 
 - Arbitrary properties: `[mask-image:…]`
 - `calc()`, `var()`, `min()`, `max()`, `clamp()`
-- Incompatible units (`w-[10vh]`) and `calc()` / `var()` / min/max/clamp
+- Incompatible units (`w-[10vh]`)
 - Ambiguous multi-matches (safety)
 - Non-exact color matches
+
+Full transformation tables: [docs](https://tailwind-canonicalize.xbp.app/docs).
 
 ---
 
@@ -137,6 +145,8 @@ const summary = await canonicalizeProject({
 });
 ```
 
+API reference: [https://tailwind-canonicalize.xbp.app/docs/api](https://tailwind-canonicalize.xbp.app/docs/api)
+
 ---
 
 ## Architecture
@@ -150,11 +160,9 @@ Parser  →  Extract class candidates
         →  Print
 ```
 
-Published package:
-
 | Package | Role |
 |---------|------|
-| **`tailwind-canonicalize`** | CLI + library API (single npm package) |
+| **`tailwind-canonicalize`** | CLI + library API (**single published npm package**) |
 
 Internal monorepo packages (not published; bundled into the CLI package):
 
@@ -167,21 +175,19 @@ Internal monorepo packages (not published; bundled into the CLI package):
 | `@tailwind-canonicalize/compiler` | Public orchestration API + config |
 | `packages/vscode` | Editor diagnostics + Quick Fix |
 
-See [docs/architecture](./docs/architecture/overview.md), [transformations](./docs/architecture/transformations.md), [migrations](./docs/guides/migrations.md), [tokens](./docs/guides/tokens.md).
-
 ---
 
-## Integrations (first-class)
+## Integrations
 
-`tailwind-canonicalize` is **standalone** and designed to sit beside formatters and linters — it does not replace them.
+`tailwind-canonicalize` is **standalone** and sits beside formatters and linters — it does not replace them.
 
-| Tool | Role | Docs |
-|------|------|------|
-| **Biome / Ultracite** | Format + lint | [docs/guides/biome.md](./docs/guides/biome.md) |
-| **ESLint** | Lint rules / optional thin plugin | [docs/guides/eslint.md](./docs/guides/eslint.md) |
-| **Oxlint** | Fast lint | [docs/guides/oxlint.md](./docs/guides/oxlint.md) |
-| **Prettier** | Format only | [docs/guides/prettier.md](./docs/guides/prettier.md) |
-| **CI / hooks** | Gates & pre-commit | [docs/guides/ci.md](./docs/guides/ci.md) · [integrations](./docs/guides/integrations.md) |
+| Tool | Docs |
+|------|------|
+| **Biome / Ultracite** | [Integrations](https://tailwind-canonicalize.xbp.app/docs/integrations) |
+| **ESLint** | same |
+| **Oxlint** | same |
+| **Prettier** | same |
+| **CI / hooks** | [CI](https://tailwind-canonicalize.xbp.app/docs) |
 
 **Recommended order:**
 
@@ -199,14 +205,6 @@ biome check --write .                    # or ultracite fix / eslint --fix
     "biome check --write --no-errors-on-unmatched"
   ]
 }
-```
-
-### GitHub Action
-
-```yaml
-- uses: tailwind-canonicalize/action@v1
-  with:
-    path: .
 ```
 
 ### CI
@@ -238,22 +236,19 @@ A rewrite is applied only when **exactly one** theme candidate matches the arbit
 Multiple matches ⇒ leave untouched.  
 Zero matches ⇒ leave untouched.
 
+Details: [Safety](https://tailwind-canonicalize.xbp.app/docs/safety)
+
 ---
 
 ## Documentation
 
-Full index: **[docs/README.md](./docs/README.md)**
+**Site:** [https://tailwind-canonicalize.xbp.app](https://tailwind-canonicalize.xbp.app)
 
-- [Architecture](./docs/architecture/overview.md)
-- [Canonicalization algorithm](./docs/architecture/algorithm.md)
-- [Safety guarantees](./docs/architecture/safety.md)
-- [Transformations](./docs/architecture/transformations.md)
-- [CLI usage](./docs/guides/cli.md)
-- [**Integrations** (Biome, ESLint, Oxlint, Prettier)](./docs/guides/integrations.md)
-- [API reference](./docs/api/reference.md)
-- [Migrations](./docs/guides/migrations.md) · [Tokens](./docs/guides/tokens.md) · [Performance](./docs/guides/performance.md)
-- [Editors](./docs/guides/editors.md) · [CI](./docs/guides/ci.md)
-- [Contributing](./docs/guides/contributing.md) · [Roadmap](./docs/guides/roadmap.md)
+Also in-repo (source of truth for the docs app):
+
+- [docs site content](./apps/docs/docs/)
+- [architecture notes](./docs/architecture/overview.md)
+- [CLI](./docs/guides/cli.md) · [integrations](./docs/guides/integrations.md) · [API](./docs/api/reference.md)
 
 ---
 
@@ -265,13 +260,14 @@ pnpm build
 pnpm test
 pnpm benchmark
 
-# Docs site (Blume)
+# Docs site
 pnpm docs:dev
 pnpm docs:build
+pnpm docs:deploy
 ```
 
 ---
 
 ## License
 
-MIT © XYLEX Group
+MIT © [XYLEX Group](https://github.com/xylex-group)
