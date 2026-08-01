@@ -33,6 +33,8 @@ versioning_disabled = [
     "packages/parser",
     "tailwind-canonicalize-resolver",
     "packages/resolver",
+    "tailwind-canonicalize-tokens",
+    "packages/tokens",
 ]
 release_disabled = []
 
@@ -428,8 +430,9 @@ restart_policy = "on_failure"
 restart_policy_max_failure_count = 10
 start_wrapper = "pm2"
 force_run_from_root = false
-version_targets = ["packages/tokens/package.json"]
 watch_paths = ["packages/tokens"]
+versioning = false
+release = false
 
 [services.commands]
 install = "pnpm install"
