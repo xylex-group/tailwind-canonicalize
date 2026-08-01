@@ -38,6 +38,7 @@ async function main(): Promise<void> {
         diagnostics: result.diagnostics,
         original,
         code: result.code,
+        parseErrors: result.parseErrors,
       },
     });
   } catch (error) {

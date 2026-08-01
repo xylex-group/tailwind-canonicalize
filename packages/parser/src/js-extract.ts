@@ -119,18 +119,74 @@ function pushTemplate(
     if (!span) {
       continue;
     }
-    // TemplateElement spans include surrounding backticks/braces boundaries
-    // inconsistently across engines; prefer the inner content range.
-    // oxc: quasi.start/end cover the raw text between ${} / backticks.
+    // TemplateElement spans can include backticks / ${} delimiters depending on
+    // engine. Only rewrite when we can prove the span maps to `cooked` content.
+    const resolved = resolveTemplateQuasiSpan(ctx.source, span, cooked);
+    if (!resolved) {
+      continue;
+    }
     ctx.occurrences.push({
       raw: cooked,
-      start: span.start,
-      end: span.end,
+      start: resolved.start,
+      end: resolved.end,
       kind,
       isTemplate: true,
       hasInterpolation,
     });
   }
+}
+
+/**
+ * Map a TemplateElement span to the exact cooked content range in source.
+ * Returns null when the slice cannot be validated (unsafe to overwrite).
+ */
+function resolveTemplateQuasiSpan(
+  source: string,
+  span: Span,
+  cooked: string,
+): Span | null {
+  if (cooked.length === 0) {
+    // Empty quasi between ${} — nothing to rewrite; skip safely.
+    return null;
+  }
+
+  const direct = source.slice(span.start, span.end);
+  if (direct === cooked) {
+    return span;
+  }
+
+  // Span may include a leading/trailing backtick or ${ / } delimiters.
+  // Search for an exact cooked match inside the span (and ±2 for edge noise).
+  const lo = Math.max(0, span.start - 2);
+  const hi = Math.min(source.length, span.end + 2);
+  const window = source.slice(lo, hi);
+  const idx = window.indexOf(cooked);
+  if (idx === -1) {
+    return null;
+  }
+  // Prefer the match that sits closest to span.start
+  let best = idx;
+  let next = window.indexOf(cooked, idx + 1);
+  while (next !== -1) {
+    const curDist = Math.abs(lo + best - span.start);
+    const nextDist = Math.abs(lo + next - span.start);
+    if (nextDist < curDist) {
+      best = next;
+    }
+    next = window.indexOf(cooked, next + 1);
+  }
+  const start = lo + best;
+  const end = start + cooked.length;
+  if (source.slice(start, end) !== cooked) {
+    return null;
+  }
+  // Refuse if the match would overwrite template delimiters exclusively
+  // without equaling cooked (already checked). Also refuse when cooked itself
+  // contains backticks that would imply multi-literal confusion.
+  if (cooked.includes("`")) {
+    return null;
+  }
+  return { start, end };
 }
 
 function calleeName(node: unknown): string | null {

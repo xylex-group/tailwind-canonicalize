@@ -96,6 +96,7 @@ export async function canonicalizeFile(
       diagnostics: result.diagnostics,
       original,
       code: result.code,
+      parseErrors: result.parseErrors,
     };
   } catch (error) {
     return {
@@ -128,16 +129,19 @@ export async function canonicalizeProject(
   let themeSource: ProjectSummary["themeSource"] = options.theme
     ? "provided"
     : "default";
+  let themePath: string | null = null;
 
   if (options.autoTheme !== false && !options.theme) {
     if (options.loadV3Config !== false) {
       const loaded = await loadProjectTheme(cwd);
       theme = loaded.theme;
       themeSource = loaded.source;
+      themePath = loaded.path;
     } else {
       const loaded = await loadThemeFromProject(cwd);
       theme = loaded.theme;
       themeSource = loaded.cssPath ? "css" : "default";
+      themePath = loaded.cssPath;
     }
   }
 
@@ -321,13 +325,24 @@ export async function canonicalizeProject(
 
   const transformationsByCategory: Record<string, number> = {};
   let transformationCount = 0;
+  let unsafeCount = 0;
   for (const r of results) {
     for (const t of r.transformations) {
       transformationCount += 1;
       transformationsByCategory[t.category] =
         (transformationsByCategory[t.category] ?? 0) + 1;
+      if (t.safety && t.safety !== "safe") {
+        unsafeCount += 1;
+      }
     }
   }
+
+  const diagnostics = results.flatMap((r) => r.diagnostics);
+  const conflicts = diagnostics.filter((d) => d.kind === "conflict").length;
+  const parseErrors = results.reduce(
+    (n, r) => n + (r.parseErrors?.length ?? 0),
+    0,
+  );
 
   return {
     files: results.length,
@@ -335,13 +350,16 @@ export async function canonicalizeProject(
     filesSkipped: results.filter((r) => r.skipped).length,
     rewrites: results.reduce((n, r) => n + countTokenRewrites(r), 0),
     transformations: transformationCount,
-    unsafe: 0,
+    unsafe: unsafeCount,
     errors: results.filter((r) => r.error).length,
+    parseErrors,
+    conflicts,
     elapsedMs: Math.round(performance.now() - started),
     results,
-    diagnostics: results.flatMap((r) => r.diagnostics),
+    diagnostics,
     transformationsByCategory,
     themeSource,
+    themePath,
   };
 }
 

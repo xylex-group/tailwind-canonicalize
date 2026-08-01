@@ -222,7 +222,7 @@ Core options:
   --check              Exit 1 if changes would be made (CI)
   --stdin              Read source from stdin, write to stdout
   --json               Machine-readable summary
-  --verbose            Print categorized rewrite details
+  --verbose            Per-rewrite −/+ blocks + full diagnostic list
   --diff               Print line diffs for changes
   --safe               Only exact/safe transforms (default)
   --review             Propose/report only; never write

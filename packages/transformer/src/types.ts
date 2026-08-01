@@ -22,6 +22,8 @@ export interface TransformResult {
   transformations: TransformationRecord[];
   diagnostics: ClassStringDiagnostic[];
   map: { mappings: string; names: string[]; sources: string[]; file?: string } | null;
+  /** Parser errors; when non-empty, no rewrites were applied. */
+  parseErrors?: string[];
 }
 
 export interface TransformOptions extends PipelineOptions {

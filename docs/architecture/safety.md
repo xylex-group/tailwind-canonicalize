@@ -25,8 +25,19 @@ These are the design-token identities authors mean when they type pixel arbitrar
 
 ## What "unsafe" means
 
-An **unsafe rewrite** would change computed styles for some viewport, root font size, or cascade context. We count `unsafe: 0` in CLI output because the engine refuses ambiguous or non-exact matches rather than guessing.
+An **unsafe rewrite** would change computed styles for some viewport, root font size, or cascade context. The engine refuses ambiguous or non-exact matches rather than guessing, so applied rewrites in safe mode always have `safety: "safe"`.
+
+CLI summary fields:
+
+| Field | Meaning |
+|-------|---------|
+| `replacements` | Applied token rewrites |
+| `conflicts` | Competing utilities in the same cascade slot (reported, not auto-fixed) |
+| `parse errors` | Extract/parse failures — **file left untouched** |
+| `non-safe rewrites` | Applied rewrites with `safety` other than `safe` (aggressive/review modes only) |
+
+Conflicts are **not** unsafe rewrites: no class text was changed for those diagnostics.
 
 ## Malformed source
 
-Parse errors are recorded; the tool continues with other files. Exit code `2` is reserved for operational failures.
+Parse errors are recorded and the file is **not rewritten**. The tool continues with other files. Exit code `2` is reserved for operational failures.

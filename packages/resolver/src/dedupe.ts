@@ -19,6 +19,9 @@ export interface DedupeOptions extends FindCanonicalOptions {
  * Remove duplicate / equivalent competing utilities; report true conflicts.
  *
  * Variant-aware: `bg-white` and `hover:bg-white` never collapse.
+ *
+ * `detectConflicts` and `collapseEquivalent` are independent: conflicts are
+ * still reported when collapse is disabled.
  */
 export function dedupeClassTokens(
   tokens: string[],
@@ -35,7 +38,6 @@ export function dedupeClassTokens(
   const transformations: TransformationRecord[] = [];
   const diagnostics: ClassStringDiagnostic[] = [];
 
-  // Work on non-whitespace tokens only; caller preserves layout
   type Entry = { token: string; index: number; drop: boolean };
   const entries: Entry[] = tokens.map((token, index) => ({
     token,
@@ -48,8 +50,6 @@ export function dedupeClassTokens(
     const seen = new Map<string, number>();
     for (const entry of entries) {
       const id = utilityIdentity(entry.token);
-      const key = `${id.variants.join(":")}|${id.important}|${id.propertyGroup}|${id.value}|${entry.token}`;
-      // Prefer full token equality for exact dups
       const exactKey = `${id.variants.join(":")}|${id.important}|${entry.token}`;
       if (seen.has(exactKey)) {
         entry.drop = true;
@@ -67,8 +67,9 @@ export function dedupeClassTokens(
     }
   }
 
-  // Second pass: equivalent competitors (e.g. max-w-40 max-w-[160px])
-  if (collapseEquivalent) {
+  // Second pass: equivalent competitors and/or conflict diagnostics.
+  // Runs when either collapse or detection is enabled so the flags stay independent.
+  if (collapseEquivalent || detectConflicts) {
     for (let i = 0; i < entries.length; i++) {
       const a = entries[i]!;
       if (a.drop) {
@@ -83,64 +84,8 @@ export function dedupeClassTokens(
           continue;
         }
         if (a.token === b.token) {
-          b.drop = true;
-          transformations.push({
-            category: "duplicate-token-removal",
-            original: b.token,
-            replacement: "",
-            confidence: "exact",
-            safety: "safe",
-          });
-          continue;
-        }
-
-        // Canonicalize both; if they resolve to the same class, keep non-arbitrary / first
-        const ca = findCanonicalEquivalent(a.token, options)?.canonical ?? a.token;
-        const cb = findCanonicalEquivalent(b.token, options)?.canonical ?? b.token;
-
-        // Also consider if one is already the canonical form of the other
-        const aIsArb = a.token.includes("[");
-        const bIsArb = b.token.includes("[");
-
-        if (ca === cb || ca === b.token || cb === a.token) {
-          // Prefer non-arbitrary, else keep earlier (source order loser drops)
-          if (aIsArb && !bIsArb) {
-            a.drop = true;
-            a.token = b.token;
-            transformations.push({
-              category: "duplicate-token-removal",
-              original: `${entries[i]!.token} ${b.token}`,
-              replacement: b.token,
-              confidence: "exact",
-              safety: "safe",
-              notes: "Collapsed equivalent utilities; kept named form",
-            });
-            // restore: drop a, keep b
-            entries[i]!.drop = true;
-            entries[i]!.token = entries[i]!.token;
-          } else if (!aIsArb && bIsArb) {
+          if (collapseEquivalent) {
             b.drop = true;
-            transformations.push({
-              category: "duplicate-token-removal",
-              original: `${a.token} ${b.token}`,
-              replacement: a.token,
-              confidence: "exact",
-              safety: "safe",
-              notes: "Collapsed equivalent utilities; kept named form",
-            });
-          } else if (ca === cb) {
-            b.drop = true;
-            // Optionally rewrite a to canonical
-            if (a.token !== ca) {
-              transformations.push({
-                category: "canonical-class",
-                original: a.token,
-                replacement: ca,
-                confidence: "exact",
-                safety: "safe",
-              });
-              a.token = ca;
-            }
             transformations.push({
               category: "duplicate-token-removal",
               original: b.token,
@@ -152,8 +97,65 @@ export function dedupeClassTokens(
           continue;
         }
 
-        // True conflict — different values, same slot
-        if (detectConflicts) {
+        const ca =
+          findCanonicalEquivalent(a.token, options)?.canonical ?? a.token;
+        const cb =
+          findCanonicalEquivalent(b.token, options)?.canonical ?? b.token;
+
+        const aIsArb = a.token.includes("[");
+        const bIsArb = b.token.includes("[");
+        const equivalent = ca === cb || ca === b.token || cb === a.token;
+
+        if (collapseEquivalent && equivalent) {
+          // Capture originals BEFORE any mutation
+          const originalA = a.token;
+          const originalB = b.token;
+
+          if (aIsArb && !bIsArb) {
+            a.drop = true;
+            transformations.push({
+              category: "duplicate-token-removal",
+              original: `${originalA} ${originalB}`,
+              replacement: originalB,
+              confidence: "exact",
+              safety: "safe",
+              notes: "Collapsed equivalent utilities; kept named form",
+            });
+          } else if (!aIsArb && bIsArb) {
+            b.drop = true;
+            transformations.push({
+              category: "duplicate-token-removal",
+              original: `${originalA} ${originalB}`,
+              replacement: originalA,
+              confidence: "exact",
+              safety: "safe",
+              notes: "Collapsed equivalent utilities; kept named form",
+            });
+          } else if (ca === cb) {
+            b.drop = true;
+            if (a.token !== ca) {
+              transformations.push({
+                category: "canonical-class",
+                original: originalA,
+                replacement: ca,
+                confidence: "exact",
+                safety: "safe",
+              });
+              a.token = ca;
+            }
+            transformations.push({
+              category: "duplicate-token-removal",
+              original: originalB,
+              replacement: "",
+              confidence: "exact",
+              safety: "safe",
+            });
+          }
+          continue;
+        }
+
+        // True conflict — different values, same slot (independent of collapse)
+        if (detectConflicts && !equivalent) {
           diagnostics.push({
             kind: "conflict",
             message: `Conflicting ${utilityIdentity(a.token).propertyGroup} utilities: ${a.token} and ${b.token}. The latter currently wins through source order. No automatic resolution applied.`,

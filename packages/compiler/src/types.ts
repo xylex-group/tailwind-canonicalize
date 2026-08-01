@@ -24,6 +24,8 @@ export interface FileResult {
   original: string;
   code: string;
   error?: string;
+  /** Parser errors for this file (no rewrites applied when present). */
+  parseErrors?: string[];
   /** True when skipped by incremental cache (content unchanged). */
   skipped?: boolean;
 }
@@ -69,15 +71,27 @@ export interface ProjectSummary {
   files: number;
   filesChanged: number;
   filesSkipped: number;
+  /** Applied token-level rewrites (non-empty replacement). */
   rewrites: number;
   transformations: number;
+  /**
+   * Applied rewrites whose safety is not `safe` (review/aggressive).
+   * Always 0 in default safe mode — the engine refuses ambiguous matches.
+   */
   unsafe: number;
+  /** Operational file I/O / worker failures. */
   errors: number;
+  /** Files (or extracts) that hit parser errors and were left untouched. */
+  parseErrors: number;
+  /** Conflict diagnostics (competing utilities; no automatic rewrite). */
+  conflicts: number;
   elapsedMs: number;
   results: FileResult[];
   diagnostics: ClassStringDiagnostic[];
   transformationsByCategory: Record<string, number>;
   themeSource?: "css" | "v3-config" | "default" | "provided";
+  /** Absolute path to CSS @theme or v3 config when auto-loaded. */
+  themePath?: string | null;
 }
 
 export type {

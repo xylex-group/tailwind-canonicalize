@@ -8,6 +8,11 @@ import type { Rewrite, TransformOptions, TransformResult } from "./types.js";
 
 /**
  * Extract class strings, run multi-category pipeline, rewrite with MagicString.
+ *
+ * Safety:
+ * - Parse errors → no rewrites (report errors; leave source unchanged).
+ * - Interpolated template quasis → only complete static utility tokens.
+ * - Span content must match occurrence.raw before overwrite.
  */
 export function transformSource(
   source: string,
@@ -16,11 +21,29 @@ export function transformSource(
   const extractOptions: ExtractOptions = {
     filePath: options.filePath,
   };
-  const { occurrences } = extractClassOccurrences(source, extractOptions);
+  const { occurrences, errors } = extractClassOccurrences(source, extractOptions);
   const rewrites: Rewrite[] = [];
   const allTransformations: TransformResult["transformations"] = [];
   const allDiagnostics: TransformResult["diagnostics"] = [];
   const ms = new MagicString(source);
+
+  // Malformed / partially parsed source: never rewrite (safety contract).
+  if (errors.length > 0) {
+    return {
+      original: source,
+      code: source,
+      changed: false,
+      rewrites: [],
+      transformations: [],
+      diagnostics: errors.map((e) => ({
+        kind: "info" as const,
+        message: `parse error: ${e.message}`,
+        utilities: [],
+      })),
+      map: null,
+      parseErrors: errors.map((e) => e.message),
+    };
+  }
 
   const sorted = [...occurrences].sort((a, b) => b.start - a.start);
 
@@ -28,7 +51,22 @@ export function transformSource(
     if (!occurrence.raw || !occurrence.raw.trim()) {
       continue;
     }
-    if (occurrence.hasInterpolation && !hasClassTokens(occurrence.raw)) {
+
+    // Prove span integrity before any mutation
+    const slice = source.slice(occurrence.start, occurrence.end);
+    if (slice !== occurrence.raw) {
+      allDiagnostics.push({
+        kind: "info",
+        message:
+          "Skipped rewrite: occurrence span does not match source slice (unsafe offset)",
+        utilities: [],
+      });
+      continue;
+    }
+
+    // Interpolated templates: only rewrite complete static utilities.
+    // Skip fragments that are partial class stems around ${...}.
+    if (occurrence.hasInterpolation && !isSafeStaticQuasi(occurrence.raw)) {
       continue;
     }
 
@@ -43,6 +81,7 @@ export function transformSource(
     }
 
     if (pipeline.result !== occurrence.raw) {
+      // Second check after pipeline — result must not expand beyond span safety
       rewrites.push({
         from: occurrence.raw,
         to: pipeline.result,
@@ -56,7 +95,6 @@ export function transformSource(
       }
     }
 
-    // Attach file location to transformations
     const { line, column } = offsetToLineCol(source, occurrence.start);
     for (const t of pipeline.transformations) {
       allTransformations.push({
@@ -97,11 +135,58 @@ export function transformSource(
     transformations: allTransformations,
     diagnostics: allDiagnostics,
     map,
+    parseErrors: [],
   };
 }
 
-function hasClassTokens(raw: string): boolean {
-  return raw.split(/\s+/).some((t) => t.length > 0 && !t.includes("${"));
+/**
+ * True when a template quasi is independently rewritable:
+ * complete static class tokens only — no partial stems next to interpolations.
+ *
+ * Rejects:
+ * - `text-${color}`  → quasi "text-"
+ * - `bg-[${value}px]` → quasis "bg-[" and "px]"
+ * - tokens containing `${`
+ */
+export function isSafeStaticQuasi(raw: string): boolean {
+  if (!raw.trim()) {
+    return false;
+  }
+  if (raw.includes("${")) {
+    return false;
+  }
+
+  const trimmed = raw.trim();
+
+  // Incomplete utility stem before an interpolation (ends with -, :, or open [)
+  if (/[-:]$/.test(trimmed) || /\[[^\]]*$/.test(trimmed)) {
+    return false;
+  }
+
+  // Incomplete continuation after interpolation (starts with ], unit, or slash)
+  if (/^[\]]/.test(trimmed) || /^(px|rem|em|%|vh|vw|svh|dvh)\b/i.test(trimmed)) {
+    return false;
+  }
+
+  // Must contain at least one complete token that looks like a utility
+  const tokens = trimmed.split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) {
+    return false;
+  }
+
+  // Every non-empty token must be a complete utility (no dangling brackets)
+  for (const t of tokens) {
+    if (t.includes("${")) {
+      return false;
+    }
+    const opens = (t.match(/\[/g) ?? []).length;
+    const closes = (t.match(/\]/g) ?? []).length;
+    if (opens !== closes) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function offsetToLineCol(

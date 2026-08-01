@@ -21,8 +21,13 @@ import {
 } from "@tailwind-canonicalize/tokens";
 import { HELP, parseArgs, type CliArgs } from "./args.js";
 import { lineDiff } from "./diff.js";
+import {
+  formatTransformation,
+  printError,
+  printProjectReport,
+} from "./report.js";
 
-const VERSION = "0.1.2";
+const VERSION = "0.1.3";
 
 export async function run(argv: string[] = process.argv.slice(2)): Promise<number> {
   let args: CliArgs;
@@ -267,12 +272,23 @@ async function runWatch(args: CliArgs): Promise<number> {
     ...projectOpts(args, flags, {}),
     debounceMs: 150,
     onRun: (summary) => {
-      console.error(
-        `✓ ${summary.files} files (${summary.filesSkipped} skipped) · ${summary.rewrites} rewrites · ${summary.elapsedMs}ms`,
+      printProjectReport(
+        {
+          ...summary,
+          results: summary.results.map((file) => ({
+            ...file,
+            filePath: path.relative(args.cwd, file.filePath) || file.filePath,
+          })),
+        },
+        {
+          cwd: args.cwd,
+          verbose: false,
+          sampleTransformations: 0,
+        },
       );
     },
     onError: (err) => {
-      console.error(`error: ${err.message}`);
+      printError(err.message);
     },
   });
 
@@ -360,6 +376,8 @@ function printSummary(
       themeSource: summary.themeSource,
       diagnostics: summary.diagnostics,
       unsafe: summary.unsafe,
+      conflicts: summary.conflicts,
+      parseErrors: summary.parseErrors,
       errors: summary.errors,
       elapsedMs: summary.elapsedMs,
       records: args.verbose
@@ -376,83 +394,59 @@ function printSummary(
     return 0;
   }
 
-  if (args.diff || args.verbose) {
+  if (args.diff) {
     for (const file of summary.results) {
-      if (!file.changed && file.diagnostics.length === 0) {
+      if (!file.changed) {
         continue;
       }
       const rel = path.relative(args.cwd, file.filePath);
-      if (args.diff && file.changed) {
-        console.log(lineDiff(rel, file.original, file.code));
-      }
-      if (args.verbose) {
-        for (const t of file.transformations) {
-          console.error(formatTransformation(t, rel));
-        }
-      }
+      console.log(lineDiff(rel, file.original, file.code));
     }
   }
 
-  for (const d of summary.diagnostics) {
-    console.error(`! ${d.message}`);
-  }
+  // Relativize paths on file results for the report
+  const relativized: typeof summary = {
+    ...summary,
+    results: summary.results.map((file) => ({
+      ...file,
+      filePath: path.relative(args.cwd, file.filePath) || file.filePath,
+      transformations: file.transformations.map((t) => ({
+        ...t,
+        file: t.file
+          ? path.relative(args.cwd, t.file) || t.file
+          : path.relative(args.cwd, file.filePath) || file.filePath,
+      })),
+    })),
+  };
+
+  printProjectReport(relativized, {
+    cwd: args.cwd,
+    verbose: args.verbose,
+    path: summary.themePath
+      ? path.relative(args.cwd, summary.themePath) || summary.themePath
+      : null,
+    // In review/check without --verbose, still show a small sample of rewrites
+    sampleTransformations:
+      args.verbose
+        ? Number.POSITIVE_INFINITY
+        : args.mode === "review" || args.check
+          ? 8
+          : 0,
+  });
 
   if (summary.errors > 0) {
-    console.error(`✗ ${summary.errors} error(s)`);
     return 2;
   }
-
-  const elapsed = (summary.elapsedMs / 1000).toFixed(2);
-  console.error(`✓ ${formatNum(summary.files)} files`);
-  if (summary.filesSkipped > 0) {
-    console.error(`✓ ${formatNum(summary.filesSkipped)} skipped (cache)`);
-  }
-  console.error(`✓ ${formatNum(summary.rewrites)} replacements`);
-  console.error(`✓ ${formatNum(summary.unsafe)} unsafe rewrites`);
-  if (summary.themeSource) {
-    console.error(`  · theme: ${summary.themeSource}`);
-  }
-  if (Object.keys(summary.transformationsByCategory).length > 0) {
-    for (const [cat, n] of Object.entries(summary.transformationsByCategory)) {
-      console.error(`  · ${cat}: ${n}`);
-    }
-  }
-  console.error(`Completed in ${elapsed}s`);
-
   if ((args.check || args.mode === "review") && summary.filesChanged > 0) {
     return 1;
   }
   return 0;
 }
 
-function formatTransformation(t: TransformationRecord, file?: string): string {
-  const loc = file ? `${file}${t.line ? `:${t.line}` : ""}` : "";
-  const head = t.replacement
-    ? `${t.original} → ${t.replacement}`
-    : `remove ${t.original}`;
-  return [
-    loc ? `  ${loc}: ${head}` : `  ${head}`,
-    `    category: ${t.category}`,
-    `    safety: ${t.safety}`,
-    t.token ? `    token: ${t.token}` : "",
-    t.confidence ? `    confidence: ${t.confidence}` : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
-}
-
 function printAnnotated(transformations: TransformationRecord[]): void {
   for (const t of transformations) {
     console.error(formatTransformation(t));
   }
-}
-
-function formatNum(n: number): string {
-  return n.toLocaleString("en-US");
-}
-
-function printError(message: string): void {
-  console.error(`error: ${message}`);
 }
 
 function readStdin(): Promise<string> {

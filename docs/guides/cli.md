@@ -12,8 +12,17 @@ tailwind-canonicalize [paths...] [options]
 | `--check` | Fail if any rewrite would apply |
 | `--stdin` | Read source from stdin, write to stdout |
 | `--json` | Print summary JSON |
-| `--verbose` | Per-rewrite logging |
+| `--verbose` | Per-rewrite −/+ blocks and full diagnostic list |
 | `--diff` | Print line diffs |
+
+## Output
+
+Default human output (stderr) is colorized when the terminal supports it (`NO_COLOR` disables; `FORCE_COLOR` forces):
+
+- Theme banner (`● Loaded theme from …`)
+- Grouped conflict diagnostics (full list with `--verbose`)
+- Tree-style rewrites with `--verbose` / a short sample under `--check` / `--review`
+- Summary counts and category breakdown
 | `--cwd <dir>` | Working directory |
 | `--concurrency <n>` | Parallelism |
 | `--root-font-size <n>` | px per rem |

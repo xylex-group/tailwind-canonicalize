@@ -55,14 +55,7 @@ const PROPERTY_GROUPS: Record<string, string> = {
   blur: "blur",
   "backdrop-blur": "backdrop-blur",
   bg: "background-color",
-  // text handled in propertyGroupForNamespace (align vs size vs color)
-  border: "border-color-or-width",
-  "border-t": "border-top",
-  "border-r": "border-right",
-  "border-b": "border-bottom",
-  "border-l": "border-left",
-  "border-x": "border-x",
-  "border-y": "border-y",
+  // text / border / flex / ring handled in propertyGroupForNamespace
   fill: "fill",
   stroke: "stroke",
   outline: "outline-color",
@@ -96,13 +89,43 @@ const FONT_SIZE_KEYS = new Set([
   "8xl",
   "9xl",
 ]);
+/** Common design-system type scale names (font-size, not color). */
+const TEXT_TYPOGRAPHY = new Set([
+  "caption",
+  "tiny",
+  "body",
+  "body-sm",
+  "body-lg",
+  "display",
+  "heading",
+  "title",
+  "subtitle",
+  "label",
+  "overline",
+  "prose",
+  "code",
+  "quote",
+  "lead",
+  "footnote",
+]);
 
 /**
  * Split text-* utilities into independent cascade slots.
+ * Alignment, wrap, overflow, font-size, and color never share a group.
  */
 function textPropertyGroup(namespace: string, value: string): string {
+  // Multi-segment: text-muted-foreground → ns text-muted + value foreground
+  //                text-body-sm → ns text-body + value sm (typography scale)
   if (namespace.startsWith("text-") && namespace !== "text") {
-    // text-red-500, text-muted-foreground → color family
+    const rest = namespace.slice("text-".length);
+    const full = value ? `${rest}-${value}` : rest;
+    if (
+      TEXT_TYPOGRAPHY.has(rest) ||
+      TEXT_TYPOGRAPHY.has(full) ||
+      FONT_SIZE_KEYS.has(value)
+    ) {
+      return "font-size";
+    }
     return "text-color";
   }
   // bare text-* (namespace === "text")
@@ -115,7 +138,7 @@ function textPropertyGroup(namespace: string, value: string): string {
   if (TEXT_OVERFLOW.has(value)) {
     return "text-overflow";
   }
-  if (FONT_SIZE_KEYS.has(value)) {
+  if (FONT_SIZE_KEYS.has(value) || TEXT_TYPOGRAPHY.has(value)) {
     return "font-size";
   }
   if (value.startsWith("[") && value.endsWith("]")) {
@@ -143,6 +166,139 @@ function textPropertyGroup(namespace: string, value: string): string {
   }
   // text-black, text-foreground, text-transparent, etc.
   return "text-color";
+}
+
+const FLEX_DIRECTION = new Set(["row", "row-reverse", "col", "col-reverse"]);
+const FLEX_WRAP = new Set(["wrap", "wrap-reverse", "nowrap"]);
+const FLEX_SHORTHAND = new Set(["1", "auto", "initial", "none"]);
+
+/**
+ * display:flex vs flex-direction vs flex-wrap vs flex shorthand are independent.
+ */
+function flexPropertyGroup(namespace: string, value: string): string {
+  if (namespace === "grow" || namespace === "flex-grow") {
+    return "flex-grow";
+  }
+  if (namespace === "shrink" || namespace === "flex-shrink") {
+    return "flex-shrink";
+  }
+  if (namespace === "basis" || namespace === "flex-basis") {
+    return "flex-basis";
+  }
+  if (namespace !== "flex") {
+    return namespace;
+  }
+  if (value === "" || value === "inline") {
+    return "display";
+  }
+  if (FLEX_DIRECTION.has(value)) {
+    return "flex-direction";
+  }
+  if (FLEX_WRAP.has(value)) {
+    return "flex-wrap";
+  }
+  if (FLEX_SHORTHAND.has(value) || /^\d+(\.\d+)?$/.test(value)) {
+    return "flex";
+  }
+  if (value.startsWith("[") && value.endsWith("]")) {
+    return "flex";
+  }
+  return "flex";
+}
+
+const BORDER_STYLE = new Set([
+  "solid",
+  "dashed",
+  "dotted",
+  "double",
+  "hidden",
+  "none",
+]);
+const BORDER_SIDE = new Set(["t", "r", "b", "l", "x", "y", "s", "e"]);
+const BORDER_WIDTH_KEYS = new Set(["0", "2", "4", "8"]);
+
+function isBorderWidthValue(value: string): boolean {
+  if (value === "" || BORDER_WIDTH_KEYS.has(value) || /^\d+(\.\d+)?$/.test(value)) {
+    return true;
+  }
+  if (value.startsWith("[") && value.endsWith("]")) {
+    const inner = value.slice(1, -1).trim().toLowerCase();
+    if (
+      /^[-+]?\d/.test(inner) ||
+      inner.endsWith("px") ||
+      inner.endsWith("rem") ||
+      inner.endsWith("em")
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isBorderColorValue(value: string): boolean {
+  if (!value || BORDER_STYLE.has(value) || isBorderWidthValue(value)) {
+    return false;
+  }
+  if (BORDER_SIDE.has(value)) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Split border width / style / color / sides into independent cascade slots.
+ * `border` + `border-border` must not conflict (width vs color).
+ */
+function borderPropertyGroup(namespace: string, value: string): string {
+  // border-spacing handled elsewhere
+  if (namespace.startsWith("border-spacing")) {
+    return namespace;
+  }
+
+  // Directional: border-t, border-b-2, border-t-red-500
+  const sideMatch = namespace.match(
+    /^border-(t|r|b|l|x|y|s|e)$/,
+  );
+  if (sideMatch) {
+    const side = sideMatch[1]!;
+    if (BORDER_STYLE.has(value)) {
+      return `border-${side}-style`;
+    }
+    if (isBorderWidthValue(value) || value === "") {
+      return `border-${side}-width`;
+    }
+    return `border-${side}-color`;
+  }
+
+  // namespace border + value is a bare side letter (border-b, border-r)
+  if (namespace === "border" && BORDER_SIDE.has(value)) {
+    return `border-${value}-width`;
+  }
+
+  if (namespace === "border") {
+    if (BORDER_STYLE.has(value)) {
+      return "border-style";
+    }
+    if (isBorderWidthValue(value)) {
+      return "border-width";
+    }
+    if (isBorderColorValue(value)) {
+      return "border-color";
+    }
+    return "border-width";
+  }
+
+  // Multi-segment color: border-red + 500, border-muted + foreground
+  if (namespace.startsWith("border-")) {
+    const rest = namespace.slice("border-".length);
+    if (BORDER_SIDE.has(rest.split("-")[0] ?? "")) {
+      // border-t-red / border-t-2 already handled via sideMatch when ns is border-t
+      return `border-${rest}-color`;
+    }
+    return "border-color";
+  }
+
+  return "border-color";
 }
 
 
@@ -211,9 +367,21 @@ function ringPropertyGroup(namespace: string, value: string): string {
   return "ring-color";
 }
 export function propertyGroupForNamespace(namespace: string, value = ""): string {
-  // text-* needs value-aware classification before the coarse map
+  // text / flex / border / ring need value-aware classification
   if (namespace === "text" || namespace.startsWith("text-")) {
     return textPropertyGroup(namespace, value);
+  }
+  if (
+    namespace === "flex" ||
+    namespace === "grow" ||
+    namespace === "shrink" ||
+    namespace === "basis" ||
+    namespace.startsWith("flex-")
+  ) {
+    return flexPropertyGroup(namespace, value);
+  }
+  if (namespace === "border" || namespace.startsWith("border-")) {
+    return borderPropertyGroup(namespace, value);
   }
   if (namespace === "ring" || namespace.startsWith("ring-")) {
     return ringPropertyGroup(namespace, value);
@@ -233,12 +401,6 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   // Gradients / multi-segment bases
   if (namespace.startsWith("bg-gradient") || namespace.startsWith("bg-linear")) {
     return "background-image-gradient";
-  }
-  // Multi-segment color utilities parse as e.g. namespace `text-muted` + value
-  // `foreground` or `text-red` + `500`. Collapse to the same cascade slot as
-  // bare `text-*` / `bg-*` so cssConflict matches IntelliSense.
-  if (namespace === "text" || namespace.startsWith("text-")) {
-    return "color-or-font-size";
   }
   if (namespace === "bg" || namespace.startsWith("bg-")) {
     return "background-color";
