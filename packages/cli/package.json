@@ -1,6 +1,6 @@
 {
   "name": "tailwind-canonicalize",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Semantic canonicalizer for Tailwind CSS utility classes — rewrite only when provably identical",
   "license": "MIT",
   "type": "module",

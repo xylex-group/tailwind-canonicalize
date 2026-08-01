@@ -318,6 +318,28 @@ describe("safety review fixes", () => {
         false,
       );
     });
+
+    it("classifies text-2sm as font-size not color", () => {
+      expect(utilityIdentity("text-2sm").propertyGroup).toBe("font-size");
+      expect(utilitiesConflict("text-2sm", "text-foreground")).toBe(false);
+    });
+
+    it("does not conflict decoration-dashed (style) with decoration-1 (thickness)", () => {
+      expect(utilityIdentity("decoration-dashed").propertyGroup).toBe(
+        "text-decoration-style",
+      );
+      expect(utilityIdentity("decoration-1").propertyGroup).toBe(
+        "text-decoration-thickness",
+      );
+      expect(utilitiesConflict("decoration-dashed", "decoration-1")).toBe(
+        false,
+      );
+    });
+
+    it("classifies shadow-xs as elevation not color", () => {
+      expect(utilityIdentity("shadow-xs").propertyGroup).toBe("box-shadow");
+      expect(utilitiesConflict("shadow-xs", "shadow-black/10")).toBe(false);
+    });
   });
 
   describe("extended type scale / font / divide / bg subproperties", () => {

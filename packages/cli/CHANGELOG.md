@@ -1,5 +1,11 @@
 # tailwind-canonicalize
 
+## 0.1.9
+
+### Patch Changes
+
+- Conflicts: `text-2sm` (and `Nsm`/`Nmd`/`Nlg` scales) as font-size; `shadow-xs` as elevation; `decoration-dashed` vs `decoration-1` (style vs thickness)
+
 ## 0.1.8
 
 ### Patch Changes

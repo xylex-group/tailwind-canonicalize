@@ -127,6 +127,10 @@ function isFontSizeKey(value: string): boolean {
   if (/^\d+x[sl]$/.test(bare)) {
     return true;
   }
+  // Design-system extended scales: 2sm, 3sm, 2md, …
+  if (/^\d+(sm|md|lg|xl|xs)$/.test(bare)) {
+    return true;
+  }
   return false;
 }
 
@@ -857,6 +861,7 @@ function outlinePropertyGroup(namespace: string, value: string): string {
 
 const SHADOW_SIZE = new Set([
   "none",
+  "xs",
   "sm",
   "md",
   "lg",
@@ -984,6 +989,62 @@ function gridPropertyGroup(namespace: string, value: string): string {
   }
   // Custom @utility grid-tables, grid-kpis, …
   return `plugin:grid:${value}`;
+}
+
+const DECORATION_STYLE = new Set([
+  "solid",
+  "double",
+  "dotted",
+  "dashed",
+  "wavy",
+]);
+const DECORATION_THICKNESS = new Set(["0", "1", "2", "4", "8", "auto", "from-font"]);
+
+/**
+ * decoration-dashed (style) vs decoration-1 (thickness) vs decoration-red-500 (color).
+ */
+function decorationPropertyGroup(namespace: string, value: string): string {
+  if (namespace.startsWith("decoration-") && namespace !== "decoration") {
+    const rest = namespace.slice("decoration-".length);
+    if (DECORATION_STYLE.has(rest)) {
+      return "text-decoration-style";
+    }
+    if (DECORATION_THICKNESS.has(rest)) {
+      return "text-decoration-thickness";
+    }
+    return "text-decoration-color";
+  }
+  if (namespace !== "decoration") {
+    return namespace;
+  }
+  if (DECORATION_STYLE.has(value)) {
+    return "text-decoration-style";
+  }
+  if (DECORATION_THICKNESS.has(value) || /^\d+(\.\d+)?$/.test(value)) {
+    return "text-decoration-thickness";
+  }
+  if (value.startsWith("[") && value.endsWith("]")) {
+    const inner = value.slice(1, -1).trim().toLowerCase();
+    if (
+      /^[-+]?\d/.test(inner) ||
+      inner.endsWith("px") ||
+      inner.endsWith("rem") ||
+      inner.endsWith("em")
+    ) {
+      return "text-decoration-thickness";
+    }
+    if (
+      inner.startsWith("#") ||
+      inner.startsWith("rgb") ||
+      inner.startsWith("hsl") ||
+      inner.startsWith("oklch") ||
+      inner.startsWith("var(")
+    ) {
+      return "text-decoration-color";
+    }
+  }
+  // decoration-red / decoration-primary …
+  return "text-decoration-color";
 }
 
 const LIST_STYLE_TYPE = new Set([
@@ -1220,6 +1281,9 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   }
   if (namespace === "grid" || namespace.startsWith("grid-")) {
     return gridPropertyGroup(namespace, value);
+  }
+  if (namespace === "decoration" || namespace.startsWith("decoration-")) {
+    return decorationPropertyGroup(namespace, value);
   }
   if (namespace === "bg" || namespace.startsWith("bg-")) {
     return backgroundPropertyGroup(namespace, value);
