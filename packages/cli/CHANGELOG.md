@@ -1,5 +1,11 @@
 # tailwind-canonicalize
 
+## 0.1.10
+
+### Patch Changes
+
+- Conflicts: stroke width vs color; snap axis vs strictness vs align; legacy `text-opacity-*`; prose size slot
+
 ## 0.1.9
 
 ### Patch Changes

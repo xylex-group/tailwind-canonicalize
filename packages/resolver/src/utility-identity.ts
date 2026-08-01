@@ -151,6 +151,11 @@ function isPaletteShade(value: string): boolean {
  * (theme color named `base`). Never classify shade suffixes as font-size.
  */
 function textPropertyGroup(namespace: string, value: string): string {
+  // Legacy v3 text-opacity-* (not a text color)
+  if (namespace === "text-opacity" || namespace.startsWith("text-opacity")) {
+    return "text-opacity";
+  }
+
   // Multi-segment: text-muted-foreground → ns text-muted + value foreground
   //                text-body-sm → ns text-body + value sm (typography scale)
   //                text-base-500 → ns text-base + value 500 (COLOR, not size)
@@ -1285,6 +1290,15 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   if (namespace === "decoration" || namespace.startsWith("decoration-")) {
     return decorationPropertyGroup(namespace, value);
   }
+  if (namespace === "stroke" || namespace.startsWith("stroke-")) {
+    return strokePropertyGroup(namespace, value);
+  }
+  if (namespace === "snap" || namespace.startsWith("snap-")) {
+    return snapPropertyGroup(namespace, value);
+  }
+  if (namespace === "prose" || namespace.startsWith("prose-")) {
+    return prosePropertyGroup(namespace, value);
+  }
   if (namespace === "bg" || namespace.startsWith("bg-")) {
     return backgroundPropertyGroup(namespace, value);
   }
@@ -1328,9 +1342,6 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   if (namespace === "fill" || namespace.startsWith("fill-")) {
     return "fill";
   }
-  if (namespace === "stroke" || namespace.startsWith("stroke-")) {
-    return "stroke";
-  }
 
   // Unknown / plugin utilities (icon, icon-tabler, btn-primary, …): do not
   // treat prefix siblings as competing cascade slots.
@@ -1341,6 +1352,118 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   }
 
   return namespace || "unknown";
+}
+
+const STROKE_WIDTH = new Set(["0", "1", "2"]);
+
+/**
+ * stroke-2 / stroke-[1px] (width) vs stroke-border / stroke-red-500 (color).
+ */
+function strokePropertyGroup(namespace: string, value: string): string {
+  if (namespace.startsWith("stroke-") && namespace !== "stroke") {
+    // stroke-red + 500
+    return "stroke-color";
+  }
+  if (namespace !== "stroke") {
+    return namespace;
+  }
+  if (value === "" || STROKE_WIDTH.has(value) || /^\d+(\.\d+)?$/.test(value)) {
+    return "stroke-width";
+  }
+  if (value.startsWith("[") && value.endsWith("]")) {
+    const inner = value.slice(1, -1).trim().toLowerCase();
+    if (
+      inner.startsWith("#") ||
+      inner.startsWith("rgb") ||
+      inner.startsWith("hsl") ||
+      inner.startsWith("oklch") ||
+      inner.startsWith("var(") && inner.includes("color")
+    ) {
+      return "stroke-color";
+    }
+    if (
+      /^[-+]?\d/.test(inner) ||
+      inner.endsWith("px") ||
+      inner.endsWith("rem") ||
+      inner.endsWith("em")
+    ) {
+      return "stroke-width";
+    }
+  }
+  return "stroke-color";
+}
+
+const SNAP_AXIS = new Set(["none", "x", "y", "both"]);
+const SNAP_STRICTNESS = new Set(["mandatory", "proximity"]);
+const SNAP_ALIGN = new Set(["start", "end", "center", "align-none"]);
+const SNAP_STOP = new Set(["normal", "always"]);
+
+/**
+ * snap-x (axis) + snap-mandatory (strictness) co-occur by design.
+ */
+function snapPropertyGroup(namespace: string, value: string): string {
+  if (namespace.startsWith("snap-") && namespace !== "snap") {
+    const rest = namespace.slice("snap-".length);
+    if (SNAP_AXIS.has(rest)) {
+      return "scroll-snap-type-axis";
+    }
+    if (SNAP_STRICTNESS.has(rest)) {
+      return "scroll-snap-type-strictness";
+    }
+    if (SNAP_ALIGN.has(rest) || rest === "align") {
+      return "scroll-snap-align";
+    }
+    if (SNAP_STOP.has(rest)) {
+      return "scroll-snap-stop";
+    }
+    return `plugin:snap:${rest}`;
+  }
+  if (namespace !== "snap") {
+    return namespace;
+  }
+  if (SNAP_AXIS.has(value) || value === "") {
+    return "scroll-snap-type-axis";
+  }
+  if (SNAP_STRICTNESS.has(value)) {
+    return "scroll-snap-type-strictness";
+  }
+  if (SNAP_ALIGN.has(value)) {
+    return "scroll-snap-align";
+  }
+  if (SNAP_STOP.has(value)) {
+    return "scroll-snap-stop";
+  }
+  return `plugin:snap:${value}`;
+}
+
+/**
+ * prose vs prose-sm are size modifiers on the same typography plugin, but
+ * prose-headings:/prose-p: variants are not competing with bare prose.
+ * Treat size keys as one slot; unknown prose-* as plugins.
+ */
+function prosePropertyGroup(namespace: string, value: string): string {
+  const PROSE_SIZE = new Set(["sm", "base", "lg", "xl", "2xl"]);
+  if (namespace.startsWith("prose-") && namespace !== "prose") {
+    const rest = namespace.slice("prose-".length);
+    if (PROSE_SIZE.has(rest)) {
+      return "prose-size";
+    }
+    // prose-headings, prose-p, prose-invert, …
+    return `plugin:prose:${rest}`;
+  }
+  if (namespace !== "prose") {
+    return namespace;
+  }
+  if (value === "" || value === "base") {
+    return "prose-size";
+  }
+  if (PROSE_SIZE.has(value)) {
+    return "prose-size";
+  }
+  if (value === "invert" || value === "none") {
+    return `plugin:prose:${value}`;
+  }
+  return `plugin:prose:${value || "base"}`;
 }
 
 /**

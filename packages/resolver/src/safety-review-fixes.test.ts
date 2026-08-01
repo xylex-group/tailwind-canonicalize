@@ -340,6 +340,37 @@ describe("safety review fixes", () => {
       expect(utilityIdentity("shadow-xs").propertyGroup).toBe("box-shadow");
       expect(utilitiesConflict("shadow-xs", "shadow-black/10")).toBe(false);
     });
+
+    it("does not conflict stroke width with stroke color", () => {
+      expect(utilityIdentity("stroke-[1px]").propertyGroup).toBe("stroke-width");
+      expect(utilityIdentity("stroke-border").propertyGroup).toBe("stroke-color");
+      expect(utilitiesConflict("stroke-[1px]", "stroke-border")).toBe(false);
+      expect(utilitiesConflict("stroke-2", "stroke-red-500")).toBe(false);
+    });
+
+    it("does not conflict snap-x with snap-mandatory", () => {
+      expect(utilityIdentity("snap-x").propertyGroup).toBe(
+        "scroll-snap-type-axis",
+      );
+      expect(utilityIdentity("snap-mandatory").propertyGroup).toBe(
+        "scroll-snap-type-strictness",
+      );
+      expect(utilitiesConflict("snap-x", "snap-mandatory")).toBe(false);
+      expect(utilitiesConflict("snap-start", "snap-x")).toBe(false);
+    });
+
+    it("does not conflict text-primary with legacy text-opacity-80", () => {
+      expect(utilityIdentity("text-opacity-80").propertyGroup).toBe(
+        "text-opacity",
+      );
+      expect(utilitiesConflict("text-primary", "text-opacity-80")).toBe(false);
+    });
+
+    it("prose and prose-sm share prose-size (true same-plugin size clash)", () => {
+      expect(utilityIdentity("prose").propertyGroup).toBe("prose-size");
+      expect(utilityIdentity("prose-sm").propertyGroup).toBe("prose-size");
+      expect(utilitiesConflict("prose", "prose-sm")).toBe(true);
+    });
   });
 
   describe("extended type scale / font / divide / bg subproperties", () => {

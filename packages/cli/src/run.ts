@@ -27,7 +27,7 @@ import {
   printProjectReport,
 } from "./report.js";
 
-const VERSION = "0.1.9";
+const VERSION = "0.1.10";
 
 export async function run(argv: string[] = process.argv.slice(2)): Promise<number> {
   let args: CliArgs;
