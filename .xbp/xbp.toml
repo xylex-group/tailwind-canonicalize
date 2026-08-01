@@ -25,6 +25,8 @@ watch_ignore_paths = []
 versioning_disabled = [
     "public",
     "apps/docs/public",
+    "tailwind-canonicalize-action",
+    "action",
 ]
 release_disabled = []
 
@@ -99,8 +101,9 @@ restart_policy = "on_failure"
 restart_policy_max_failure_count = 10
 start_wrapper = "pm2"
 force_run_from_root = false
-version_targets = ["action/package.json"]
 watch_paths = ["action"]
+versioning = false
+release = false
 
 [services.commands]
 install = "pnpm install"
