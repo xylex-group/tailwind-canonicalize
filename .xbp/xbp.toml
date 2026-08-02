@@ -1,5 +1,5 @@
 project_name = "tailwind-canonicalize"
-version = "0.1.0"
+version = "0.2.0"
 port = 3000
 build_dir = "./"
 app_type = "library-node"

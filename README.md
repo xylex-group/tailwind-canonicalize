@@ -1,5 +1,7 @@
 # tailwind-canonicalize
 
+current version: `0.2.0`
+
 [![npm](https://img.shields.io/npm/v/tailwind-canonicalize.svg)](https://www.npmjs.com/package/tailwind-canonicalize)
 [![license](https://img.shields.io/npm/l/tailwind-canonicalize.svg)](./LICENSE)
 [![node](https://img.shields.io/node/v/tailwind-canonicalize.svg)](https://www.npmjs.com/package/tailwind-canonicalize)
