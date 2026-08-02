@@ -11,15 +11,18 @@ import {
 import type { TransformationRecord } from "@tailwind-canonicalize/resolver";
 import {
   analyzeColorTokens,
+  buildStyleUsageReport,
+  formatStyleUsageReportMarkdown,
   generateDualThemeFromManifest,
   loadTokenManifest,
   manifestToMappings,
   manifestToPairs,
   manifestToRecipes,
+  writeStyleUsageReport,
   writeThemeCss,
   writeTokenManifest,
 } from "@tailwind-canonicalize/tokens";
-import { HELP, parseArgs, type CliArgs } from "./args.js";
+import { formatHelp, parseArgs, type CliArgs } from "./args.js";
 import { lineDiff } from "./diff.js";
 import {
   formatTransformation,
@@ -27,7 +30,7 @@ import {
   printProjectReport,
 } from "./report.js";
 
-const VERSION = "0.1.10";
+const VERSION = "0.1.18";
 
 export async function run(argv: string[] = process.argv.slice(2)): Promise<number> {
   let args: CliArgs;
@@ -39,7 +42,7 @@ export async function run(argv: string[] = process.argv.slice(2)): Promise<numbe
   }
 
   if (args.help) {
-    console.log(HELP);
+    console.log(formatHelp());
     return 0;
   }
 
@@ -54,6 +57,9 @@ export async function run(argv: string[] = process.argv.slice(2)): Promise<numbe
     }
     if (args.command === "tokens-apply") {
       return await runTokensApply(args);
+    }
+    if (args.command === "tokens-report") {
+      return await runTokensReport(args);
     }
     if (args.stdin) {
       return await runStdin(args);
@@ -134,6 +140,73 @@ async function runTokensAnalyze(args: CliArgs): Promise<number> {
     return 2;
   }
   return files.length === 0 ? 1 : 0;
+}
+
+async function runTokensReport(args: CliArgs): Promise<number> {
+  const files = await collectFiles(args.paths, {
+    cwd: args.cwd,
+    ignore: args.ignore.filter(Boolean),
+  });
+  const report = await buildStyleUsageReport({
+    cwd: args.cwd,
+    files,
+  });
+
+  const outJson =
+    args.outManifest ??
+    args.reportPath ??
+    path.join(args.cwd, "styles-report.json");
+  const jsonPath = path.isAbsolute(outJson)
+    ? outJson
+    : path.join(args.cwd, outJson);
+  await writeStyleUsageReport(jsonPath, report);
+
+  if (args.styleReportMarkdown) {
+    const mdPath = path.isAbsolute(args.styleReportMarkdown)
+      ? args.styleReportMarkdown
+      : path.join(args.cwd, args.styleReportMarkdown);
+    await writeFile(mdPath, formatStyleUsageReportMarkdown(report), "utf8");
+    if (!args.json) {
+      console.error(`✓ Wrote markdown: ${mdPath}`);
+    }
+  }
+
+  if (args.json) {
+    console.log(JSON.stringify(report, null, 2));
+  } else {
+    console.error(`✓ Analyzed ${report.filesAnalyzed} files`);
+    console.error(
+      `✓ ${report.summary.totalHits} color utility hits · ${report.summary.uniqueUtilities} unique`,
+    );
+    console.error(
+      `✓ ${report.summary.uniqueTags} tags · ${report.summary.driftCount} drift signal(s)`,
+    );
+    console.error(`Wrote style report: ${jsonPath}`);
+    if (report.summary.topUtilities.length > 0) {
+      console.error("");
+      console.error("Top colors:");
+      for (const u of report.summary.topUtilities.slice(0, 10)) {
+        console.error(`  ${String(u.count).padStart(5)}  ${u.utility}`);
+      }
+    }
+    if (report.drift.length > 0) {
+      console.error("");
+      console.error("Drift (sample):");
+      for (const d of report.drift.slice(0, 5)) {
+        console.error(`  ! [${d.severity}] ${d.message}`);
+      }
+      if (report.drift.length > 5) {
+        console.error(`  … and ${report.drift.length - 5} more (see JSON)`);
+      }
+    }
+    if (files.length === 0) {
+      console.error("");
+      console.error("! No source files matched under the given paths.");
+      return 1;
+    }
+  }
+
+  return 0;
 }
 
 async function runTokensApply(args: CliArgs): Promise<number> {

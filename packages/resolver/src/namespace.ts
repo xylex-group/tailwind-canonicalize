@@ -61,15 +61,6 @@ export function scaleForNamespace(namespace: string, theme: Theme): ThemeScale |
     "scroll-pl",
     "translate-x",
     "translate-y",
-    "border",
-    "border-x",
-    "border-y",
-    "border-t",
-    "border-r",
-    "border-b",
-    "border-l",
-    "border-s",
-    "border-e",
     "indent",
     "basis",
     "border-spacing",
@@ -83,6 +74,11 @@ export function scaleForNamespace(namespace: string, theme: Theme): ThemeScale |
 
   if (spacingNamespaces.has(namespace)) {
     return theme.spacing;
+  }
+
+  // Border width utilities (border-2, border-b-8) — px scale, not spacing.
+  if (isBorderWidthNamespace(namespace)) {
+    return theme.borderWidth;
   }
 
   if (
@@ -130,8 +126,17 @@ export function scaleForNamespace(namespace: string, theme: Theme): ThemeScale |
     namespace === "outline" ||
     namespace === "ring" ||
     namespace === "divide" ||
-    namespace === "border-color" ||
-    namespace.startsWith("border-") && isColorishBorder(namespace)
+    namespace === "border-color"
+  ) {
+    return theme.colors;
+  }
+
+  // Multi-segment color namespaces: border-red, border-muted, …
+  // (width namespaces already returned above)
+  if (
+    namespace.startsWith("border-") &&
+    !namespace.startsWith("border-spacing") &&
+    !isBorderWidthNamespace(namespace)
   ) {
     return theme.colors;
   }
@@ -139,17 +144,18 @@ export function scaleForNamespace(namespace: string, theme: Theme): ThemeScale |
   return null;
 }
 
-function isColorishBorder(namespace: string): boolean {
-  // border-red-500 style uses colors; border-2 uses spacing
-  // namespace for border-red would be parsed differently
+/** `border`, `border-t`, … — width utilities use the borderWidth px scale. */
+export function isBorderWidthNamespace(namespace: string): boolean {
   return (
+    namespace === "border" ||
     namespace === "border-t" ||
     namespace === "border-r" ||
     namespace === "border-b" ||
     namespace === "border-l" ||
     namespace === "border-x" ||
     namespace === "border-y" ||
-    namespace === "border"
+    namespace === "border-s" ||
+    namespace === "border-e"
   );
 }
 
@@ -160,16 +166,10 @@ export function alternateScales(namespace: string, theme: Theme): ThemeScale[] {
   if (namespace === "text") {
     return [theme.fontSize, theme.colors];
   }
-  if (
-    namespace === "border" ||
-    namespace === "border-t" ||
-    namespace === "border-r" ||
-    namespace === "border-b" ||
-    namespace === "border-l" ||
-    namespace === "border-x" ||
-    namespace === "border-y"
-  ) {
-    return [theme.spacing, theme.colors];
+  // Width primary + color alternate so border-[#fff] can still match colors
+  // and border-[8px] matches borderWidth (never spacing).
+  if (isBorderWidthNamespace(namespace)) {
+    return [theme.colors];
   }
   return [];
 }

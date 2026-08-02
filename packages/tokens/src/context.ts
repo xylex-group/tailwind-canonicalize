@@ -89,15 +89,16 @@ export function inferContextSignals(input: {
 
 /**
  * Extract nearby JSX element name, aria role, and cva variant hints from source slice.
+ *
+ * Prefer the **last** (closest preceding) open tag so nested
+ * `<div><button className=…>` attributes to `button`, not outer `div`.
  */
 export function extractStructuralHints(nearby: string): {
   elementName?: string;
   ariaRole?: string;
   cvaVariant?: string;
 } {
-  const element =
-    nearby.match(/<([A-Z][A-Za-z0-9.]*)\b/)?.[1] ??
-    nearby.match(/<([a-z][a-z0-9-]*)\b/)?.[1];
+  const element = lastOpenTagName(nearby);
   const ariaRole =
     nearby.match(/\brole\s*=\s*["']([^"']+)["']/)?.[1] ??
     nearby.match(/\baria-role\s*=\s*["']([^"']+)["']/)?.[1];
@@ -112,6 +113,23 @@ export function extractStructuralHints(nearby: string): {
     ariaRole: ariaRole,
     cvaVariant: cvaVariant,
   };
+}
+
+/** Closest preceding JSX/HTML open tag name in a source window. */
+export function lastOpenTagName(nearby: string): string | undefined {
+  // Match open tags; skip closing tags and self-closing noise by scanning opens only.
+  const re = /<\/?([A-Za-z][A-Za-z0-9.-]*)\b[^>]*>/g;
+  let lastOpen: string | undefined;
+  let m: RegExpExecArray | null = re.exec(nearby);
+  while (m) {
+    const full = m[0] ?? "";
+    const name = m[1];
+    if (name && !full.startsWith("</")) {
+      lastOpen = name;
+    }
+    m = re.exec(nearby);
+  }
+  return lastOpen;
 }
 
 export function proposeSemanticToken(

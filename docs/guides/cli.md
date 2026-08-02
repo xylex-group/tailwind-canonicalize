@@ -14,7 +14,7 @@ tailwind-canonicalize [paths...] [options]
 | `--json` | Print summary JSON |
 | `--verbose` | Per-rewrite −/+ blocks and full diagnostic list |
 | `--diff` | Print line diffs |
-| `-o, --report <file>` | Also write the human report (plain text) to a file |
+| `-o, --report <file>` | Also write the human report (plain text) to a file. Requires a path (`--report report.txt`); do not put `-h` after `--report` |
 | `--safe` / `--review` / `--aggressive` | Pipeline mode (default: safe) |
 | `--cwd <dir>` | Working directory |
 | `--concurrency <n>` | Parallelism |
@@ -32,7 +32,19 @@ Default human output (stderr) is colorized when the terminal supports it (`NO_CO
 - Tree-style rewrites with `--verbose` / a short sample under `--check` / `--review`
 - Summary counts and category breakdown
 
+`--help` (stdout) is also ANSI-colored on a TTY: bold yellow section headers, cyan flags, green examples. Same `NO_COLOR` / `FORCE_COLOR` rules apply (detected on **stdout** for help).
+
 Use `-o report.txt` (or `--report report.txt`) to persist the same plain-text report for CI artifacts or PR threads. With `--json`, the file receives pretty-printed JSON instead.
+
+### Conflicts
+
+Same cascade slot, different values → diagnostic only (never rewritten). Property-group identity filters false positives, e.g.:
+
+| Classes | Conflict? |
+|---------|-----------|
+| `prose` + `prose-sm` | No (enable + size) |
+| `before:from-50%` + `before:from-popover` | No (position + color) |
+| `flex` + `grid` | Yes (display) |
 
 ## JSON shape
 

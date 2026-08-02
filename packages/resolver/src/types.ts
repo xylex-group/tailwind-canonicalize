@@ -16,6 +16,11 @@ export interface Theme {
   spacingUnit: ParsedLength | null;
   spacing: ThemeScale;
   colors: ThemeScale;
+  /**
+   * Border *width* scale (px keys: 0, 2, 4, 8 — not spacing multipliers).
+   * `border-2` is 2px; never confuse with spacing key `2` (= 0.5rem).
+   */
+  borderWidth: ThemeScale;
   borderRadius: ThemeScale;
   fontSize: ThemeScale;
   lineHeight: ThemeScale;
@@ -49,8 +54,13 @@ export interface UtilityParts {
   negative: boolean;
   /** Property-ish prefix, e.g. `w`, `min-w`, `rounded-t`, `text` */
   namespace: string;
-  /** Value portion, e.g. `[40px]`, `10`, `1/2` */
+  /** Value portion, e.g. `[40px]`, `10`, `1/2` (opacity modifier stripped). */
   value: string;
+  /**
+   * Tailwind opacity/alpha modifier without the slash, e.g. `50`, `3`, `[0.5]`.
+   * From `text-red-500/50` or `text-[13px]/3`.
+   */
+  opacityModifier?: string;
   /** True when value is arbitrary `[...]`. */
   isArbitrary: boolean;
   /** True for arbitrary properties `[mask-image:...]`. */

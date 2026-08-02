@@ -366,10 +366,52 @@ describe("safety review fixes", () => {
       expect(utilitiesConflict("text-primary", "text-opacity-80")).toBe(false);
     });
 
-    it("prose and prose-sm share prose-size (true same-plugin size clash)", () => {
-      expect(utilityIdentity("prose").propertyGroup).toBe("prose-size");
+    it("does not conflict bare prose (enable) with prose-sm (size) — co-occur by design", () => {
+      // Original found case: prose + prose-sm must not conflict
+      expect(utilityIdentity("prose").propertyGroup).toBe("prose");
       expect(utilityIdentity("prose-sm").propertyGroup).toBe("prose-size");
-      expect(utilitiesConflict("prose", "prose-sm")).toBe(true);
+      expect(utilitiesConflict("prose", "prose-sm")).toBe(false);
+      expect(utilitiesConflict("prose", "prose-lg")).toBe(false);
+      // true same-slot size clash still reported
+      expect(utilitiesConflict("prose-sm", "prose-lg")).toBe(true);
+      expect(utilityIdentity("prose-lg").propertyGroup).toBe("prose-size");
+    });
+
+    it("does not conflict gradient stop position with gradient color (from-50% vs from-popover)", () => {
+      // Original found case: before:from-50% + before:from-popover must not conflict
+      expect(utilityIdentity("before:from-50%").propertyGroup).toBe(
+        "gradient-from-position",
+      );
+      expect(utilityIdentity("before:from-popover").propertyGroup).toBe(
+        "gradient-from",
+      );
+      expect(
+        utilitiesConflict("before:from-50%", "before:from-popover"),
+      ).toBe(false);
+      expect(utilitiesConflict("from-10%", "from-red-500")).toBe(false);
+      expect(utilitiesConflict("via-30%", "via-black")).toBe(false);
+      expect(utilitiesConflict("to-90%", "to-white")).toBe(false);
+      expect(utilitiesConflict("from-[25%]", "from-popover")).toBe(false);
+      // true same-slot clashes still reported
+      expect(utilitiesConflict("from-red-500", "from-blue-500")).toBe(true);
+      expect(utilitiesConflict("from-10%", "from-50%")).toBe(true);
+      expect(utilitiesConflict("via-black", "via-white")).toBe(true);
+    });
+
+    it("maps full display utilities so flex/grid/inline-flex compete on display", () => {
+      expect(utilityIdentity("flex").propertyGroup).toBe("display");
+      expect(utilityIdentity("grid").propertyGroup).toBe("display");
+      expect(utilityIdentity("inline-flex").propertyGroup).toBe("display");
+      expect(utilityIdentity("inline-grid").propertyGroup).toBe("display");
+      expect(utilityIdentity("hidden").propertyGroup).toBe("display");
+      expect(utilityIdentity("block").propertyGroup).toBe("display");
+      expect(utilityIdentity("inline-block").propertyGroup).toBe("display");
+      expect(utilitiesConflict("flex", "grid")).toBe(true);
+      expect(utilitiesConflict("flex", "inline-flex")).toBe(true);
+      expect(utilitiesConflict("grid", "hidden")).toBe(true);
+      // non-display siblings still independent
+      expect(utilitiesConflict("flex", "flex-col")).toBe(false);
+      expect(utilitiesConflict("grid", "grid-tables")).toBe(false);
     });
   });
 
@@ -401,6 +443,173 @@ describe("safety review fixes", () => {
       expect(utilitiesConflict("divide-y", "divide-border")).toBe(false);
       expect(utilitiesConflict("divide-y", "divide-border/50")).toBe(false);
       expect(utilitiesConflict("divide-border", "divide-primary")).toBe(true);
+    });
+
+    it("does not conflict overflow-hidden with overflow-ellipsis (text-overflow legacy)", () => {
+      // Original found case: overflow-hidden + overflow-ellipsis (truncate pattern)
+      expect(utilityIdentity("overflow-hidden").propertyGroup).toBe("overflow");
+      expect(utilityIdentity("overflow-ellipsis").propertyGroup).toBe(
+        "text-overflow",
+      );
+      expect(utilityIdentity("text-ellipsis").propertyGroup).toBe(
+        "text-overflow",
+      );
+      expect(
+        utilitiesConflict("overflow-hidden", "overflow-ellipsis"),
+      ).toBe(false);
+      expect(utilitiesConflict("overflow-hidden", "text-ellipsis")).toBe(
+        false,
+      );
+      // real overflow conflicts remain
+      expect(utilitiesConflict("overflow-hidden", "overflow-auto")).toBe(
+        true,
+      );
+      expect(utilitiesConflict("overflow-ellipsis", "text-clip")).toBe(true);
+    });
+
+    it("does not conflict space-*-reverse with space amount (co-occur by design)", () => {
+      // Original found case: -space-y-1 + space-y-reverse
+      expect(utilityIdentity("space-y-reverse").propertyGroup).toBe(
+        "space-y-reverse",
+      );
+      expect(utilityIdentity("-space-y-1").propertyGroup).toBe("space-y");
+      expect(utilityIdentity("space-x-reverse").propertyGroup).toBe(
+        "space-x-reverse",
+      );
+      expect(utilityIdentity("-space-x-1").propertyGroup).toBe("space-x");
+      expect(utilitiesConflict("-space-y-1", "space-y-reverse")).toBe(false);
+      expect(utilitiesConflict("-space-x-1", "space-x-reverse")).toBe(false);
+      expect(utilitiesConflict("space-y-4", "space-y-reverse")).toBe(false);
+      // two amounts still conflict
+      expect(utilitiesConflict("space-y-1", "space-y-2")).toBe(true);
+      expect(utilitiesConflict("space-x-2", "space-x-4")).toBe(true);
+    });
+
+    it("does not conflict Tremor text size with text color (text-tremor-default vs content)", () => {
+      // Original found case: text-tremor-default + text-tremor-content
+      expect(utilityIdentity("text-tremor-default").propertyGroup).toBe(
+        "font-size",
+      );
+      expect(utilityIdentity("text-tremor-metric").propertyGroup).toBe(
+        "font-size",
+      );
+      expect(utilityIdentity("text-tremor-title").propertyGroup).toBe(
+        "font-size",
+      );
+      expect(utilityIdentity("text-tremor-label").propertyGroup).toBe(
+        "font-size",
+      );
+      expect(utilityIdentity("text-tremor-content").propertyGroup).toBe(
+        "text-color",
+      );
+      expect(
+        utilityIdentity("text-tremor-content-strong").propertyGroup,
+      ).toBe("text-color");
+      expect(
+        utilitiesConflict("text-tremor-default", "text-tremor-content"),
+      ).toBe(false);
+      expect(
+        utilitiesConflict(
+          "text-tremor-default",
+          "text-tremor-content-strong",
+        ),
+      ).toBe(false);
+      expect(
+        utilitiesConflict("text-tremor-metric", "text-foreground"),
+      ).toBe(false);
+      expect(utilitiesConflict("text-tremor-default", "text-white")).toBe(
+        false,
+      );
+      expect(utilitiesConflict("text-tremor-default", "text-brand")).toBe(
+        false,
+      );
+      // same family still conflicts
+      expect(
+        utilitiesConflict("text-tremor-default", "text-tremor-metric"),
+      ).toBe(true);
+      expect(
+        utilitiesConflict(
+          "text-tremor-content",
+          "text-tremor-content-strong",
+        ),
+      ).toBe(true);
+    });
+
+    it("does not conflict text-[13px]/3 (font-size+opacity) with text-foreground/70 (color)", () => {
+      // Original found case: opacity on arbitrary size misparsed as color
+      expect(utilityIdentity("text-[13px]/3").propertyGroup).toBe("font-size");
+      expect(utilityIdentity("text-[0.80rem]/6").propertyGroup).toBe(
+        "font-size",
+      );
+      expect(utilityIdentity("text-foreground/70").propertyGroup).toBe(
+        "text-color",
+      );
+      expect(
+        utilitiesConflict("text-[13px]/3", "text-foreground/70"),
+      ).toBe(false);
+      expect(
+        utilitiesConflict("text-[13px]/3", "text-muted-foreground/50"),
+      ).toBe(false);
+      // size vs size still conflicts
+      expect(utilitiesConflict("text-xs", "text-[13px]")).toBe(true);
+    });
+
+    it("does not conflict inset-shadow / drop-shadow size with color", () => {
+      // Original found case: inset-shadow-sm + inset-shadow-white/20
+      expect(utilityIdentity("inset-shadow-sm").propertyGroup).toBe(
+        "inset-shadow",
+      );
+      expect(utilityIdentity("inset-shadow-white/20").propertyGroup).toBe(
+        "inset-shadow-color",
+      );
+      expect(
+        utilitiesConflict("inset-shadow-sm", "inset-shadow-white/20"),
+      ).toBe(false);
+      expect(utilityIdentity("drop-shadow-2xl").propertyGroup).toBe(
+        "drop-shadow",
+      );
+      expect(utilityIdentity("drop-shadow-white/20").propertyGroup).toBe(
+        "drop-shadow-color",
+      );
+      expect(
+        utilitiesConflict("drop-shadow-2xl", "drop-shadow-white/20"),
+      ).toBe(false);
+      // same-slot elevations still conflict
+      expect(utilitiesConflict("inset-shadow-sm", "inset-shadow-lg")).toBe(
+        true,
+      );
+      expect(utilitiesConflict("drop-shadow-sm", "drop-shadow-2xl")).toBe(
+        true,
+      );
+    });
+
+    it("does not conflict bg-[length:…] (size) with bg-[linear-gradient(…)] (image)", () => {
+      // Original found case: shimmer size + gradient image co-occur
+      expect(
+        utilityIdentity("bg-[length:200%_100%]").propertyGroup,
+      ).toBe("background-size");
+      expect(
+        utilityIdentity(
+          "bg-[linear-gradient(110deg,#404040,35%,#fff,50%,#404040,75%,#404040)]",
+        ).propertyGroup,
+      ).toBe("background-image");
+      expect(
+        utilitiesConflict(
+          "bg-[length:200%_100%]",
+          "bg-[linear-gradient(110deg,#404040,35%,#fff,50%,#404040,75%,#404040)]",
+        ),
+      ).toBe(false);
+      expect(
+        utilitiesConflict("bg-[url(/x.png)]", "bg-background"),
+      ).toBe(false);
+      // same-slot colors still conflict
+      expect(utilitiesConflict("bg-red-500", "bg-blue-500")).toBe(true);
+      expect(
+        utilitiesConflict(
+          "bg-[linear-gradient(red,blue)]",
+          "bg-[url(/y.png)]",
+        ),
+      ).toBe(true);
     });
 
     it("does not conflict bg color with bg-clip-*", () => {

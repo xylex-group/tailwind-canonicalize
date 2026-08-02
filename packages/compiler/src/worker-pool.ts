@@ -15,6 +15,7 @@ export interface SerializedTheme {
   spacingUnit: { value: number; unit: string; raw: string } | null;
   spacing: Array<[string, string]>;
   colors: Array<[string, string]>;
+  borderWidth?: Array<[string, string]>;
   borderRadius: Array<[string, string]>;
   fontSize: Array<[string, string]>;
   lineHeight: Array<[string, string]>;
@@ -26,6 +27,15 @@ export interface SerializedTheme {
   source: string;
   tailwindVersion?: 3 | 4;
 }
+
+const DEFAULT_BORDER_WIDTH: Array<[string, string]> = [
+  ["0", "0px"],
+  ["DEFAULT", "1px"],
+  ["px", "1px"],
+  ["2", "2px"],
+  ["4", "4px"],
+  ["8", "8px"],
+];
 
 /**
  * Run file transforms in worker_threads for large monorepos.
@@ -128,6 +138,7 @@ export function serializeTheme(theme: {
   spacingUnit: { value: number; unit: string; raw: string } | null;
   spacing: { values: Map<string, string> };
   colors: { values: Map<string, string> };
+  borderWidth?: { values: Map<string, string> };
   borderRadius: { values: Map<string, string> };
   fontSize: { values: Map<string, string> };
   lineHeight: { values: Map<string, string> };
@@ -145,6 +156,9 @@ export function serializeTheme(theme: {
     spacingUnit: theme.spacingUnit,
     spacing: [...theme.spacing.values],
     colors: [...theme.colors.values],
+    borderWidth: theme.borderWidth
+      ? [...theme.borderWidth.values]
+      : DEFAULT_BORDER_WIDTH,
     borderRadius: [...theme.borderRadius.values],
     fontSize: [...theme.fontSize.values],
     lineHeight: [...theme.lineHeight.values],
@@ -162,6 +176,7 @@ export function reviveTheme(s: SerializedTheme): {
   spacingUnit: SerializedTheme["spacingUnit"];
   spacing: { values: Map<string, string> };
   colors: { values: Map<string, string> };
+  borderWidth: { values: Map<string, string> };
   borderRadius: { values: Map<string, string> };
   fontSize: { values: Map<string, string> };
   lineHeight: { values: Map<string, string> };
@@ -180,6 +195,9 @@ export function reviveTheme(s: SerializedTheme): {
     spacingUnit: s.spacingUnit,
     spacing,
     colors: { values: new Map(s.colors) },
+    borderWidth: {
+      values: new Map(s.borderWidth ?? DEFAULT_BORDER_WIDTH),
+    },
     borderRadius: { values: new Map(s.borderRadius) },
     fontSize: { values: new Map(s.fontSize) },
     lineHeight: { values: new Map(s.lineHeight) },

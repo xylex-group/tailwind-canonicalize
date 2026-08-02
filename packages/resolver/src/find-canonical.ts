@@ -319,28 +319,38 @@ function buildMatch(
   reason: CanonicalMatch["reason"],
   matched: string[],
 ): CanonicalMatch {
+  const formatParts = {
+    variants: parts.variants,
+    important: parts.important,
+    negative: parts.negative,
+    namespace: parts.namespace,
+    opacityModifier: parts.opacityModifier,
+  };
+
   const canonicalBase =
     suffix === ""
-      ? `${parts.negative ? "-" : ""}${parts.namespace}`
+      ? formatUtility(
+          {
+            variants: "",
+            important: false,
+            negative: parts.negative,
+            namespace: parts.namespace,
+            opacityModifier: parts.opacityModifier,
+          },
+          "",
+        )
       : formatUtility(
           {
             variants: "",
             important: false,
             negative: parts.negative,
             namespace: parts.namespace,
+            opacityModifier: parts.opacityModifier,
           },
           suffix,
         );
 
-  const canonical = formatUtility(
-    {
-      variants: parts.variants,
-      important: parts.important,
-      negative: parts.negative,
-      namespace: parts.namespace,
-    },
-    suffix,
-  );
+  const canonical = formatUtility(formatParts, suffix);
 
   return {
     canonical,

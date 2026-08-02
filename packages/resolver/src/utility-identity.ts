@@ -58,10 +58,7 @@ const PROPERTY_GROUPS: Record<string, string> = {
   // text / border / flex / ring / object / font / divide handled below
   fill: "fill",
   stroke: "stroke",
-  // outline / shadow handled by value-aware groups (width vs color vs style)
-  from: "gradient-from",
-  via: "gradient-via",
-  to: "gradient-to",
+  // outline / shadow / from|via|to handled by value-aware groups
   opacity: "opacity",
   "border-spacing": "border-spacing",
   "border-spacing-x": "border-spacing-x",
@@ -159,12 +156,34 @@ function textPropertyGroup(namespace: string, value: string): string {
   // Multi-segment: text-muted-foreground → ns text-muted + value foreground
   //                text-body-sm → ns text-body + value sm (typography scale)
   //                text-base-500 → ns text-base + value 500 (COLOR, not size)
+  //                text-tremor-default (SIZE) vs text-tremor-content (COLOR)
   if (namespace.startsWith("text-") && namespace !== "text") {
     const rest = namespace.slice("text-".length);
     const full = value ? `${rest}-${value}` : rest;
 
     // text-red-500 / text-base-400 / text-slate-200 → color
     if (isPaletteShade(value)) {
+      return "text-color";
+    }
+
+    // Tremor design system (and forks): font sizes vs content colors share
+    // the text-tremor-* prefix but never the same cascade slot.
+    // https://tremor.so — text-tremor-default/title/label/metric are sizes;
+    // text-tremor-content* / brand* are colors.
+    if (rest === "tremor" || rest.startsWith("tremor-")) {
+      const role =
+        rest === "tremor"
+          ? value
+          : `${rest.slice("tremor-".length)}${value ? `-${value}` : ""}`;
+      const TREMOR_FONT_SIZE = new Set([
+        "default",
+        "title",
+        "label",
+        "metric",
+      ]);
+      if (TREMOR_FONT_SIZE.has(role)) {
+        return "font-size";
+      }
       return "text-color";
     }
 
@@ -501,6 +520,50 @@ function backgroundPropertyGroup(namespace: string, value: string): string {
   if (full === "none" || (namespace === "bg" && value === "none")) {
     return "background-image";
   }
+
+  // Arbitrary values: size/position hints and images must not fight colors
+  // Original found case: bg-[length:200%_100%] + bg-[linear-gradient(...)]
+  if (value.startsWith("[") && value.endsWith("]")) {
+    const inner = value.slice(1, -1).trim().toLowerCase();
+    if (
+      inner.startsWith("length:") ||
+      inner.startsWith("size:") ||
+      // bare size pairs like 200%_100% / 50%_auto
+      /^\d/.test(inner) && (inner.includes("%") || inner.includes("px") || inner.includes("rem")) &&
+        (inner.includes("_") || inner.includes(" "))
+    ) {
+      return "background-size";
+    }
+    if (
+      inner.startsWith("position:") ||
+      inner.startsWith("top_") ||
+      inner.startsWith("bottom_") ||
+      inner.startsWith("left_") ||
+      inner.startsWith("right_") ||
+      inner === "center" ||
+      /^(top|bottom|left|right|center)(\s|_)/.test(inner)
+    ) {
+      return "background-position";
+    }
+    if (
+      inner.startsWith("linear-gradient(") ||
+      inner.startsWith("radial-gradient(") ||
+      inner.startsWith("conic-gradient(") ||
+      inner.startsWith("repeating-linear-gradient(") ||
+      inner.startsWith("repeating-radial-gradient(") ||
+      inner.startsWith("repeating-conic-gradient(") ||
+      inner.startsWith("url(") ||
+      inner.startsWith("image:") ||
+      inner.startsWith("paint(") ||
+      inner.startsWith("cross-fade(") ||
+      inner.startsWith("element(")
+    ) {
+      return "background-image";
+    }
+    // Default arbitrary → color (hex, rgb, oklch, named CSS colors, vars)
+    return "background-color";
+  }
+
   return "background-color";
 }
 
@@ -873,37 +936,47 @@ const SHADOW_SIZE = new Set([
   "xl",
   "2xl",
   "inner",
+  // drop-shadow / inset-shadow also use these elevation keys
+  "2xs",
 ]);
 
 /**
- * shadow-sm (elevation) vs shadow-border/10 (color) never share a slot.
- * Named elevations (incl. custom numeric theme keys like shadow-600) share size.
+ * Elevation vs color for box-shadow, drop-shadow, and inset-shadow.
+ * Original found cases: inset-shadow-sm + inset-shadow-white/20;
+ * drop-shadow-2xl + drop-shadow-white/20 — co-occur by design.
  */
-function shadowPropertyGroup(namespace: string, value: string): string {
-  if (namespace.startsWith("shadow-") && namespace !== "shadow") {
-    // shadow-red + 500, shadow-border handled as multi-seg color-ish
-    const rest = namespace.slice("shadow-".length);
+function shadowFamilyPropertyGroup(
+  family: "box-shadow" | "drop-shadow" | "inset-shadow",
+  namespace: string,
+  value: string,
+  prefix: string,
+): string {
+  const sizeGroup = family;
+  const colorGroup = `${family}-color`;
+
+  if (namespace.startsWith(`${prefix}-`) && namespace !== prefix) {
+    const rest = namespace.slice(prefix.length + 1);
     if (SHADOW_SIZE.has(rest)) {
-      return "box-shadow";
+      return sizeGroup;
     }
-    return "box-shadow-color";
+    return colorGroup;
   }
-  if (namespace !== "shadow") {
+  if (namespace !== prefix) {
     return namespace;
   }
-  if (!value || SHADOW_SIZE.has(value)) {
-    return "box-shadow";
+  // bare value may still include /opacity if parse didn't strip (legacy)
+  const bare = (value.split("/")[0] ?? value).trim();
+  if (!bare || SHADOW_SIZE.has(bare)) {
+    return sizeGroup;
   }
-  // opacity modifier on a size is rare; slash usually means color token
-  if (value.includes("/")) {
-    return "box-shadow-color";
+  if (value.includes("/") || bare.includes("/")) {
+    return colorGroup;
   }
-  // numeric theme keys (shadow-600) → elevation slot
-  if (/^\d+(\.\d+)?$/.test(value)) {
-    return "box-shadow";
+  if (/^\d+(\.\d+)?$/.test(bare)) {
+    return sizeGroup;
   }
-  if (value.startsWith("[") && value.endsWith("]")) {
-    const inner = value.slice(1, -1).trim().toLowerCase();
+  if (bare.startsWith("[") && bare.endsWith("]")) {
+    const inner = bare.slice(1, -1).trim().toLowerCase();
     if (
       inner.startsWith("#") ||
       inner.startsWith("rgb") ||
@@ -911,16 +984,32 @@ function shadowPropertyGroup(namespace: string, value: string): string {
       inner.startsWith("oklch") ||
       inner.startsWith("color(")
     ) {
-      return "box-shadow-color";
+      return colorGroup;
     }
-    return "box-shadow";
+    return sizeGroup;
   }
-  // shadow-border, shadow-primary (color names without shade in value)
-  // Heuristic: known sizes only above; everything else with a letter → color
-  if (/[a-z]/i.test(value) && !SHADOW_SIZE.has(value)) {
-    return "box-shadow-color";
+  // named colors: white, black, primary, border, …
+  if (/[a-z]/i.test(bare) && !SHADOW_SIZE.has(bare)) {
+    return colorGroup;
   }
-  return "box-shadow";
+  return sizeGroup;
+}
+
+function shadowPropertyGroup(namespace: string, value: string): string {
+  return shadowFamilyPropertyGroup("box-shadow", namespace, value, "shadow");
+}
+
+function dropShadowPropertyGroup(namespace: string, value: string): string {
+  return shadowFamilyPropertyGroup("drop-shadow", namespace, value, "drop-shadow");
+}
+
+function insetShadowPropertyGroup(namespace: string, value: string): string {
+  return shadowFamilyPropertyGroup(
+    "inset-shadow",
+    namespace,
+    value,
+    "inset-shadow",
+  );
 }
 
 const OVERFLOW_VALUES = new Set([
@@ -929,12 +1018,14 @@ const OVERFLOW_VALUES = new Set([
   "clip",
   "visible",
   "scroll",
-  "ellipsis", // text-overflow sometimes aliased; keep out of custom
 ]);
 
 /**
  * Standard overflow-* share a slot; unknown values (overflow-stable, …) are
  * treated as plugin utilities so they don't false-conflict with overflow-auto.
+ *
+ * Legacy `overflow-ellipsis` sets text-overflow (like text-ellipsis), NOT the
+ * overflow property — co-occurs with overflow-hidden by design (truncate).
  */
 function overflowPropertyGroup(namespace: string, value: string): string {
   if (namespace === "overflow-x" || namespace.startsWith("overflow-x")) {
@@ -942,6 +1033,13 @@ function overflowPropertyGroup(namespace: string, value: string): string {
   }
   if (namespace === "overflow-y" || namespace.startsWith("overflow-y")) {
     return "overflow-y";
+  }
+  // overflow-ellipsis → text-overflow (Tailwind v2/v3 legacy alias)
+  if (
+    (namespace === "overflow" && value === "ellipsis") ||
+    namespace === "overflow-ellipsis"
+  ) {
+    return "text-overflow";
   }
   if (namespace.startsWith("overflow-") && namespace !== "overflow") {
     const rest = namespace.slice("overflow-".length);
@@ -1243,7 +1341,71 @@ function isKnownCompetingNamespace(namespace: string): boolean {
   return false;
 }
 
+/**
+ * Tailwind display utilities (full class names).
+ * Parsed as bare (`flex`) or namespace+value (`inline`+`flex` → inline-flex).
+ */
+const DISPLAY_UTILITIES = new Set([
+  "block",
+  "inline-block",
+  "inline",
+  "flex",
+  "inline-flex",
+  "grid",
+  "inline-grid",
+  "contents",
+  "flow-root",
+  "list-item",
+  "hidden",
+  "table",
+  "inline-table",
+  "table-caption",
+  "table-cell",
+  "table-column",
+  "table-column-group",
+  "table-footer-group",
+  "table-header-group",
+  "table-row-group",
+  "table-row",
+]);
+
+function fullUtilityName(namespace: string, value: string): string {
+  if (!namespace) {
+    return value;
+  }
+  if (!value) {
+    return namespace;
+  }
+  return `${namespace}-${value}`;
+}
+
 export function propertyGroupForNamespace(namespace: string, value = ""): string {
+  // Known display classes compete on the same cascade slot.
+  // Must run before plugin fallback (inline-flex parses as ns=inline, val=flex).
+  const full = fullUtilityName(namespace, value);
+  if (
+    DISPLAY_UTILITIES.has(full) ||
+    (DISPLAY_UTILITIES.has(namespace) && !value)
+  ) {
+    return "display";
+  }
+
+  // space-x-reverse / space-y-reverse set --tw-space-*-reverse; they co-occur
+  // with space amounts (e.g. -space-y-1 space-y-reverse) by design.
+  if (
+    (namespace === "space-x" || namespace === "space-y") &&
+    value === "reverse"
+  ) {
+    return `${namespace}-reverse`;
+  }
+  // divide-x-reverse / divide-y-reverse same pattern
+  if (
+    (namespace === "divide-x" || namespace === "divide-y") &&
+    value === "reverse"
+  ) {
+    return `${namespace}-reverse`;
+  }
+
   // text / flex / border / ring / font / divide / bg / object need value-aware classification
   if (namespace === "text" || namespace.startsWith("text-")) {
     return textPropertyGroup(namespace, value);
@@ -1280,6 +1442,12 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   }
   if (namespace === "shadow" || namespace.startsWith("shadow-")) {
     return shadowPropertyGroup(namespace, value);
+  }
+  if (namespace === "drop-shadow" || namespace.startsWith("drop-shadow-")) {
+    return dropShadowPropertyGroup(namespace, value);
+  }
+  if (namespace === "inset-shadow" || namespace.startsWith("inset-shadow-")) {
+    return insetShadowPropertyGroup(namespace, value);
   }
   if (namespace === "overflow" || namespace.startsWith("overflow-")) {
     return overflowPropertyGroup(namespace, value);
@@ -1318,6 +1486,16 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   if (namespace === "placeholder-opacity") {
     return "placeholder-opacity";
   }
+  // Gradient stops: color vs position percentage are independent
+  if (namespace === "from" || namespace.startsWith("from-")) {
+    return gradientStopPropertyGroup("from", namespace, value);
+  }
+  if (namespace === "via" || namespace.startsWith("via-")) {
+    return gradientStopPropertyGroup("via", namespace, value);
+  }
+  if (namespace === "to" || namespace.startsWith("to-")) {
+    return gradientStopPropertyGroup("to", namespace, value);
+  }
   if (PROPERTY_GROUPS[namespace]) {
     return PROPERTY_GROUPS[namespace]!;
   }
@@ -1329,15 +1507,6 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   }
   if (namespace.startsWith("scroll-p")) {
     return namespace;
-  }
-  if (namespace === "from" || namespace.startsWith("from-")) {
-    return "gradient-from";
-  }
-  if (namespace === "via" || namespace.startsWith("via-")) {
-    return "gradient-via";
-  }
-  if (namespace === "to" || namespace.startsWith("to-")) {
-    return "gradient-to";
   }
   if (namespace === "fill" || namespace.startsWith("fill-")) {
     return "fill";
@@ -1437,9 +1606,58 @@ function snapPropertyGroup(namespace: string, value: string): string {
 }
 
 /**
- * prose vs prose-sm are size modifiers on the same typography plugin, but
- * prose-headings:/prose-p: variants are not competing with bare prose.
- * Treat size keys as one slot; unknown prose-* as plugins.
+ * Gradient stop color vs position.
+ * `from-popover` (color) co-occurs with `from-50%` (position) by design.
+ * Same for via / to.
+ */
+function isGradientStopPosition(value: string): boolean {
+  if (!value) {
+    return false;
+  }
+  // Opacity modifier is never valid on positions, but strip just in case
+  const bare = (value.split("/")[0] ?? value).trim();
+  if (/^\d+(\.\d+)?%$/.test(bare)) {
+    return true;
+  }
+  if (bare.startsWith("[") && bare.endsWith("]")) {
+    const inner = bare.slice(1, -1).trim().toLowerCase();
+    if (!inner) {
+      return false;
+    }
+    if (inner.endsWith("%") || /^\d+(\.\d+)?%$/.test(inner)) {
+      return true;
+    }
+    if (
+      inner.startsWith("length:") ||
+      inner.startsWith("percentage:") ||
+      inner.startsWith("--") && (inner.includes("position") || inner.includes("%"))
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function gradientStopPropertyGroup(
+  stop: "from" | "via" | "to",
+  namespace: string,
+  value: string,
+): string {
+  // Multi-segment rare namespaces (from-something-else) → color slot of that stop
+  let val = value;
+  if (namespace.startsWith(`${stop}-`) && namespace !== stop) {
+    val = namespace.slice(stop.length + 1) + (value ? `-${value}` : "");
+  }
+  if (isGradientStopPosition(val)) {
+    return `gradient-${stop}-position`;
+  }
+  return `gradient-${stop}`;
+}
+
+/**
+ * Typography plugin: bare `prose` enables base styles; `prose-sm` etc. are
+ * size modifiers that co-occur (`prose prose-sm`). Only size keys share a slot.
+ * prose-headings / prose-invert / etc. are independent.
  */
 function prosePropertyGroup(namespace: string, value: string): string {
   const PROSE_SIZE = new Set(["sm", "base", "lg", "xl", "2xl"]);
@@ -1454,8 +1672,9 @@ function prosePropertyGroup(namespace: string, value: string): string {
   if (namespace !== "prose") {
     return namespace;
   }
-  if (value === "" || value === "base") {
-    return "prose-size";
+  // Bare `prose` = plugin enable (not a size competitor)
+  if (value === "") {
+    return "prose";
   }
   if (PROSE_SIZE.has(value)) {
     return "prose-size";
@@ -1463,7 +1682,7 @@ function prosePropertyGroup(namespace: string, value: string): string {
   if (value === "invert" || value === "none") {
     return `plugin:prose:${value}`;
   }
-  return `plugin:prose:${value || "base"}`;
+  return `plugin:prose:${value}`;
 }
 
 /**

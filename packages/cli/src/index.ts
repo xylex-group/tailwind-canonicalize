@@ -1,5 +1,12 @@
-export { HELP, parseArgs, type CliArgs, type CliCommand } from "./args.js";
+export {
+  HELP,
+  formatHelp,
+  parseArgs,
+  type CliArgs,
+  type CliCommand,
+} from "./args.js";
 export { run } from "./run.js";
+export { makePaint, useColor, type PaintKit } from "./ansi.js";
 
 export {
   canonicalizeClass,

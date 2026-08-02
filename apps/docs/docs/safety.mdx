@@ -24,6 +24,25 @@ A rewrite is applied only when **exactly one** theme candidate matches after val
 | Review | `--review` | Report/diff only |
 | Aggressive | `--aggressive` | Explicit; may include review migrations / high-confidence inference |
 
+## Conflict diagnostics (not rewrites)
+
+The engine also detects **true cascade conflicts** — two utilities that set the same CSS slot with different values. Those are **reported only** (never auto-resolved). Unrelated utilities that merely share a prefix must **not** show up as conflicts.
+
+Classification uses **property-group identity** (value-aware where needed):
+
+| Classes | Conflict? | Why |
+|---------|-----------|-----|
+| `prose prose-sm` | No | Typography: bare `prose` enables the plugin; `prose-sm` is a size modifier (co-occur by design) |
+| `prose-sm prose-lg` | Yes | Two prose sizes |
+| `before:from-50% before:from-popover` | No | Gradient stop **position** vs **color** |
+| `from-red-500 from-blue-500` | Yes | Two gradient-from colors |
+| `font-mono font-medium` | No | Font family vs weight |
+| `flex flex-col` | No | Display vs direction |
+| `flex grid` | Yes | Both set `display` |
+| `max-w-40 max-w-44` | Yes | Same width slot |
+
+If you still see a false conflict, file an issue — property groups are intentionally expanded as real-world class strings surface.
+
 ## Idempotence
 
 ```bash
@@ -33,4 +52,4 @@ tailwind-canonicalize . --write   # zero changes
 
 ## Unsafe counter
 
-CLI always reports `unsafe: 0` — the engine refuses ambiguous rewrites rather than guessing.
+CLI always reports `unsafe: 0` for rewrites — the engine refuses ambiguous rewrites rather than guessing. Conflict **counts** are separate (`conflicts` in the summary) and never rewrite source.

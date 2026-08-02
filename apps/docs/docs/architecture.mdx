@@ -32,4 +32,6 @@ Parser  →  Extract class candidates (oxc AST)
 6. Duplicate removal  
 7. Conflict diagnostics  
 
+Conflict diagnostics use **property-group identity** (value-aware for families like text, border, gradient stops, prose, display). Same group + variants + different values → report only; never rewrite. See [Safety](/docs/safety).
+
 See monorepo `docs/architecture/` for deeper design notes.

@@ -23,3 +23,7 @@ text-[16px]          → text-base
 5. Require a single safe candidate  
 
 Optional: `--strict-compile` uses Tailwind’s `compile()` API when installed.
+
+## Conflicts are separate
+
+Canonical rewrites never “pick a winner” when two classes set the same cascade slot (`max-w-40` + `max-w-44`, `flex` + `grid`). Those are diagnostics only. Unrelated co-occurring classes (`prose` + `prose-sm`, `from-50%` + `from-popover`) share different property groups and stay quiet — see [Safety](/docs/safety).

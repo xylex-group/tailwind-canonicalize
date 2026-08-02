@@ -27,6 +27,18 @@ export {
   type GenerateThemeOptions,
 } from "./generate-theme.js";
 export { isColorUtility, parseColorUtility } from "./palette.js";
+export {
+  buildStyleUsageReport,
+  formatStyleUsageReportMarkdown,
+  writeStyleUsageReport,
+  type StyleDriftSignal,
+  type StyleHitSample,
+  type StyleReportOptions,
+  type StyleTagUsage,
+  type StyleUsageReport,
+  type StyleUtilityKind,
+  type StyleUtilityUsage,
+} from "./style-report.js";
 export type {
   ColorAnalysisEntry,
   ColorOccurrence,

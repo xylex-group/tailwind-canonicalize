@@ -17,6 +17,24 @@ pnpm exec tailwind-canonicalize . --write --safe
 pnpm exec tailwind-canonicalize . --check --verbose --diff
 ```
 
+### Why do I see “conflicts detected”?
+
+Conflicts mean two utilities compete for the **same cascade slot** with different values. They are **not rewritten** — you choose which class to keep in source.
+
+Common **true** conflicts:
+
+- `flex` + `grid` (both set `display`)
+- `max-w-40` + `max-w-44`
+- `prose-sm` + `prose-lg`
+
+Common **non-conflicts** (should not appear):
+
+- `prose` + `prose-sm` (enable + size)
+- `from-50%` + `from-popover` (gradient position + color)
+- `font-mono` + `font-medium` (family + weight)
+
+Default output **groups** diagnostics by property group; use `--verbose` for sample lines. Details: [Safety](/docs/safety).
+
 ### Cache seems stale
 
 Delete `.tailwind-canonicalize-cache.json` or change options (options hash invalidates).
@@ -28,3 +46,7 @@ Run canonicalize **then** format. Don’t enable two tools that rewrite the same
 ### Semantic tokens not applied
 
 Ensure `tokens apply` + manifest path, or config `tokens.enabled` + `manifest`. Safe mode never invents mappings.
+
+### `--help` has no color
+
+Color is on only for TTY stdout. `NO_COLOR=1` always disables; `FORCE_COLOR=1` forces ANSI even when piped.

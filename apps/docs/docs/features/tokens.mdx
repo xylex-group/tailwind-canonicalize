@@ -13,6 +13,22 @@ pnpm exec tailwind-canonicalize tokens analyze . --out proposed.json
 
 No source edits. Outputs proposals, conflicts, duplicate token reports, cycles.
 
+## Style usage report (drift)
+
+Inventory **all color utilities** (not only `bg-*`) — `text-black`, `bg-slate-200`, `border-*`, `ring-*`, `fill-*`, gradients, semantic tokens like `text-muted-foreground` — with **HTML/JSX tag** attribution:
+
+```bash
+tailwind-canonicalize tokens report . -o styles-report.json --md styles.md
+```
+
+JSON includes:
+
+- `utilities[]` — count, channel, kind (`palette` | `semantic` | `arbitrary`), `tags`, `files`, samples  
+- `byTag[]` — colors used on `<button>`, `<p>`, …  
+- `drift[]` — multi-color same tag, palette mix, semantic+raw mix, high cardinality  
+
+Never rewrites source. Use before/after a design-system migration to catch styling drift.
+
 ## Phase 2 — Apply
 
 ```bash

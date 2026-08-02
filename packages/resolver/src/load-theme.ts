@@ -13,6 +13,7 @@ export function loadThemeFromCss(css: string, base: Theme = createDefaultTheme()
     spacingUnit: base.spacingUnit,
     spacing: cloneScale(base.spacing),
     colors: cloneScale(base.colors),
+    borderWidth: cloneScale(base.borderWidth),
     borderRadius: cloneScale(base.borderRadius),
     fontSize: cloneScale(base.fontSize),
     lineHeight: cloneScale(base.lineHeight),
@@ -87,6 +88,14 @@ function applyCssVariable(theme: Theme, name: string, value: string): void {
   if (radius?.[1]) {
     const key = radius[1] === "DEFAULT" ? "DEFAULT" : radius[1];
     theme.borderRadius.values.set(key, value);
+    return;
+  }
+
+  // --border-width-* / --border-width (DEFAULT)
+  const borderW = name.match(/^--border-width(?:-(.+))?$/);
+  if (borderW) {
+    const key = borderW[1] && borderW[1].length > 0 ? borderW[1] : "DEFAULT";
+    theme.borderWidth.values.set(key, value);
     return;
   }
 

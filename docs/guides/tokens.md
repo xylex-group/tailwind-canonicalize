@@ -18,6 +18,23 @@ tailwind-canonicalize tokens analyze . --out tailwind-tokens.proposed.json
 - Reports duplicate values and alias cycles
 - Writes a **proposal** manifest only — **no source edits**
 
+## Style usage / drift report
+
+```bash
+tailwind-canonicalize tokens report . -o styles-report.json --md styles.md
+```
+
+Exports a **read-only** inventory of color styling classes:
+
+| Field | Meaning |
+|-------|---------|
+| `utilities` | Every color utility hit (`text-black`, `bg-slate-200`, `border-primary`, gradients, …) with counts |
+| `tags` | Which element (`button`, `p`, `div`, …) the class appeared on |
+| `byTag` | Reverse index: tag → colors used |
+| `drift` | Signals: many colors on one tag, mixed palettes, semantic + raw mix |
+
+Useful for design-system cleanup and before/after token migrations. Does not rewrite files.
+
 ## Phase 2 — Apply
 
 ```bash

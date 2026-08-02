@@ -55,6 +55,31 @@ describe("PR #1 review fixes", () => {
     ).toBe("border-spacing-3.25");
   });
 
+  it("P1: Border width uses px scale not spacing (border-b-[8px] → border-b-8)", () => {
+    // Original found case: border-b-[8px] must NOT become border-b-2 (spacing).
+    // Tailwind border-2 = 2px; border-8 = 8px.
+    const theme = createDefaultTheme();
+    expect(findCanonicalEquivalent("border-b-[8px]", { theme })?.canonical).toBe(
+      "border-b-8",
+    );
+    expect(findCanonicalEquivalent("border-[8px]", { theme })?.canonical).toBe(
+      "border-8",
+    );
+    expect(findCanonicalEquivalent("border-b-[2px]", { theme })?.canonical).toBe(
+      "border-b-2",
+    );
+    expect(findCanonicalEquivalent("border-x-[4px]", { theme })?.canonical).toBe(
+      "border-x-4",
+    );
+    // Non-scale widths stay arbitrary
+    expect(findCanonicalEquivalent("md:border-b-[10px]", { theme })).toBeNull();
+    expect(findCanonicalEquivalent("md:border-l-[6px]", { theme })).toBeNull();
+    // Never map 8px → spacing key 2
+    expect(findCanonicalEquivalent("border-b-[8px]", { theme })?.canonical).not.toBe(
+      "border-b-2",
+    );
+  });
+
   it("P2: Distinguish text property families before reporting conflicts", () => {
     // Original found case: text-center + text-red-500 must not conflict
     expect(utilitiesConflict("text-center", "text-red-500")).toBe(false);

@@ -176,10 +176,22 @@ export function createDefaultTheme(): Theme {
   // Full default palette — exact hex match only.
   const colors = { values: defaultColorScale() };
 
+  // Tailwind border-width scale: bare numbers are CSS px, NOT --spacing units.
+  // border-2 = 2px; border-8 = 8px. Never map 8px → border-2 (spacing).
+  const borderWidth = scale({
+    0: "0px",
+    DEFAULT: "1px",
+    px: "1px",
+    2: "2px",
+    4: "4px",
+    8: "8px",
+  });
+
   return {
     spacingUnit,
     spacing: { values: spacingValues },
     colors,
+    borderWidth,
     borderRadius: radius,
     fontSize,
     lineHeight,

@@ -96,6 +96,17 @@ function mergeV3Config(base: Theme, config: Record<string, unknown>): Theme {
     false,
   );
 
+  applySection(
+    base.borderWidth,
+    themeBlock.borderWidth as Record<string, unknown> | undefined,
+    true,
+  );
+  applySection(
+    base.borderWidth,
+    extend.borderWidth as Record<string, unknown> | undefined,
+    false,
+  );
+
   applySection(base.fontSize, flattenFontSize(themeBlock.fontSize), true);
   applySection(base.fontSize, flattenFontSize(extend.fontSize), false);
 

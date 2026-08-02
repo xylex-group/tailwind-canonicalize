@@ -11,6 +11,12 @@ tailwind-canonicalize tokens analyze [paths...] [--out manifest.json]
 tailwind-canonicalize tokens apply <manifest.json> [paths...] [--write]
 ```
 
+```bash
+tailwind-canonicalize --help
+```
+
+`--help` prints a full flag reference. On a TTY it is **ANSI-colored** (title, sections, flags, examples). Respects `NO_COLOR=1` (plain) and `FORCE_COLOR=1` (force color).
+
 ## Core options
 
 | Flag | Description |
@@ -19,12 +25,20 @@ tailwind-canonicalize tokens apply <manifest.json> [paths...] [--write]
 | `--check` | Exit 1 if changes would be made |
 | `--stdin` | Read source from stdin → stdout |
 | `--json` | Machine-readable summary |
-| `--verbose` | Full −/+ rewrite blocks + diagnostics |
+| `--verbose` | Full −/+ rewrite blocks + every diagnostic line |
 | `--diff` | Line diffs |
-| `-o, --report <file>` | Write human report (plain text) to a file |
+| `-o, --report <file>` | Write human report (plain text, no ANSI) to a file. **Requires a path** (`--report report.txt` or `--report=report.txt`). `--report -h` is invalid — use `-h` alone for help. |
 | `--safe` | Exact/safe only (default mode) |
 | `--review` | Report only; never write |
 | `--aggressive` | Review-level migrations / high-confidence inference |
+
+## Tokens / style report
+
+| Command | Description |
+|---------|-------------|
+| `tokens analyze [paths…]` | Propose semantic color mappings (no writes) |
+| `tokens apply <manifest> [--write]` | Apply approved mappings + optional theme CSS |
+| `tokens report [paths…]` | **Style usage report** — color frequency + tag attribution + drift (`-o styles-report.json`, `--md styles.md`) |
 
 ## Migrations
 
@@ -59,13 +73,24 @@ tailwind-canonicalize tokens apply <manifest.json> [paths...] [--write]
 | `1` | Changes required (`--check`) |
 | `2` | Error |
 
+## Conflicts & diagnostics
+
+Utilities that share a **cascade slot** (same property group + variants) but differ in value are **reported, never rewritten**.
+
+- Default report **groups** identical conflicts by property group (counts + top pairs).
+- `--verbose` lists sample diagnostic lines per message.
+- Conflicts do **not** block other rewrites in the same file.
+
+See [Safety](/docs/safety) for true vs false-positive conflict examples (`prose` + `prose-sm`, gradient position vs color, `flex` + `grid`).
+
 ## Example output
 
 ```
 ✓ 1,523 files
 ✓ 9,421 replacements
-✓ 0 unsafe rewrites
-Completed in 1.82s
+! 1 conflicts detected (not rewritten)
+  · canonical-class: 9,000
+Completed in 1.82s · v0.1.10
 ```
 
 ## JSON shape
@@ -77,6 +102,7 @@ Completed in 1.82s
   "filesSkipped": 0,
   "rewrites": 9421,
   "unsafe": 0,
+  "conflicts": 1,
   "elapsedMs": 1821,
   "transformationsByCategory": {
     "canonical-class": 9000,

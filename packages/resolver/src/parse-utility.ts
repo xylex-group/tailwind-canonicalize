@@ -75,14 +75,19 @@ export function parseUtility(token: string): UtilityParts {
   let namespace = "";
   let value = "";
   let isArbitrary = false;
+  let opacityModifier: string | undefined;
 
+  // Arbitrary + optional opacity: text-[13px]/3, bg-[#fff]/50
   const arbitraryMatch = base.match(
-    /^((?:[a-zA-Z]+(?:-[a-zA-Z]+)*)(?:-(?:x|y|t|b|l|r|s|e|ss|se|ee|es|tl|tr|bl|br))?)-(\[[\s\S]*\])$/,
+    /^((?:[a-zA-Z]+(?:-[a-zA-Z]+)*)(?:-(?:x|y|t|b|l|r|s|e|ss|se|ee|es|tl|tr|bl|br))?)-(\[[\s\S]*\])(?:\/(\d+(?:\.\d+)?%?|\[[\s\S]*\]))?$/,
   );
   if (arbitraryMatch) {
     namespace = arbitraryMatch[1] ?? "";
     value = arbitraryMatch[2] ?? "";
     isArbitrary = true;
+    if (arbitraryMatch[3]) {
+      opacityModifier = arbitraryMatch[3];
+    }
   } else {
     // Named utility: split on last meaningful hyphen groups
     // e.g. min-w-full, text-red-500, w-1/2, gap-x-4
@@ -97,6 +102,14 @@ export function parseUtility(token: string): UtilityParts {
       namespace = base;
       value = "";
     }
+    // Strip opacity from named values: red-500/50, white/20 — not fractions 1/2
+    if (value && !/^\d+\/\d+$/.test(value)) {
+      const op = value.match(/^(.*?)\/(\d+(?:\.\d+)?%?|\[[\s\S]*\])$/);
+      if (op?.[1] && op[2]) {
+        value = op[1];
+        opacityModifier = op[2];
+      }
+    }
   }
 
   return {
@@ -107,6 +120,7 @@ export function parseUtility(token: string): UtilityParts {
     negative,
     namespace,
     value,
+    opacityModifier,
     isArbitrary,
     isArbitraryProperty: false,
   };
@@ -116,14 +130,21 @@ export function parseUtility(token: string): UtilityParts {
  * Reassemble a utility from parts with a new base value suffix.
  */
 export function formatUtility(
-  parts: Pick<UtilityParts, "variants" | "important" | "negative" | "namespace">,
+  parts: Pick<
+    UtilityParts,
+    "variants" | "important" | "negative" | "namespace" | "opacityModifier"
+  >,
   valueSuffix: string,
 ): string {
   const neg = parts.negative ? "-" : "";
+  const opacity =
+    parts.opacityModifier != null && parts.opacityModifier !== ""
+      ? `/${parts.opacityModifier}`
+      : "";
   const base =
     valueSuffix === ""
-      ? `${neg}${parts.namespace}`
-      : `${neg}${parts.namespace}-${valueSuffix}`;
+      ? `${neg}${parts.namespace}${opacity}`
+      : `${neg}${parts.namespace}-${valueSuffix}${opacity}`;
   const withVariants = `${parts.variants}${base}`;
   return parts.important ? `${withVariants}!` : withVariants;
 }
