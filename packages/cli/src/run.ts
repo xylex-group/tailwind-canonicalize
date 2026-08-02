@@ -174,6 +174,7 @@ async function runTokensReport(args: CliArgs): Promise<number> {
   if (args.json) {
     console.log(JSON.stringify(report, null, 2));
   } else {
+    const health = report.summary.health;
     console.error(`✓ Analyzed ${report.filesAnalyzed} files`);
     console.error(
       `✓ ${report.summary.totalHits} color utility hits · ${report.summary.uniqueUtilities} unique`,
@@ -181,12 +182,46 @@ async function runTokensReport(args: CliArgs): Promise<number> {
     console.error(
       `✓ ${report.summary.uniqueTags} tags · ${report.summary.driftCount} drift signal(s)`,
     );
+    console.error(
+      `✓ Health ${health.score}/100 · semantic ${Math.round(health.semanticRatio * 100)}% · palette ${Math.round(health.paletteRatio * 100)}%`,
+    );
+    if (report.theme.colorTokens.length > 0) {
+      console.error(
+        `✓ Theme: ${report.theme.colorTokens.length} color token(s) · ${report.theme.missingForSemanticUtilities.length} missing · ${report.theme.unusedColorTokens.length} unused`,
+      );
+    }
+    if (report.suggestions.length > 0) {
+      console.error(
+        `✓ ${report.suggestions.length} workflow suggestion(s) for CSS / token cleanup`,
+      );
+    }
     console.error(`Wrote style report: ${jsonPath}`);
     if (report.summary.topUtilities.length > 0) {
       console.error("");
       console.error("Top colors:");
       for (const u of report.summary.topUtilities.slice(0, 10)) {
         console.error(`  ${String(u.count).padStart(5)}  ${u.utility}`);
+      }
+    }
+    if (report.summary.topFiles.length > 0) {
+      console.error("");
+      console.error("Top files:");
+      for (const f of report.summary.topFiles.slice(0, 5)) {
+        console.error(
+          `  ${String(f.count).padStart(5)}  ${f.file} (${f.uniqueUtilities} unique)`,
+        );
+      }
+    }
+    if (report.suggestions.length > 0) {
+      console.error("");
+      console.error("Suggestions (sample):");
+      for (const s of report.suggestions.slice(0, 5)) {
+        console.error(`  · [${s.severity}] ${s.title}`);
+      }
+      if (report.suggestions.length > 5) {
+        console.error(
+          `  … and ${report.suggestions.length - 5} more (see JSON)`,
+        );
       }
     }
     if (report.drift.length > 0) {

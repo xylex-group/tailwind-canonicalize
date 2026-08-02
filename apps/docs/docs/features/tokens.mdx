@@ -13,7 +13,7 @@ pnpm exec tailwind-canonicalize tokens analyze . --out proposed.json
 
 No source edits. Outputs proposals, conflicts, duplicate token reports, cycles.
 
-## Style usage report (drift)
+## Style usage report (drift) — v2
 
 Inventory **all color utilities** (not only `bg-*`) — `text-black`, `bg-slate-200`, `border-*`, `ring-*`, `fill-*`, gradients, semantic tokens like `text-muted-foreground` — with **HTML/JSX tag** attribution:
 
@@ -21,13 +21,17 @@ Inventory **all color utilities** (not only `bg-*`) — `text-black`, `bg-slate-
 tailwind-canonicalize tokens report . -o styles-report.json --md styles.md
 ```
 
-JSON includes:
+JSON includes (paths always POSIX: `src/components/...`, never `src\\...`):
 
-- `utilities[]` — count, channel, kind (`palette` | `semantic` | `arbitrary`), `tags`, `files`, samples  
-- `byTag[]` — colors used on `<button>`, `<p>`, …  
-- `drift[]` — multi-color same tag, palette mix, semantic+raw mix, high cardinality  
+- `utilities[]` — count, channel, kind (`palette` | `semantic` | `arbitrary`), variants, `tags`, `files`, samples  
+- `byTag[]` / `byFile[]` / `byDirectory[]` — reverse indexes and hotspots  
+- `summary.health` — 0–100 score + semantic/palette ratios  
+- `summary.byPalette` / `byShade` / `byVariant` — rollups  
+- `theme` — CSS / `@theme` color tokens, unused vars, missing vars for semantic utilities  
+- `suggestions[]` — workflow hooks (`add-css-color-token`, file hotspots, …) for updating `globals.css`  
+- `drift[]` — multi-color tags, palette mix, unused/missing theme tokens, file hotspots  
 
-Never rewrites source. Use before/after a design-system migration to catch styling drift.
+Never rewrites source. Feed `suggestions` + `theme.missingForSemanticUtilities` into token/CSS generators, then re-run the report.
 
 ## Phase 2 — Apply
 

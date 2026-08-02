@@ -30,14 +30,22 @@ export { isColorUtility, parseColorUtility } from "./palette.js";
 export {
   buildStyleUsageReport,
   formatStyleUsageReportMarkdown,
+  semanticBareFromBase,
+  toReportPath,
   writeStyleUsageReport,
+  type StyleDirectoryUsage,
   type StyleDriftSignal,
+  type StyleFileUsage,
+  type StyleHealthScore,
   type StyleHitSample,
   type StyleReportOptions,
   type StyleTagUsage,
+  type StyleThemeColorToken,
+  type StyleThemeSection,
   type StyleUsageReport,
   type StyleUtilityKind,
   type StyleUtilityUsage,
+  type StyleWorkflowSuggestion,
 } from "./style-report.js";
 export type {
   ColorAnalysisEntry,

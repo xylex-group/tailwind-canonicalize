@@ -1,5 +1,11 @@
 # tailwind-canonicalize
 
+## 0.1.19
+
+### Patch Changes
+
+- **tokens report (v2):** portable POSIX paths in `styles-report.json` (no Windows `src\\…` keys); `byFile` / `topFiles`, palette·shade·variant rollups, health score, CSS/`@theme` analysis, and workflow `suggestions` for globals.css token work
+
 ## 0.1.18
 
 ### Patch Changes

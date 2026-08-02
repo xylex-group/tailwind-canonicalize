@@ -18,22 +18,35 @@ tailwind-canonicalize tokens analyze . --out tailwind-tokens.proposed.json
 - Reports duplicate values and alias cycles
 - Writes a **proposal** manifest only — **no source edits**
 
-## Style usage / drift report
+## Style usage / drift report (v2)
 
 ```bash
 tailwind-canonicalize tokens report . -o styles-report.json --md styles.md
 ```
 
-Exports a **read-only** inventory of color styling classes:
+Exports a **read-only** inventory of color styling classes. Paths are always **POSIX** (`src/components/...`) even on Windows — never `src\\components\\...`.
 
 | Field | Meaning |
 |-------|---------|
-| `utilities` | Every color utility hit (`text-black`, `bg-slate-200`, `border-primary`, gradients, …) with counts |
-| `tags` | Which element (`button`, `p`, `div`, …) the class appeared on |
-| `byTag` | Reverse index: tag → colors used |
-| `drift` | Signals: many colors on one tag, mixed palettes, semantic + raw mix |
+| `utilities` | Every color utility hit (`text-black`, `bg-slate-200`, `border-primary`, gradients, …) with counts, tags, and file maps |
+| `byTag` | Reverse index: tag → colors used + per-tag drift |
+| `byFile` / `summary.topFiles` | File → hit counts, unique utilities, channels/kinds (hotspots) |
+| `byDirectory` | Shallow directory rollup for large trees |
+| `summary.byPalette` / `byShade` / `byVariant` | Palette families, shades, and variants (`hover`, `dark`, `base`, …) |
+| `summary.health` | 0–100 score + semantic/palette ratios and notes |
+| `theme` | CSS / `@theme` scan: color tokens, unused vars, missing vars for semantic utilities, duplicate values |
+| `suggestions` | Workflow hooks (`add-css-color-token`, `review-file-hotspot`, …) with stable `payload` for generators |
+| `drift` | Signals: multi-color tags, mixed palettes, unused/missing theme tokens, file hotspots |
 
-Useful for design-system cleanup and before/after token migrations. Does not rewrite files.
+### Workflow: report → globals.css / `@theme`
+
+The report does **not** write CSS. Agents and pipelines can:
+
+1. Read `theme.missingForSemanticUtilities` and `suggestions` where `kind === "add-css-color-token"` and `payload.applyable === true`.
+2. Add `--color-*` keys to `globals.css` / `@theme` (or feed `tokens analyze` / `generateTheme`).
+3. Re-run `tokens report` to confirm unused/missing lists shrink and health improves.
+
+Useful for design-system cleanup and before/after token migrations.
 
 ## Phase 2 — Apply
 
