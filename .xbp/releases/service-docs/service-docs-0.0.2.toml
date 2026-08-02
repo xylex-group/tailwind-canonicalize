@@ -1,0 +1,176 @@
+scope_kind = "service"
+scope_label = "docs"
+scope_slug = "service-docs"
+version = "0.0.2"
+tag_name = "docs-0.0.2"
+xbp_version = "10.61.0"
+branch_name = "releases/docs-0.0.2"
+cloudflare_evidence = []
+status = "Completed"
+created_at = "2026-08-02T07:20:29.504086Z"
+updated_at = "2026-08-02T07:20:49.178722600Z"
+completed_at = "2026-08-02T07:20:49.178722600Z"
+
+[baseline]
+source = "release-ledger"
+reference = "docs-0.0.1"
+tag = "docs-0.0.1"
+
+[selection]
+changed_files = [
+    ".changeset/config.json",
+    ".changeset/initial.md",
+    ".xbp/releases/service-cli/service-cli-0.1.0.toml",
+    ".xbp/releases/service-docs/service-docs-0.0.1.toml",
+    ".xbp/releases/service-tailwind-canonicalize-vscode/service-tailwind-canonicalize-vscode-0.1.0.toml",
+    ".xbp/releases/service-tailwind-canonicalize/service-tailwind-canonicalize-0.1.0.toml",
+    ".xbp/versioning/history.jsonl",
+    ".xbp/xbp.toml",
+    "README.md",
+    "apps/docs/docs/architecture.mdx",
+    "apps/docs/docs/cli.mdx",
+    "apps/docs/docs/examples.mdx",
+    "apps/docs/docs/features/canonical.mdx",
+    "apps/docs/docs/features/tokens.mdx",
+    "apps/docs/docs/safety.mdx",
+    "apps/docs/docs/troubleshooting.mdx",
+    "apps/docs/lib/examples.ts",
+    "apps/docs/package.json",
+    "benchmarks/run.ts",
+    "docs/architecture/safety.md",
+    "docs/architecture/transformations.md",
+    "docs/guides/cli.md",
+    "docs/guides/tokens.md",
+    "fixtures/react/safe.input.tsx",
+    "fixtures/react/safe.output.tsx",
+    "package.json",
+    "packages/cli/CHANGELOG.md",
+    "packages/cli/README.md",
+    "packages/cli/package.json",
+    "packages/cli/src/ansi.ts",
+    "packages/cli/src/args.test.ts",
+    "packages/cli/src/args.ts",
+    "packages/cli/src/bin.ts",
+    "packages/cli/src/index.ts",
+    "packages/cli/src/report.test.ts",
+    "packages/cli/src/report.ts",
+    "packages/cli/src/run.ts",
+    "packages/cli/tsconfig.build.json",
+    "packages/cli/tsup.config.ts",
+    "packages/compiler/package.json",
+    "packages/compiler/src/canonicalize.ts",
+    "packages/compiler/src/scan.ts",
+    "packages/compiler/src/types.ts",
+    "packages/compiler/src/worker-pool.ts",
+    "packages/compiler/src/worker.ts",
+    "packages/parser/package.json",
+    "packages/parser/src/extract.test.ts",
+    "packages/parser/src/extract.ts",
+    "packages/parser/src/html-extract.ts",
+    "packages/parser/src/js-extract.ts",
+    "packages/resolver/package.json",
+    "packages/resolver/src/dedupe.ts",
+    "packages/resolver/src/default-theme.ts",
+    "packages/resolver/src/find-canonical.test.ts",
+    "packages/resolver/src/find-canonical.ts",
+    "packages/resolver/src/generated-matrix.test.ts",
+    "packages/resolver/src/index.ts",
+    "packages/resolver/src/length.ts",
+    "packages/resolver/src/load-theme.ts",
+    "packages/resolver/src/load-v3-config.ts",
+    "packages/resolver/src/matrix.test.ts",
+    "packages/resolver/src/migrations/migrations.test.ts",
+    "packages/resolver/src/migrations/registry.ts",
+    "packages/resolver/src/namespace.ts",
+    "packages/resolver/src/parse-utility.ts",
+    "packages/resolver/src/pipeline.test.ts",
+    "packages/resolver/src/pipeline.ts",
+    "packages/resolver/src/pr1-review-fixes.test.ts",
+    "packages/resolver/src/pr2-review-fixes.test.ts",
+    "packages/resolver/src/safety-review-fixes.test.ts",
+    "packages/resolver/src/types.ts",
+    "packages/resolver/src/utility-identity.ts",
+    "packages/tokens/package.json",
+    "packages/tokens/src/context.ts",
+    "packages/tokens/src/index.ts",
+    "packages/tokens/src/style-report.test.ts",
+    "packages/tokens/src/style-report.ts",
+    "packages/transformer/package.json",
+    "packages/transformer/src/index.ts",
+    "packages/transformer/src/transform-safety.test.ts",
+    "packages/transformer/src/transform.ts",
+    "packages/transformer/src/types.ts",
+    "packages/vscode/package.json",
+    "pnpm-lock.yaml",
+]
+publish_targets = []
+
+[[selection.version_targets]]
+path = "apps/docs/package.json"
+
+[steps.commit_release_docs]
+status = "Completed"
+started_at = "2026-08-02T07:20:44.561061300Z"
+completed_at = "2026-08-02T07:20:49.177662900Z"
+
+[steps.commit_release_docs.details]
+paths = [
+    "CHANGELOG.md",
+    "SECURITY.md",
+]
+
+[steps.github_release]
+status = "Completed"
+started_at = "2026-08-02T07:20:38.498200200Z"
+completed_at = "2026-08-02T07:20:39.686672900Z"
+
+[steps.github_release.details]
+release_id = 363725339
+release_url = "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/docs-0.0.2"
+
+[steps.publish_linear]
+status = "Completed"
+started_at = "2026-08-02T07:20:39.699351700Z"
+completed_at = "2026-08-02T07:20:43.663449700Z"
+
+[[steps.publish_linear.details.initiatives]]
+id = "fd28f67f-8dc8-44b2-bf14-3821ce389145"
+name = "Changelog"
+url = "https://linear.app/suits-formations/initiative/fd28f67f-8dc8-44b2-bf14-3821ce389145"
+
+[steps.push_tag]
+status = "Completed"
+started_at = "2026-08-02T07:20:33.121510900Z"
+completed_at = "2026-08-02T07:20:37.374614200Z"
+
+[steps.push_tag.details]
+tag_name = "docs-0.0.2"
+branch_name = "releases/docs-0.0.2"
+
+[steps.sync_release_docs]
+status = "Completed"
+started_at = "2026-08-02T07:20:44.536767Z"
+completed_at = "2026-08-02T07:20:44.560206900Z"
+
+[steps.sync_release_docs.details]
+paths = [
+    "CHANGELOG.md",
+    "SECURITY.md",
+]
+
+[steps.sync_version]
+status = "Completed"
+started_at = "2026-08-02T07:20:29.695549Z"
+completed_at = "2026-08-02T07:20:29.779269900Z"
+
+[steps.sync_version.details]
+updated_paths = ["apps/docs/package.json"]
+
+[steps.upload_openapi_assets]
+status = "Completed"
+started_at = "2026-08-02T07:20:39.697924900Z"
+completed_at = "2026-08-02T07:20:39.698635500Z"
+
+[steps.upload_openapi_assets.details]
+uploaded_assets = []
+prepared_assets = []
