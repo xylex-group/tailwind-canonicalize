@@ -189,6 +189,26 @@ function resolveTemplateQuasiSpan(
   return { start, end };
 }
 
+function jsxAttributeName(nameNode: unknown): string | undefined {
+  if (!isRecord(nameNode)) {
+    return undefined;
+  }
+  const type = getString(nameNode, "type");
+  if (type === "JSXIdentifier") {
+    return getString(nameNode, "name");
+  }
+  if (type === "JSXNamespacedName") {
+    const ns = getNode(nameNode, "namespace");
+    const name = getNode(nameNode, "name");
+    const left = isRecord(ns) ? getString(ns, "name") : undefined;
+    const right = isRecord(name) ? getString(name, "name") : undefined;
+    if (left && right) {
+      return `${left}:${right}`;
+    }
+  }
+  return undefined;
+}
+
 function calleeName(node: unknown): string | null {
   if (!isRecord(node)) {
     return null;
@@ -333,23 +353,17 @@ function walkProgram(ctx: WalkerContext, node: unknown): void {
   const type = getString(node, "type");
 
   if (type === "JSXAttribute") {
-    const nameNode = getNode(node, "name");
-    const attrName =
-      isRecord(nameNode) && getString(nameNode, "type") === "JSXIdentifier"
-        ? getString(nameNode, "name")
-        : undefined;
-    if (attrName === "className" || attrName === "class") {
+    const attrName = jsxAttributeName(getNode(node, "name"));
+    if (attrName === "className" || attrName === "class" || attrName === "class:list") {
+      const kind: ClassOccurrence["kind"] =
+        attrName === "class:list" ? "clsx" : attrName === "class" ? "class" : "className";
       const value = getNode(node, "value");
       if (isRecord(value)) {
         const vType = getString(value, "type");
         if (vType === "Literal" || vType === "StringLiteral") {
-          pushLiteral(ctx, value, attrName === "class" ? "class" : "className");
+          pushLiteral(ctx, value, kind);
         } else if (vType === "JSXExpressionContainer") {
-          walkExpr(
-            ctx,
-            getNode(value, "expression"),
-            attrName === "class" ? "class" : "className",
-          );
+          walkExpr(ctx, getNode(value, "expression"), kind);
         }
       }
       return;

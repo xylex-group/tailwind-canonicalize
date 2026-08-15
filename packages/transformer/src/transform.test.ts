@@ -38,4 +38,19 @@ describe("transformSource", () => {
     expect(result.changed).toBe(false);
     expect(result.code).toBe(src);
   });
+
+  it("rewrites Astro class:list and frontmatter with TSX parity", () => {
+    const src = `---
+const box = cn("w-[40px] p-[16px]");
+---
+<div class:list={["h-[10px] gap-[8px]", { "min-w-[10rem]": ok }]}>{box}</div>
+`;
+    const result = transformSource(src, { filePath: "Card.astro", theme });
+    expect(result.changed).toBe(true);
+    expect(result.code).toContain('cn("w-10 p-4")');
+    expect(result.code).toContain('"h-2.5 gap-2"');
+    expect(result.code).toContain('"min-w-40"');
+    expect(result.code).not.toContain("w-[40px]");
+    expect(result.code).not.toContain("h-[10px]");
+  });
 });

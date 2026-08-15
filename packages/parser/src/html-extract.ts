@@ -52,37 +52,171 @@ function looksLikeScriptModule(src: string): boolean {
   );
 }
 
+type JsExtract = (src: string) => {
+  occurrences: ClassOccurrence[];
+  errors: ExtractError[];
+};
+
+function kindForAttr(attr: string): ClassOccurrence["kind"] {
+  if (attr === "className") {
+    return "className";
+  }
+  if (attr === "class:list") {
+    return "clsx";
+  }
+  return "html-class";
+}
+
+/** Map `{...}` / quoted attribute values; expression forms need a JS walker. */
+function extractWrappedExpression(
+  inner: string,
+  innerStart: number,
+  extractJs: JsExtract,
+  kind: ClassOccurrence["kind"],
+): ClassOccurrence[] {
+  // Wrap as a `cn(...)` call so the JS walker treats array/object/conditional
+  // literals as class containers (same as `className={...}` / `clsx(...)`).
+  const prefix = "cn(\n";
+  const wrapped = `${prefix}${inner}\n);`;
+  let js = extractJs(wrapped);
+  let shift = prefix.length;
+  if (js.occurrences.length === 0) {
+    js = extractJs(`void (\n${inner}\n);`);
+    shift = "void (\n".length;
+  }
+  if (js.occurrences.length === 0) {
+    js = extractJs(inner);
+    shift = 0;
+  }
+  const out: ClassOccurrence[] = [];
+  for (const o of js.occurrences) {
+    const localStart = o.start - shift;
+    const localEnd = o.end - shift;
+    if (localStart < 0 || localEnd > inner.length) {
+      continue;
+    }
+    if (inner.slice(localStart, localEnd) !== o.raw) {
+      continue;
+    }
+    out.push({
+      ...o,
+      start: localStart + innerStart,
+      end: localEnd + innerStart,
+      kind: o.kind === "unknown" ? kind : o.kind,
+    });
+  }
+  return out;
+}
+
+function readBalanced(
+  source: string,
+  openIndex: number,
+  open: string,
+  close: string,
+): { inner: string; innerStart: number; end: number } | null {
+  if (source[openIndex] !== open) {
+    return null;
+  }
+  let depth = 0;
+  let quote: string | null = null;
+  let escape = false;
+  for (let i = openIndex; i < source.length; i++) {
+    const ch = source[i] ?? "";
+    if (quote) {
+      if (escape) {
+        escape = false;
+        continue;
+      }
+      if (ch === "\\") {
+        escape = true;
+        continue;
+      }
+      if (ch === quote) {
+        quote = null;
+      }
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") {
+      quote = ch;
+      continue;
+    }
+    if (ch === open) {
+      depth += 1;
+      continue;
+    }
+    if (ch === close) {
+      depth -= 1;
+      if (depth === 0) {
+        const innerStart = openIndex + 1;
+        return {
+          inner: source.slice(innerStart, i),
+          innerStart,
+          end: i + 1,
+        };
+      }
+    }
+  }
+  return null;
+}
+
 export function extractFromHtml(
   source: string,
+  extractJs?: JsExtract,
 ): { occurrences: ClassOccurrence[]; errors: ExtractError[] } {
   const occurrences: ClassOccurrence[] = [];
   const errors: ExtractError[] = [];
 
-  // Match class / className attributes with "..." or '...' values.
-  // Does not cross into script content via naive global scan — callers should
-  // pass only template/markup regions for Vue/Svelte/Astro when possible.
-  const attrRe =
-    /\b(className|class)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{`([^`]*)`\}|\{"([^"]*)"\}|\{'([^']*)'\})/g;
+  // class / className / Astro class:list. Quoted values plus `{expr}` (JSX/Astro).
+  const attrRe = /\b(className|class:list|class)\s*=\s*/g;
 
   let match: RegExpExecArray | null = attrRe.exec(source);
   while (match) {
-    const full = match[0];
     const attr = match[1] ?? "class";
-    const value =
-      match[2] ?? match[3] ?? match[4] ?? match[5] ?? match[6] ?? "";
-    const valueIndexInFull = full.lastIndexOf(value);
-    if (valueIndexInFull === -1) {
-      match = attrRe.exec(source);
-      continue;
+    const valueStart = (match.index ?? 0) + match[0].length;
+    const head = source[valueStart];
+    if (head === '"' || head === "'") {
+      const close = source.indexOf(head, valueStart + 1);
+      if (close === -1) {
+        match = attrRe.exec(source);
+        continue;
+      }
+      const start = valueStart + 1;
+      occurrences.push({
+        raw: source.slice(start, close),
+        start,
+        end: close,
+        kind: kindForAttr(attr),
+      });
+      attrRe.lastIndex = close + 1;
+    } else if (head === "{") {
+      const braced = readBalanced(source, valueStart, "{", "}");
+      if (!braced) {
+        match = attrRe.exec(source);
+        continue;
+      }
+      const trimmed = braced.inner.trim();
+      const quote = trimmed[0];
+      const isQuoted =
+        (quote === '"' || quote === "'" || quote === "`") &&
+        trimmed.endsWith(quote) &&
+        trimmed.length >= 2 &&
+        !trimmed.slice(1, -1).includes(quote);
+      if (isQuoted && quote) {
+        const innerStart = braced.innerStart + braced.inner.indexOf(trimmed) + 1;
+        const innerEnd = innerStart + trimmed.length - 2;
+        occurrences.push({
+          raw: source.slice(innerStart, innerEnd),
+          start: innerStart,
+          end: innerEnd,
+          kind: kindForAttr(attr),
+        });
+      } else if (extractJs) {
+        occurrences.push(
+          ...extractWrappedExpression(braced.inner, braced.innerStart, extractJs, kindForAttr(attr)),
+        );
+      }
+      attrRe.lastIndex = braced.end;
     }
-    const start = (match.index ?? 0) + valueIndexInFull;
-    const end = start + value.length;
-    occurrences.push({
-      raw: value,
-      start,
-      end,
-      kind: attr === "className" ? "className" : "html-class",
-    });
     match = attrRe.exec(source);
   }
 
@@ -138,6 +272,73 @@ export function extractFromMdx(
   });
 
   return { occurrences: unique, errors };
+}
+
+function looksLikeJsxIsland(src: string): boolean {
+  const t = src.trim();
+  if (!t || t.length < 8) {
+    return false;
+  }
+  return (
+    t.includes("<") ||
+    t.includes("className") ||
+    t.includes("class:list") ||
+    /\bclass\s*=/.test(t) ||
+    /\b(clsx|cn|cva|twMerge|classnames|tv|cx)\s*\(/.test(t)
+  );
+}
+
+function skipRanges(source: string): Array<[number, number]> {
+  const ranges: Array<[number, number]> = [];
+  const re = /<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi;
+  let m: RegExpExecArray | null = re.exec(source);
+  while (m) {
+    ranges.push([m.index ?? 0, (m.index ?? 0) + m[0].length]);
+    m = re.exec(source);
+  }
+  return ranges;
+}
+
+function inRange(index: number, ranges: Array<[number, number]>): boolean {
+  return ranges.some(([a, b]) => index >= a && index < b);
+}
+
+function extractAstroExpressionIslands(
+  markup: string,
+  markupOffset: number,
+  extractJs: (
+    src: string,
+    baseOffset: number,
+  ) => { occurrences: ClassOccurrence[]; errors: ExtractError[] },
+  out: ClassOccurrence[],
+): void {
+  const skips = skipRanges(markup);
+  let i = 0;
+  while (i < markup.length) {
+    if (inRange(i, skips)) {
+      i += 1;
+      continue;
+    }
+    if (markup[i] !== "{") {
+      i += 1;
+      continue;
+    }
+    const braced = readBalanced(markup, i, "{", "}");
+    if (!braced) {
+      i += 1;
+      continue;
+    }
+    if (looksLikeJsxIsland(braced.inner)) {
+      const found = extractWrappedExpression(
+        braced.inner,
+        braced.innerStart + markupOffset,
+        (src) => extractJs(src, 0),
+        "clsx",
+      );
+      out.push(...found);
+    }
+    i = braced.end;
+  }
 }
 
 /**
@@ -203,8 +404,8 @@ export function extractFromSfc(
       markup = source.slice(fm[0].length);
       markupOffset = fm[0].length;
     }
-    // Attribute scan on markup (and full file as fallback for class outside fm)
-    const html = extractFromHtml(markup);
+    // Attribute scan on markup (class, className, class:list, `{expr}`)
+    const html = extractFromHtml(markup, extractJs);
     for (const o of html.occurrences) {
       occurrences.push({
         ...o,
@@ -212,9 +413,11 @@ export function extractFromSfc(
         end: o.end + markupOffset,
       });
     }
+    // JSX-like `{ ... }` islands in Astro templates (map callbacks, fragments)
+    extractAstroExpressionIslands(markup, markupOffset, extractJs, occurrences);
     // Also scan full source for className/class in case fm regex missed
     if (html.occurrences.length === 0) {
-      const fullHtml = extractFromHtml(source);
+      const fullHtml = extractFromHtml(source, extractJs);
       occurrences.push(...fullHtml.occurrences);
     }
   }

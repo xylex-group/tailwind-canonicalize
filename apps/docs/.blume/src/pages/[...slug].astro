@@ -43,7 +43,10 @@ import Icon from "blume/components/Icon.astro";
 import ApiOverview from "blume/components/openapi/ApiOverview.astro";
 import ApiTagOperations from "blume/components/openapi/ApiTagOperations.astro";
 import Operation from "blume/components/openapi/Operation.astro";
-import { mdxComponents as userMdx, layoutOverrides } from "../generated/components.ts";
+import {
+  mdxComponents as userMdx,
+  layoutOverrides,
+} from "../generated/components.ts";
 import { islandComponents } from "../generated/islands.ts";
 import data from "blume:data";
 
@@ -113,7 +116,18 @@ export function getStaticPaths() {
   }));
 }
 
-const { entryId, collection, route, title, indexable, editUrl, lastModified, locale, alternates, fallback } = Astro.props;
+const {
+  entryId,
+  collection,
+  route,
+  title,
+  indexable,
+  editUrl,
+  lastModified,
+  locale,
+  alternates,
+  fallback,
+} = Astro.props;
 const entry = await getEntry(collection as CollectionKey, entryId);
 if (!entry) {
   return new Response(null, { status: 404 });
@@ -139,7 +153,10 @@ const ogGenerated = !seo.image && Boolean(ogPath);
 
 // X attribution: the site's account, plus a creator the page can claim for
 // itself (a guest post crediting its own author) over the configured default.
-const x = { ...data.config.x, ...(seo.x?.creator ? { creator: seo.x.creator } : {}) };
+const x = {
+  ...data.config.x,
+  ...(seo.x?.creator ? { creator: seo.x.creator } : {}),
+};
 
 const basedRoute = withBase(route);
 const canonical =
@@ -162,10 +179,14 @@ const localizeRoute = (logical: string, codeArg: string) => {
 };
 const stripLocale = (path: string, codeArg: string) => {
   const prefix = localePrefix(codeArg);
-  return prefix && path.startsWith(prefix) ? path.slice(prefix.length) || "/" : path;
+  return prefix && path.startsWith(prefix)
+    ? path.slice(prefix.length) || "/"
+    : path;
 };
 
-const navigation = i18n ? (data.navigationByLocale[locale] ?? data.navigation) : data.navigation;
+const navigation = i18n
+  ? (data.navigationByLocale[locale] ?? data.navigation)
+  : data.navigation;
 const ui = i18n ? (data.uiByLocale[locale] ?? data.ui) : data.ui;
 const localeMeta = i18n ? i18n.locales.find((l) => l.code === locale) : null;
 const dir = localeMeta?.dir ?? "ltr";
@@ -184,9 +205,14 @@ const absolute = (path: string) => {
 
 const localeAlternates =
   i18n && base
-    ? (alternates ?? []).map((alt) => ({ hreflang: alt.locale, href: absolute(alt.path) }))
+    ? (alternates ?? []).map((alt) => ({
+        hreflang: alt.locale,
+        href: absolute(alt.path),
+      }))
     : [];
-const defaultAlt = i18n ? (alternates ?? []).find((alt) => alt.locale === i18n.defaultLocale) : null;
+const defaultAlt = i18n
+  ? (alternates ?? []).find((alt) => alt.locale === i18n.defaultLocale)
+  : null;
 const xDefault = defaultAlt && base ? absolute(defaultAlt.path) : null;
 
 const logicalRoute = i18n ? stripLocale(route, locale) : route;
@@ -228,7 +254,11 @@ const LayoutComponent = resolveSlot(layoutOverrides.Layout, RootLayout);
   localeAlternates={localeAlternates}
   xDefault={xDefault}
   localeSwitch={localeSwitch}
-  page={{ title: seo.title ?? title, description: seo.description ?? frontmatter.description, route }}
+  page={{
+    title: seo.title ?? title,
+    description: seo.description ?? frontmatter.description,
+    route,
+  }}
   headings={headings}
   toc={data.config.toc}
   dateFormat={data.config.dateFormat}
@@ -253,6 +283,10 @@ const LayoutComponent = resolveSlot(layoutOverrides.Layout, RootLayout);
   structuredDataEnabled={data.config.structuredData}
 >
   <h1>{title}</h1>
-  {frontmatter.description && <p class="text-lg text-muted-foreground">{frontmatter.description}</p>}
+  {
+    frontmatter.description && (
+      <p class="text-lg text-muted-foreground">{frontmatter.description}</p>
+    )
+  }
   <Content components={components} />
 </LayoutComponent>

@@ -14,7 +14,8 @@
       "!**/.turbo",
       "!**/pnpm-lock.yaml",
       "!**/fixtures/**",
-      "!**/*.md"
+      "!**/*.md",
+      "!**/*.astro"
     ]
   },
   "formatter": {

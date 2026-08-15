@@ -2,6 +2,15 @@ import { describe, expect, it } from "vitest";
 import { extractClassOccurrences } from "./extract.js";
 
 describe("extractClassOccurrences", () => {
+  it("extracts JSX class:list the same as className expressions", () => {
+    const src = `export const A = () => (
+      <img class:list={["w-[40px]", cond ? "h-[10px]" : "h-[20px]"]} />
+    )`;
+    const { occurrences } = extractClassOccurrences(src, { filePath: "a.tsx" });
+    const raws = occurrences.map((o) => o.raw);
+    expect(raws).toEqual(expect.arrayContaining(["w-[40px]", "h-[10px]", "h-[20px]"]));
+  });
+
   it("extracts className JSX attributes", () => {
     const src = `export const A = () => <div className="w-[40px] p-4" />`;
     const { occurrences } = extractClassOccurrences(src, { filePath: "a.tsx" });
@@ -126,5 +135,52 @@ const title = "Hi";
     const raws = occurrences.map((o) => o.raw);
     expect(raws.some((r) => r.includes("w-[40px]"))).toBe(true);
     expect(raws.some((r) => r.includes("object-cover"))).toBe(true);
+  });
+
+  it("extracts Astro class:list arrays, objects, and JSX islands like TSX className", () => {
+    const src = `---
+const box = cn("w-[40px] p-[16px]");
+---
+
+<div
+  class:list={[
+    "h-[10px] gap-[8px]",
+    { "min-w-[10rem]": true },
+  ]}
+>
+  {box}
+</div>
+
+{
+  items.map((item, index) => (
+    <img
+      class:list={[
+        "w-[40px] object-cover",
+        index % 2 === 0 ? "h-[10px]" : "h-[20px]",
+      ]}
+    />
+  ))
+}
+
+<span class={cn("m-[4px]", "p-[8px]")} />
+`;
+    const { occurrences, errors, language } = extractClassOccurrences(src, {
+      filePath: "Card.astro",
+    });
+    expect(language).toBe("astro");
+    expect(errors).toHaveLength(0);
+    const raws = occurrences.map((o) => o.raw);
+    expect(raws).toEqual(
+      expect.arrayContaining([
+        "w-[40px] p-[16px]",
+        "h-[10px] gap-[8px]",
+        "min-w-[10rem]",
+        "w-[40px] object-cover",
+        "h-[10px]",
+        "h-[20px]",
+        "m-[4px]",
+        "p-[8px]",
+      ]),
+    );
   });
 });

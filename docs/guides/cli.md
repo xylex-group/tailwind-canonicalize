@@ -63,6 +63,8 @@ Same cascade slot, different values → diagnostic only (never rewritten). Prope
 
 `ts`, `tsx`, `js`, `jsx`, `mjs`, `cjs`, `mts`, `cts`, `html`, `vue`, `astro`, `svelte`, `mdx`
 
+Astro has the same rewrite coverage as TSX: frontmatter + `<script>` (oxc), markup `class` / `className`, `class:list` (arrays, objects, conditionals), `class={cn(...)}`, and JSX-like `{ ... }` islands. Format `*.astro` with Prettier (`prettier-plugin-astro`); Biome does not own those files.
+
 ## With linters / formatters
 
 Canonicalize is not a replacement for Biome, ESLint, Oxlint, or Prettier. Compose:

@@ -70,8 +70,7 @@ const defaultId = featured[0]?.id ?? "spacing";
 
 <script>
   const panels = document.querySelectorAll<HTMLElement>("[data-hp-ex]");
-  const buttons =
-    document.querySelectorAll<HTMLButtonElement>(".hp-example");
+  const buttons = document.querySelectorAll<HTMLButtonElement>(".hp-example");
 
   const show = (id: string) => {
     for (const button of buttons) {
@@ -86,8 +85,6 @@ const defaultId = featured[0]?.id ?? "spacing";
   };
 
   for (const button of buttons) {
-    button.addEventListener("click", () =>
-      show(button.dataset.example ?? ""),
-    );
+    button.addEventListener("click", () => show(button.dataset.example ?? ""));
   }
 </script>

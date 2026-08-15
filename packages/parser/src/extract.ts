@@ -39,7 +39,7 @@ export function extractClassOccurrences(
 
   if (ext === ".astro") {
     const result = extractFromSfc(source, "astro", (src) =>
-      extractFromJavaScript(src, { ...options, filePath: "block.ts" }),
+      extractFromJavaScript(src, { ...options, filePath: "block.tsx" }),
     );
     return { ...result, language: "astro" };
   }

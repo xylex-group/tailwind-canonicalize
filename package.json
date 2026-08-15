@@ -14,9 +14,10 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc -b --pretty false",
     "lint": "ultracite check",
-    "format": "ultracite fix",
-    "check": "ultracite check",
-    "fix": "ultracite fix",
+    "format": "ultracite fix && prettier --write \"**/*.astro\" --ignore-path .gitignore",
+    "format:astro": "prettier --write \"**/*.astro\" --ignore-path .gitignore",
+    "check": "ultracite check && prettier --check \"**/*.astro\" --ignore-path .gitignore",
+    "fix": "ultracite fix && prettier --write \"**/*.astro\" --ignore-path .gitignore",
     "knip": "knip",
     "publint": "pnpm -r --filter=./packages/* exec publint",
     "benchmark": "tsx benchmarks/run.ts",
@@ -40,6 +41,8 @@
     "husky": "^9.1.7",
     "knip": "^5.63.0",
     "lint-staged": "^16.1.5",
+    "prettier": "^3.6.2",
+    "prettier-plugin-astro": "^0.14.1",
     "publint": "^0.3.12",
     "tsx": "^4.20.4",
     "typescript": "^5.9.2",
@@ -49,6 +52,9 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,jsonc,css,md,mdx}": [
       "pnpm exec ultracite fix"
+    ],
+    "*.astro": [
+      "prettier --write"
     ]
   },
   "version": "0.2.0"

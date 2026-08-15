@@ -81,9 +81,7 @@ const footerNav = [
                 <a
                   class="text-muted-foreground text-sm transition-colors hover:text-accent"
                   href={link.href}
-                  rel={
-                    link.href.startsWith("http") ? "noreferrer" : undefined
-                  }
+                  rel={link.href.startsWith("http") ? "noreferrer" : undefined}
                   target={link.href.startsWith("http") ? "_blank" : undefined}
                 >
                   {link.label}

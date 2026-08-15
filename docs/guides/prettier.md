@@ -48,7 +48,7 @@ Avoid any Prettier plugin that *converts* arbitrary values — that belongs here
 
 ```json
 {
-  "*.{js,jsx,ts,tsx,vue,html,mdx,css,md,json}": [
+  "*.{js,jsx,ts,tsx,vue,astro,html,mdx,css,md,json}": [
     "tailwind-canonicalize --write",
     "prettier --write"
   ]

@@ -2,7 +2,7 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "workspaces": {
     ".": {
-      "entry": ["vitest.config.ts", "benchmarks/**/*.ts", "tests/**/*.ts"],
+      "entry": ["vitest.config.ts", "benchmarks/**/*.ts", "tests/**/*.ts", "prettier.config.js"],
       "project": ["**/*.{ts,tsx}"]
     },
     "packages/*": {

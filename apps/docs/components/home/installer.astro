@@ -98,7 +98,9 @@ const {
     };
 
     for (const button of modes) {
-      button.addEventListener("click", () => setMode(button.dataset.mode ?? "human"));
+      button.addEventListener("click", () =>
+        setMode(button.dataset.mode ?? "human"),
+      );
     }
 
     let timer: ReturnType<typeof setTimeout>;
