@@ -176,6 +176,23 @@ export function createDefaultTheme(): Theme {
   // Full default palette — exact hex match only.
   const colors = { values: defaultColorScale() };
 
+  // Tailwind v4 --container-* (used by min-w / max-w / w / size / basis).
+  const container = scale({
+    "3xs": "16rem",
+    "2xs": "18rem",
+    xs: "20rem",
+    sm: "24rem",
+    md: "28rem",
+    lg: "32rem",
+    xl: "36rem",
+    "2xl": "42rem",
+    "3xl": "48rem",
+    "4xl": "56rem",
+    "5xl": "64rem",
+    "6xl": "72rem",
+    "7xl": "80rem",
+  });
+
   // Tailwind border-width scale: bare numbers are CSS px, NOT --spacing units.
   // border-2 = 2px; border-8 = 8px. Never map 8px → border-2 (spacing).
   const borderWidth = scale({
@@ -201,6 +218,7 @@ export function createDefaultTheme(): Theme {
     opacity,
     width: { values: new Map(spacingValues) },
     height: { values: new Map(spacingValues) },
+    container,
     cssVariables: new Map([
       ["--spacing", "0.25rem"],
     ]),

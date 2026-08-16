@@ -144,6 +144,17 @@ export function scaleForNamespace(namespace: string, theme: Theme): ThemeScale |
   return null;
 }
 
+/** Namespaces that accept Tailwind v4 `--container-*` tokens. */
+export function usesContainerScale(namespace: string): boolean {
+  return (
+    namespace === "w" ||
+    namespace === "min-w" ||
+    namespace === "max-w" ||
+    namespace === "size" ||
+    namespace === "basis"
+  );
+}
+
 /** `border`, `border-t`, … — width utilities use the borderWidth px scale. */
 export function isBorderWidthNamespace(namespace: string): boolean {
   return (
@@ -163,6 +174,9 @@ export function isBorderWidthNamespace(namespace: string): boolean {
  * Namespaces where `text-[16px]` means font-size and `text-[#ff0000]` means color.
  */
 export function alternateScales(namespace: string, theme: Theme): ThemeScale[] {
+  if (usesContainerScale(namespace) && theme.tailwindVersion !== 3) {
+    return [theme.container];
+  }
   if (namespace === "text") {
     return [theme.fontSize, theme.colors];
   }

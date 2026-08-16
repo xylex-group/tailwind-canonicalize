@@ -30,6 +30,11 @@ export interface Theme {
   opacity: ThemeScale;
   width: ThemeScale;
   height: ThemeScale;
+  /**
+   * Tailwind v4 `--container-*` sizes (`md` → `28rem`).
+   * Used by `w` / `min-w` / `max-w` / `size` / `basis` only — not padding.
+   */
+  container: ThemeScale;
   /** Raw CSS variables from @theme. */
   cssVariables: Map<string, string>;
   /** Source of the theme for diagnostics. */

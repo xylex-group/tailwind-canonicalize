@@ -23,6 +23,7 @@ export interface SerializedTheme {
   blur: Array<[string, string]>;
   boxShadow: Array<[string, string]>;
   opacity: Array<[string, string]>;
+  container?: Array<[string, string]>;
   cssVariables: Array<[string, string]>;
   source: string;
   tailwindVersion?: 3 | 4;
@@ -35,6 +36,22 @@ const DEFAULT_BORDER_WIDTH: Array<[string, string]> = [
   ["2", "2px"],
   ["4", "4px"],
   ["8", "8px"],
+];
+
+const DEFAULT_CONTAINER: Array<[string, string]> = [
+  ["3xs", "16rem"],
+  ["2xs", "18rem"],
+  ["xs", "20rem"],
+  ["sm", "24rem"],
+  ["md", "28rem"],
+  ["lg", "32rem"],
+  ["xl", "36rem"],
+  ["2xl", "42rem"],
+  ["3xl", "48rem"],
+  ["4xl", "56rem"],
+  ["5xl", "64rem"],
+  ["6xl", "72rem"],
+  ["7xl", "80rem"],
 ];
 
 /**
@@ -148,6 +165,7 @@ export function serializeTheme(theme: {
   opacity: { values: Map<string, string> };
   width: { values: Map<string, string> };
   height: { values: Map<string, string> };
+  container?: { values: Map<string, string> };
   cssVariables: Map<string, string>;
   source: string;
   tailwindVersion?: 3 | 4;
@@ -166,6 +184,7 @@ export function serializeTheme(theme: {
     blur: [...theme.blur.values],
     boxShadow: [...theme.boxShadow.values],
     opacity: [...theme.opacity.values],
+    container: theme.container ? [...theme.container.values] : undefined,
     cssVariables: [...theme.cssVariables],
     source: theme.source,
     tailwindVersion: theme.tailwindVersion,
@@ -186,6 +205,7 @@ export function reviveTheme(s: SerializedTheme): {
   opacity: { values: Map<string, string> };
   width: { values: Map<string, string> };
   height: { values: Map<string, string> };
+  container: { values: Map<string, string> };
   cssVariables: Map<string, string>;
   source: string;
   tailwindVersion?: 3 | 4;
@@ -207,6 +227,7 @@ export function reviveTheme(s: SerializedTheme): {
     opacity: { values: new Map(s.opacity) },
     width: { values: new Map(s.spacing) },
     height: { values: new Map(s.spacing) },
+    container: { values: new Map(s.container ?? DEFAULT_CONTAINER) },
     cssVariables: new Map(s.cssVariables),
     source: s.source,
     tailwindVersion: s.tailwindVersion ?? 4,

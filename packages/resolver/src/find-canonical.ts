@@ -2,6 +2,7 @@ import { createDefaultTheme } from "./default-theme.js";
 import {
   formatScaleKey,
   invertSpacingMultiplier,
+  resolveSpacingMultiplier,
   valuesEqual,
 } from "./length.js";
 import {
@@ -9,6 +10,7 @@ import {
   KEYWORD_MAP,
   normalizeEaseValue,
   scaleForNamespace,
+  usesContainerScale,
 } from "./namespace.js";
 import { arbitraryInner, formatUtility, parseUtility } from "./parse-utility.js";
 import type {
@@ -54,10 +56,10 @@ function findCanonicalUncached(
 ): CanonicalMatch | null {
   const parts = parseUtility(token);
 
-  // Already non-arbitrary named utility — nothing to do for now
-  // (future: collapse redundant forms). Safety first: skip.
+  // Named numeric utilities can still collapse onto unique container tokens
+  // (min-w-112 → min-w-md). Other named utilities stay untouched.
   if (!parts.isArbitrary) {
-    return null;
+    return collapseNumericToContainer(parts, theme, rootFontSizePx);
   }
 
   if (parts.isArbitraryProperty) {
@@ -378,6 +380,57 @@ export function canonicalizeClasses(
   options: FindCanonicalOptions = {},
 ): string[] {
   return tokens.map((t) => canonicalizeClass(t, options));
+}
+
+/**
+ * Collapse `min-w-112` → `min-w-md` when the spacing multiplier equals a unique
+ * `--container-*` token. v4 only; padding/height namespaces are excluded.
+ */
+function collapseNumericToContainer(
+  parts: UtilityParts,
+  theme: Theme,
+  rootFontSizePx: number,
+): CanonicalMatch | null {
+  if (theme.tailwindVersion === 3) {
+    return null;
+  }
+  if (!usesContainerScale(parts.namespace)) {
+    return null;
+  }
+  const suffix = parts.value;
+  if (!suffix || !/^\d+(\.\d+)?$/.test(suffix)) {
+    return null;
+  }
+  const css = cssForSpacingKey(suffix, theme);
+  if (css === null) {
+    return null;
+  }
+  const named: string[] = [];
+  for (const [key, val] of theme.container.values) {
+    if (valuesEqual(css, val, rootFontSizePx)) {
+      named.push(key);
+    }
+  }
+  const unique = [...new Set(named)];
+  if (unique.length !== 1) {
+    return null;
+  }
+  return buildMatch(parts, unique[0]!, "theme-exact", unique);
+}
+
+function cssForSpacingKey(key: string, theme: Theme): string | null {
+  const explicit = theme.spacing.values.get(key);
+  if (explicit !== undefined) {
+    return explicit;
+  }
+  if (!theme.spacingUnit) {
+    return null;
+  }
+  const n = Number(key);
+  if (!Number.isFinite(n)) {
+    return null;
+  }
+  return resolveSpacingMultiplier(n, theme.spacingUnit);
 }
 
 /** Namespaces whose bare numeric utilities are --spacing multipliers (not border px widths). */

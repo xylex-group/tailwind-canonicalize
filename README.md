@@ -9,7 +9,7 @@ current version: `0.2.0`
 **Semantic canonicalizer** for Tailwind CSS utility classes.
 
 > **Docs:** [https://tailwind-canonicalize.xbp.app](https://tailwind-canonicalize.xbp.app)  
-> **npm:** [tailwind-canonicalize](https://www.npmjs.com/package/tailwind-canonicalize) · **current:** `0.1.3`
+> **npm:** [tailwind-canonicalize](https://www.npmjs.com/package/tailwind-canonicalize) · **current:** `0.1.19`
 
 Not a linter. Not a general formatter. A zero-false-positive rewriter that turns arbitrary values into theme tokens **only when the resulting utility is provably equivalent**.
 

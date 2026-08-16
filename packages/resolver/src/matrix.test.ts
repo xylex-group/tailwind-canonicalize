@@ -1,7 +1,28 @@
 import { describe, expect, it } from "vitest";
 import { createDefaultTheme } from "./default-theme.js";
 import { findCanonicalEquivalent } from "./find-canonical.js";
-import { resolveSpacingMultiplier } from "./length.js";
+import { resolveSpacingMultiplier, valuesEqual } from "./length.js";
+import { usesContainerScale } from "./namespace.js";
+
+function expectedSpacingCanonical(
+  ns: string,
+  key: number,
+  theme: ReturnType<typeof createDefaultTheme>,
+): string {
+  const unit = theme.spacingUnit;
+  if (!unit) {
+    return `${ns}-${key}`;
+  }
+  const css = resolveSpacingMultiplier(key, unit);
+  if (usesContainerScale(ns)) {
+    for (const [ck, cv] of theme.container.values) {
+      if (valuesEqual(css, cv, 16)) {
+        return `${ns}-${ck}`;
+      }
+    }
+  }
+  return `${ns}-${key}`;
+}
 
 /**
  * Matrix coverage: every default numeric spacing key should round-trip
@@ -42,9 +63,10 @@ describe("spacing matrix", () => {
     for (const key of keys) {
       const css = resolveSpacingMultiplier(key, unit);
       const token = `${ns}-[${css}]`;
-      it(`${token} → ${ns}-${key}`, () => {
+      const expected = expectedSpacingCanonical(ns, key, theme);
+      it(`${token} → ${expected}`, () => {
         const match = findCanonicalEquivalent(token, { theme });
-        expect(match?.canonical).toBe(`${ns}-${key}`);
+        expect(match?.canonical).toBe(expected);
       });
     }
   }

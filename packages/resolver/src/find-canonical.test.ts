@@ -95,6 +95,10 @@ describe("findCanonicalEquivalent", () => {
       ["max-h-[260px]", "max-h-65"],
       ["max-w-[1240px]", "max-w-310"],
       ["md:min-w-[250px]", "md:min-w-62.5"],
+      // Tailwind v4 suggestCanonicalClasses: rem arbitrary → spacing key
+      ["min-w-[3.25rem]", "min-w-13"],
+      ["w-[3.25rem]", "w-13"],
+      ["max-w-[3.25rem]", "max-w-13"],
     ];
     for (const [from, to] of cases) {
       expect(findCanonicalEquivalent(from, { theme })?.canonical, from).toBe(to);
@@ -142,9 +146,52 @@ describe("findCanonicalEquivalent", () => {
     );
   });
 
+  it("rewrites spacing-multiplier min-w to container tokens", () => {
+    // Tailwind v4 suggestCanonicalClasses: min-w-112 → min-w-md (28rem)
+    expect(findCanonicalEquivalent("min-w-112", { theme })?.canonical).toBe(
+      "min-w-md",
+    );
+    expect(findCanonicalEquivalent("min-w-144", { theme })?.canonical).toBe(
+      "min-w-xl",
+    );
+    expect(findCanonicalEquivalent("min-w-[28rem]", { theme })?.canonical).toBe(
+      "min-w-md",
+    );
+    expect(findCanonicalEquivalent("min-w-[36rem]", { theme })?.canonical).toBe(
+      "min-w-xl",
+    );
+    expect(findCanonicalEquivalent("hover:min-w-112!", { theme })?.canonical).toBe(
+      "hover:min-w-md!",
+    );
+    expect(findCanonicalEquivalent("max-w-[28rem]", { theme })?.canonical).toBe(
+      "max-w-md",
+    );
+    expect(findCanonicalEquivalent("w-[28rem]", { theme })?.canonical).toBe("w-md");
+  });
+
+  it("does not invent container tokens on spacing-only namespaces", () => {
+    expect(findCanonicalEquivalent("p-112", { theme })).toBeNull();
+    expect(findCanonicalEquivalent("p-[28rem]", { theme })?.canonical).toBe("p-112");
+    expect(findCanonicalEquivalent("h-[28rem]", { theme })?.canonical).toBe("h-112");
+  });
+
+  it("does not rewrite min-w-112 when --container-md is overridden", () => {
+    const custom = loadThemeFromCss(`
+      @theme {
+        --spacing: 0.25rem;
+        --container-md: 30rem;
+      }
+    `);
+    expect(findCanonicalEquivalent("min-w-112", { theme: custom })).toBeNull();
+    expect(findCanonicalEquivalent("min-w-[28rem]", { theme: custom })?.canonical).toBe(
+      "min-w-112",
+    );
+  });
+
   it("canonicalizeClass leaves non-matches intact", () => {
     expect(canonicalizeClass("flex", { theme })).toBe("flex");
     expect(canonicalizeClass("w-10", { theme })).toBe("w-10");
+    expect(canonicalizeClass("min-w-md", { theme })).toBe("min-w-md");
   });
 
   it("canonicalizeClassString preserves whitespace layout", () => {

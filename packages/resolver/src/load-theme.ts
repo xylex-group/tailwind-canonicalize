@@ -23,6 +23,7 @@ export function loadThemeFromCss(css: string, base: Theme = createDefaultTheme()
     opacity: cloneScale(base.opacity),
     width: cloneScale(base.width),
     height: cloneScale(base.height),
+    container: cloneScale(base.container),
     cssVariables: new Map(base.cssVariables),
     source: "merged",
     tailwindVersion: base.tailwindVersion ?? 4,
@@ -131,6 +132,13 @@ function applyCssVariable(theme: Theme, name: string, value: string): void {
   const shadow = name.match(/^--shadow-(.+)$/);
   if (shadow?.[1]) {
     theme.boxShadow.values.set(shadow[1], value);
+    return;
+  }
+
+  // --container-* (min-w-md, max-w-xl, …)
+  const container = name.match(/^--container-(.+)$/);
+  if (container?.[1]) {
+    theme.container.values.set(container[1], value);
     return;
   }
 

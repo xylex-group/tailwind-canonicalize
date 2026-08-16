@@ -2,9 +2,30 @@ import { describe, expect, it } from "vitest";
 import { createDefaultTheme } from "./default-theme.js";
 import { findCanonicalEquivalent } from "./find-canonical.js";
 import { DEFAULT_COLOR_PALETTE } from "./palette-default.js";
-import { resolveSpacingMultiplier } from "./length.js";
+import { resolveSpacingMultiplier, valuesEqual } from "./length.js";
 import { migrateUtility } from "./migrations/apply.js";
+import { usesContainerScale } from "./namespace.js";
 import { transformClassString } from "./pipeline.js";
+
+function expectedSpacingCanonical(
+  ns: string,
+  key: number,
+  theme: ReturnType<typeof createDefaultTheme>,
+): string {
+  const unit = theme.spacingUnit;
+  if (!unit) {
+    return `${ns}-${key}`;
+  }
+  const css = resolveSpacingMultiplier(key, unit);
+  if (usesContainerScale(ns)) {
+    for (const [ck, cv] of theme.container.values) {
+      if (valuesEqual(css, cv, 16)) {
+        return `${ns}-${ck}`;
+      }
+    }
+  }
+  return `${ns}-${key}`;
+}
 
 /**
  * Thousands of generated cases covering spacing × namespaces × variants,
@@ -66,12 +87,13 @@ describe("generated matrix (thousands)", () => {
         const css = resolveSpacingMultiplier(key, unit);
         const token = `${ns}-[${css}]`;
         const match = findCanonicalEquivalent(token, { theme });
+        const expected = expectedSpacingCanonical(ns, key, theme);
         checked++;
-        if (match?.canonical === `${ns}-${key}`) {
+        if (match?.canonical === expected) {
           ok++;
         } else {
           // Prefer fail with context
-          expect(match?.canonical, token).toBe(`${ns}-${key}`);
+          expect(match?.canonical, token).toBe(expected);
         }
       }
     }
