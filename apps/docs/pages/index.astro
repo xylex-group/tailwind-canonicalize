@@ -3,6 +3,7 @@ import PageLayout from "blume/components/layout/PageLayout.astro";
 import data from "blume:data";
 import "../styles/home.css";
 
+import Context7Script from "../components/Context7Script.astro";
 import Cta from "../components/home/cta.astro";
 import Demo from "../components/home/demo.astro";
 import Editors from "../components/home/editors.astro";
@@ -55,4 +56,5 @@ const siteDescription =
     <Cta />
     <Footer />
   </div>
+  <Context7Script slot="footer" />
 </PageLayout>

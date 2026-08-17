@@ -6,14 +6,14 @@ import { blumeMarkdownProcessor, blumeMdxProcessor, blumeShikiTransformers, blum
 import { blumeIntegration, prerenderDepsPlugin, serverAppResolvePlugin } from "blume/astro";
 
 export default defineConfig({
-  root: "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/.blume",
-  srcDir: "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/.blume/src",
-  outDir: "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/dist",
-  publicDir: "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/public",
+  root: "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/.blume",
+  srcDir: "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/.blume/src",
+  outDir: "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/dist",
+  publicDir: "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/public",
   output: "static",
   site: "https://tailwind-canonicalize.xbp.app",
   fonts: [{ provider: fontProviders.google(), name: "Inter Tight", cssVariable: "--blume-ff-inter-tight", weights: [400,500,600,700], fallbacks: ["ui-sans-serif","system-ui","sans-serif"] }, { provider: fontProviders.google(), name: "Inter", cssVariable: "--blume-ff-inter", weights: [400,500,600,700], fallbacks: ["ui-sans-serif","system-ui","sans-serif"] }, { provider: fontProviders.google(), name: "IBM Plex Mono", cssVariable: "--blume-ff-ibm-plex-mono", weights: [400,500,600], fallbacks: ["ui-monospace","SF Mono","Menlo","monospace"] }],
-  integrations: [mdx({ processor: blumeMdxProcessor({"basePath":"","codeThemes":{"dark":"github-dark","light":"github-light"},"deployBase":"","headingAnchors":true}) }), blumeIntegration({"contentRoutes":["/docs","/docs/api","/docs/architecture","/docs/cli","/docs/examples","/docs/faq","/docs/features/canonical","/docs/features/migrations","/docs/features/performance","/docs/features/tokens","/docs/installation","/docs/integrations","/docs/integrations/biome","/docs/integrations/ci","/docs/integrations/eslint","/docs/integrations/oxlint","/docs/integrations/prettier","/docs/safety","/docs/troubleshooting"],"pages":[{"entrypoint":"C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/pages/index.astro","pattern":"/"}]})],
+  integrations: [mdx({ processor: blumeMdxProcessor({"basePath":"","codeThemes":{"dark":"github-dark","light":"github-light"},"deployBase":"","headingAnchors":true}) }), blumeIntegration({"contentRoutes":["/docs","/docs/api","/docs/architecture","/docs/cli","/docs/examples","/docs/faq","/docs/features/canonical","/docs/features/migrations","/docs/features/performance","/docs/features/tokens","/docs/installation","/docs/integrations","/docs/integrations/biome","/docs/integrations/ci","/docs/integrations/eslint","/docs/integrations/oxlint","/docs/integrations/prettier","/docs/safety","/docs/troubleshooting"],"pages":[{"entrypoint":"C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/pages/index.astro","pattern":"/"}]})],
   markdown: {
     processor: blumeMarkdownProcessor({"basePath":"","codeThemes":{"dark":"github-dark","light":"github-light"},"deployBase":"","headingAnchors":true}),
     shikiConfig: {
@@ -65,18 +65,18 @@ export default defineConfig({
     },
     resolve: {
       alias: {
-        "blume:ask": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/.blume/src/generated/Ask.astro",
-        "blume:data": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/.blume/src/generated/data.json",
-        "blume:examples": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/.blume/src/generated/examples.ts",
-        "blume:examples-theme": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/.blume/src/generated/examples.css",
-        "blume:openapi": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/.blume/src/generated/openapi.json",
-        "blume:search-client": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/.blume/src/generated/search-client.ts",
-        "blume:theme": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/.blume/src/generated/app.css",
+        "blume:ask": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/.blume/src/generated/Ask.astro",
+        "blume:data": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/.blume/src/generated/data.json",
+        "blume:examples": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/.blume/src/generated/examples.ts",
+        "blume:examples-theme": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/.blume/src/generated/examples.css",
+        "blume:openapi": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/.blume/src/generated/openapi.json",
+        "blume:search-client": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/.blume/src/generated/search-client.ts",
+        "blume:theme": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/.blume/src/generated/app.css",
       },
     },
     server: {
       fs: {
-        allow: ["C:/Users/floris/Documents/GitHub/tailwind-canonicalize","C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs"],
+        allow: ["C:/Users/floris/documents/github/tailwind-canonicalize","C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs"],
       },
     },
   },

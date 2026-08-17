@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 /* Scan the example files and the project sources they import. */
-@source "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/**/*.{astro,jsx,svelte,ts,tsx,vue}";
+@source "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/**/*.{astro,jsx,svelte,ts,tsx,vue}";
 
 /* Dark mode is driven by data-theme on the <html> element. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

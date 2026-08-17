@@ -5,7 +5,7 @@ import { glob } from "astro/loaders";
 const docs = defineCollection({
   loader: glob({
     pattern: ["**/*.{md,mdx}","!**/_*","!**/.*","!**/.blume-verify/**","!**/.cache/**","!**/.git/**","!**/.next/**","!**/.turbo/**","!**/.vercel/**","!**/dist/**","!**/node_modules/**"],
-    base: "file:///C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs",
+    base: "file:///C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs",
     generateId: ({ entry }) => entry,
   }),
 });

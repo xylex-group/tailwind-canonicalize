@@ -1,8 +1,8 @@
 {
   "blumeVersion": "1.2.1",
-  "contentRoot": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs",
+  "contentRoot": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs",
   "output": "static",
-  "projectRoot": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs",
+  "projectRoot": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs",
   "routes": [
     {
       "alternates": [],
@@ -19,7 +19,7 @@
         "name": "docs",
         "ref": "index.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/index.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/index.mdx",
       "title": "Introduction"
     },
     {
@@ -37,7 +37,7 @@
         "name": "docs",
         "ref": "api.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/api.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/api.mdx",
       "title": "API"
     },
     {
@@ -55,7 +55,7 @@
         "name": "docs",
         "ref": "architecture.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/architecture.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/architecture.mdx",
       "title": "Architecture"
     },
     {
@@ -73,7 +73,7 @@
         "name": "docs",
         "ref": "cli.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/cli.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/cli.mdx",
       "title": "CLI"
     },
     {
@@ -91,7 +91,7 @@
         "name": "docs",
         "ref": "examples.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/examples.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/examples.mdx",
       "title": "Examples"
     },
     {
@@ -109,7 +109,7 @@
         "name": "docs",
         "ref": "faq.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/faq.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/faq.mdx",
       "title": "FAQ"
     },
     {
@@ -127,7 +127,7 @@
         "name": "docs",
         "ref": "features/canonical.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/features/canonical.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/features/canonical.mdx",
       "title": "Canonical classes"
     },
     {
@@ -145,7 +145,7 @@
         "name": "docs",
         "ref": "features/migrations.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/features/migrations.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/features/migrations.mdx",
       "title": "Migrations"
     },
     {
@@ -163,7 +163,7 @@
         "name": "docs",
         "ref": "features/performance.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/features/performance.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/features/performance.mdx",
       "title": "Performance"
     },
     {
@@ -181,7 +181,7 @@
         "name": "docs",
         "ref": "features/tokens.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/features/tokens.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/features/tokens.mdx",
       "title": "Semantic tokens"
     },
     {
@@ -199,7 +199,7 @@
         "name": "docs",
         "ref": "installation.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/installation.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/installation.mdx",
       "title": "Installation"
     },
     {
@@ -217,7 +217,7 @@
         "name": "docs",
         "ref": "integrations/index.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/integrations/index.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/integrations/index.mdx",
       "title": "Integrations"
     },
     {
@@ -235,7 +235,7 @@
         "name": "docs",
         "ref": "integrations/biome.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/integrations/biome.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/integrations/biome.mdx",
       "title": "Biome"
     },
     {
@@ -253,7 +253,7 @@
         "name": "docs",
         "ref": "integrations/ci.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/integrations/ci.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/integrations/ci.mdx",
       "title": "CI & hooks"
     },
     {
@@ -271,7 +271,7 @@
         "name": "docs",
         "ref": "integrations/eslint.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/integrations/eslint.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/integrations/eslint.mdx",
       "title": "ESLint"
     },
     {
@@ -289,7 +289,7 @@
         "name": "docs",
         "ref": "integrations/oxlint.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/integrations/oxlint.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/integrations/oxlint.mdx",
       "title": "Oxlint"
     },
     {
@@ -307,7 +307,7 @@
         "name": "docs",
         "ref": "integrations/prettier.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/integrations/prettier.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/integrations/prettier.mdx",
       "title": "Prettier"
     },
     {
@@ -325,7 +325,7 @@
         "name": "docs",
         "ref": "safety.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/safety.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/safety.mdx",
       "title": "Safety"
     },
     {
@@ -343,7 +343,7 @@
         "name": "docs",
         "ref": "troubleshooting.mdx"
       },
-      "sourcePath": "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs/troubleshooting.mdx",
+      "sourcePath": "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs/troubleshooting.mdx",
       "title": "Troubleshooting"
     }
   ],

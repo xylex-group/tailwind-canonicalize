@@ -47,10 +47,8 @@ const formatDate = (value: string | null | undefined) => {
 };
 
 const slugify = (text: string) =>
-  text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "update";
+  text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") ||
+  "update";
 
 // The major of a version's embedded semver (`1.2.3` -> 1, `pkg@2.0.0` -> 2), or
 // null when there is no full major.minor.patch to key on. Drives the changelog's
@@ -63,15 +61,17 @@ const majorVersion = (version: string | null | undefined) => {
 // Map each entry to its own generated page so the timeline heading can deep-link
 // to it. The collection entry id matches the route manifest's `entryId`.
 const routeByEntry = new Map(
-  data.routes.map((route) => [route.entryId, route.path]),
+  data.routes.map((route) => [route.entryId, route.path])
 );
 
-const changelogEntries = [...(await getCollection("docs"))]
+const changelogEntries = [
+  ...(await getCollection("docs")),
+]
   .filter(
     (entry) =>
       entry.data.type === "changelog" &&
       !entry.data.draft &&
-      !entry.data.sidebar?.hidden,
+      !entry.data.sidebar?.hidden
   )
   .toSorted((a, b) => toTime(entryDate(b)) - toTime(entryDate(a)));
 
@@ -93,7 +93,7 @@ const items = await Promise.all(
         ? [entry.data.changelog.category]
         : [],
     };
-  }),
+  })
 );
 
 // Repeated labels slug to the same id (e.g. two entries with neither a title
@@ -195,19 +195,11 @@ const LayoutComponent = resolveSlot(layoutOverrides.Layout, RootLayout);
         class="not-prose mt-8 block"
         data-i18n-more={data.ui.changelog?.showReleases}
       >
-        {majorGroups[0].items.map(
-          ({ Content, href, id, label, date, tags }) => (
-            <Update
-              description={date}
-              href={href}
-              id={id}
-              label={label}
-              tags={tags}
-            >
-              <Content />
-            </Update>
-          ),
-        )}
+        {majorGroups[0].items.map(({ Content, href, id, label, date, tags }) => (
+          <Update description={date} href={href} id={id} label={label} tags={tags}>
+            <Content />
+          </Update>
+        ))}
         {majorGroups.slice(1).map((group) => (
           <section
             aria-label={group.label + " releases"}
@@ -215,13 +207,7 @@ const LayoutComponent = resolveSlot(layoutOverrides.Layout, RootLayout);
             data-changelog-major={group.major}
           >
             {group.items.map(({ Content, href, id, label, date, tags }) => (
-              <Update
-                description={date}
-                href={href}
-                id={id}
-                label={label}
-                tags={tags}
-              >
+              <Update description={date} href={href} id={id} label={label} tags={tags}>
                 <Content />
               </Update>
             ))}
@@ -241,13 +227,7 @@ const LayoutComponent = resolveSlot(layoutOverrides.Layout, RootLayout);
     ) : (
       <div class="not-prose mt-8">
         {items.map(({ Content, href, id, label, date, tags }) => (
-          <Update
-            description={date}
-            href={href}
-            id={id}
-            label={label}
-            tags={tags}
-          >
+          <Update description={date} href={href} id={id} label={label} tags={tags}>
             <Content />
           </Update>
         ))}
