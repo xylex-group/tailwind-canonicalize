@@ -4,7 +4,7 @@
 
 /* Scan Blume's components and the user's project for utility classes. */
 @source "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/node_modules/.pnpm/blume@1.2.1_@astrojs+markdown-remark@7.2.2_@emnapi+core@1.11.1_@emnapi+runtime@1.11.1_@shikij_agxm224gaovavl4gf7vc7l7ru4/node_modules/blume/src/**/*.{astro,ts,tsx}";
-@source "C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/**/*.{astro,mdx,ts,tsx}";
+@source "C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/**/*.{astro,mdx,ts,tsx}";
 
 /* Dark mode is driven by data-theme on the <html> element. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

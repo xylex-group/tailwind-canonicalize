@@ -68,7 +68,12 @@
     },
     "x": {}
   },
-  "feeds": [],
+  "feeds": [
+    {
+      "href": "/changelog/rss.xml",
+      "title": "tailwind-canonicalize — Changelog"
+    }
+  ],
   "fontCssVars": [
     "--blume-ff-inter-tight",
     "--blume-ff-inter",
@@ -79,6 +84,56 @@
     "root": "/",
     "selectors": [],
     "sidebar": [
+      {
+        "children": [
+          {
+            "kind": "page",
+            "label": "0.1.1-tailwind-canonicalize-vscode",
+            "pageId": "changelog:tailwind-canonicalize-vscode-0-1-1.md",
+            "route": "/changelog/tailwind-canonicalize-vscode-0-1-1"
+          },
+          {
+            "kind": "page",
+            "label": "0.2.0-tailwind-canonicalize",
+            "pageId": "changelog:tailwind-canonicalize-0-2-0.md",
+            "route": "/changelog/tailwind-canonicalize-0-2-0"
+          },
+          {
+            "kind": "page",
+            "label": "0.0.2-docs",
+            "pageId": "changelog:docs-0-0-2.md",
+            "route": "/changelog/docs-0-0-2"
+          },
+          {
+            "kind": "page",
+            "label": "0.1.0-tailwind-canonicalize-vscode",
+            "pageId": "changelog:tailwind-canonicalize-vscode-0-1-0.md",
+            "route": "/changelog/tailwind-canonicalize-vscode-0-1-0"
+          },
+          {
+            "kind": "page",
+            "label": "0.1.0-tailwind-canonicalize",
+            "pageId": "changelog:tailwind-canonicalize-0-1-0.md",
+            "route": "/changelog/tailwind-canonicalize-0-1-0"
+          },
+          {
+            "kind": "page",
+            "label": "0.0.1-docs",
+            "pageId": "changelog:docs-0-0-1.md",
+            "route": "/changelog/docs-0-0-1"
+          },
+          {
+            "kind": "page",
+            "label": "0.1.0-cli",
+            "pageId": "changelog:cli-0-1-0.md",
+            "route": "/changelog/cli-0-1-0"
+          }
+        ],
+        "display": "flat",
+        "kind": "group",
+        "label": "Changelog",
+        "path": "/changelog"
+      },
       {
         "children": [
           {
@@ -244,13 +299,119 @@
       },
       {
         "label": "Changelog",
-        "path": "/changelog"
+        "path": "/changelog",
+        "href": "/changelog/tailwind-canonicalize-vscode-0-1-1"
       }
     ],
     "repoUrl": "https://github.com/xylex-group/tailwind-canonicalize"
   },
   "navigationByLocale": {},
   "routes": [
+    {
+      "alternates": [],
+      "collection": "staged",
+      "draft": false,
+      "editUrl": "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/cli-0.1.0",
+      "entryId": "changelog/cli-0-1-0.md",
+      "fallback": false,
+      "hidden": false,
+      "id": "changelog:cli-0-1-0.md",
+      "indexable": true,
+      "lastModified": "2026-08-01T17:07:35Z",
+      "locale": "",
+      "path": "/changelog/cli-0-1-0",
+      "title": "0.1.0-cli"
+    },
+    {
+      "alternates": [],
+      "collection": "staged",
+      "draft": false,
+      "editUrl": "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/docs-0.0.1",
+      "entryId": "changelog/docs-0-0-1.md",
+      "fallback": false,
+      "hidden": false,
+      "id": "changelog:docs-0-0-1.md",
+      "indexable": true,
+      "lastModified": "2026-08-01T17:07:52Z",
+      "locale": "",
+      "path": "/changelog/docs-0-0-1",
+      "title": "0.0.1-docs"
+    },
+    {
+      "alternates": [],
+      "collection": "staged",
+      "draft": false,
+      "editUrl": "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/docs-0.0.2",
+      "entryId": "changelog/docs-0-0-2.md",
+      "fallback": false,
+      "hidden": false,
+      "id": "changelog:docs-0-0-2.md",
+      "indexable": true,
+      "lastModified": "2026-08-02T07:20:40Z",
+      "locale": "",
+      "path": "/changelog/docs-0-0-2",
+      "title": "0.0.2-docs"
+    },
+    {
+      "alternates": [],
+      "collection": "staged",
+      "draft": false,
+      "editUrl": "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/tailwind-canonicalize-0.1.0",
+      "entryId": "changelog/tailwind-canonicalize-0-1-0.md",
+      "fallback": false,
+      "hidden": false,
+      "id": "changelog:tailwind-canonicalize-0-1-0.md",
+      "indexable": true,
+      "lastModified": "2026-08-01T17:08:14Z",
+      "locale": "",
+      "path": "/changelog/tailwind-canonicalize-0-1-0",
+      "title": "0.1.0-tailwind-canonicalize"
+    },
+    {
+      "alternates": [],
+      "collection": "staged",
+      "draft": false,
+      "editUrl": "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/tailwind-canonicalize-0.2.0",
+      "entryId": "changelog/tailwind-canonicalize-0-2-0.md",
+      "fallback": false,
+      "hidden": false,
+      "id": "changelog:tailwind-canonicalize-0-2-0.md",
+      "indexable": true,
+      "lastModified": "2026-08-02T07:21:08Z",
+      "locale": "",
+      "path": "/changelog/tailwind-canonicalize-0-2-0",
+      "title": "0.2.0-tailwind-canonicalize"
+    },
+    {
+      "alternates": [],
+      "collection": "staged",
+      "draft": false,
+      "editUrl": "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/tailwind-canonicalize-vscode-0.1.0",
+      "entryId": "changelog/tailwind-canonicalize-vscode-0-1-0.md",
+      "fallback": false,
+      "hidden": false,
+      "id": "changelog:tailwind-canonicalize-vscode-0-1-0.md",
+      "indexable": true,
+      "lastModified": "2026-08-01T17:08:36Z",
+      "locale": "",
+      "path": "/changelog/tailwind-canonicalize-vscode-0-1-0",
+      "title": "0.1.0-tailwind-canonicalize-vscode"
+    },
+    {
+      "alternates": [],
+      "collection": "staged",
+      "draft": false,
+      "editUrl": "https://github.com/xylex-group/tailwind-canonicalize/releases/tag/tailwind-canonicalize-vscode-0.1.1",
+      "entryId": "changelog/tailwind-canonicalize-vscode-0-1-1.md",
+      "fallback": false,
+      "hidden": false,
+      "id": "changelog:tailwind-canonicalize-vscode-0-1-1.md",
+      "indexable": true,
+      "lastModified": "2026-08-02T07:21:30Z",
+      "locale": "",
+      "path": "/changelog/tailwind-canonicalize-vscode-0-1-1",
+      "title": "0.1.1-tailwind-canonicalize-vscode"
+    },
     {
       "alternates": [],
       "collection": "docs",

@@ -66,6 +66,7 @@ const routeByEntry = new Map(
 
 const changelogEntries = [
   ...(await getCollection("docs")),
+  ...(await getCollection("staged")),
 ]
   .filter(
     (entry) =>

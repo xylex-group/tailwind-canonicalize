@@ -5,9 +5,17 @@ import { glob } from "astro/loaders";
 const docs = defineCollection({
   loader: glob({
     pattern: ["**/*.{md,mdx}","!**/_*","!**/.*","!**/.blume-verify/**","!**/.cache/**","!**/.git/**","!**/.next/**","!**/.turbo/**","!**/.vercel/**","!**/dist/**","!**/node_modules/**"],
-    base: "file:///C:/Users/floris/documents/github/tailwind-canonicalize/apps/docs/docs",
+    base: "file:///C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/docs",
     generateId: ({ entry }) => entry,
   }),
 });
 
-export const collections = { docs };
+const staged = defineCollection({
+  loader: glob({
+    pattern: ["**/*.{md,mdx}"],
+    base: "file:///C:/Users/floris/Documents/GitHub/tailwind-canonicalize/apps/docs/.blume/content",
+    generateId: ({ entry }) => entry,
+  }),
+});
+
+export const collections = { docs, staged };
