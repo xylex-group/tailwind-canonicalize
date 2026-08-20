@@ -1,6 +1,6 @@
 # API reference
 
-Package entry: `tailwind-canonicalize` (re-exports compiler).
+Package entry: **`tailwind-canonicalize`** (the sole published npm package). The CLI re-exports in-repo compiler orchestration; `@tailwind-canonicalize/compiler` is not an npm package.
 
 ## `findCanonicalEquivalent(token, options?)`
 

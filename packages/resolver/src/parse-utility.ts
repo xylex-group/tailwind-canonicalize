@@ -1,6 +1,6 @@
 import type { UtilityParts } from "./types.js";
 
-const VARIANT_SPLIT = /:(?![^\[]*\])/; // colon not inside [...]
+const VARIANT_SPLIT = /:(?![^[]*\])/; // colon not inside [...]
 
 /**
  * Parse a single Tailwind utility token into structural parts.

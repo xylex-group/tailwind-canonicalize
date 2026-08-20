@@ -8,10 +8,10 @@ export type {
   UtilityIdentity,
 } from "./categories.js";
 export {
+  type CompileEqualFn,
   createTailwindCompileEqual,
   normalizeCompiledCss,
   unavailableCompileEqual,
-  type CompileEqualFn,
 } from "./compile-equal.js";
 export {
   collapseDarkPairs,
@@ -40,14 +40,14 @@ export {
   loadThemeFromV3Config,
 } from "./load-v3-config.js";
 export {
-  migrateUtility,
   type ApplyMigrationOptions,
+  migrateUtility,
 } from "./migrations/apply.js";
 export {
   buildMigrationIndex,
   filterMigrations,
-  TAILWIND_MIGRATIONS,
   type MigrationSafety,
+  TAILWIND_MIGRATIONS,
   type TailwindMigration,
 } from "./migrations/registry.js";
 export {
@@ -63,10 +63,10 @@ export {
 export { arbitraryInner, formatUtility, parseUtility } from "./parse-utility.js";
 export {
   canonicalizeClassString,
-  transformClassString,
   type PipelineMode,
   type PipelineOptions,
   type TokenMapping,
+  transformClassString,
 } from "./pipeline.js";
 export {
   BUILTIN_RECIPES,

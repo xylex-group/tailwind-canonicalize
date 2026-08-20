@@ -1,11 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  emptyCache,
-  hashContent,
-  hashOptions,
-  isFileFresh,
-  markFile,
-} from "./hash-cache.js";
+import { emptyCache, hashContent, hashOptions, isFileFresh, markFile } from "./hash-cache.js";
 
 describe("incremental hash cache", () => {
   it("hashes content stably", () => {

@@ -101,25 +101,13 @@ function mergeV3Config(base: Theme, config: Record<string, unknown>): Theme {
     themeBlock.borderWidth as Record<string, unknown> | undefined,
     true,
   );
-  applySection(
-    base.borderWidth,
-    extend.borderWidth as Record<string, unknown> | undefined,
-    false,
-  );
+  applySection(base.borderWidth, extend.borderWidth as Record<string, unknown> | undefined, false);
 
   applySection(base.fontSize, flattenFontSize(themeBlock.fontSize), true);
   applySection(base.fontSize, flattenFontSize(extend.fontSize), false);
 
-  applySection(
-    base.lineHeight,
-    themeBlock.lineHeight as Record<string, unknown> | undefined,
-    true,
-  );
-  applySection(
-    base.lineHeight,
-    extend.lineHeight as Record<string, unknown> | undefined,
-    false,
-  );
+  applySection(base.lineHeight, themeBlock.lineHeight as Record<string, unknown> | undefined, true);
+  applySection(base.lineHeight, extend.lineHeight as Record<string, unknown> | undefined, false);
 
   applySection(
     base.letterSpacing,
@@ -171,11 +159,7 @@ function applySection(
   flattenColorish(section, "", scale);
 }
 
-function flattenColorish(
-  obj: Record<string, unknown>,
-  prefix: string,
-  scale: ThemeScale,
-): void {
+function flattenColorish(obj: Record<string, unknown>, prefix: string, scale: ThemeScale): void {
   for (const [key, value] of Object.entries(obj)) {
     const name = prefix ? `${prefix}-${key}` : key;
     if (typeof value === "string") {
@@ -188,9 +172,7 @@ function flattenColorish(
   }
 }
 
-function flattenFontSize(
-  section: unknown,
-): Record<string, unknown> | undefined {
+function flattenFontSize(section: unknown): Record<string, unknown> | undefined {
   if (!section || typeof section !== "object") {
     return undefined;
   }

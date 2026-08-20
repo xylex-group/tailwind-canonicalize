@@ -36,10 +36,7 @@ interface SyndicationTweet {
 // The syndication text keeps t.co short links. Swap each linked URL for its
 // human-readable display form (e.g. ultracite.ai) and drop trailing media
 // links (the pic.x.com attachment), matching how an embedded tweet reads.
-const formatText = (
-  text: string,
-  entities: SyndicationTweet["entities"]
-): string => {
+const formatText = (text: string, entities: SyndicationTweet["entities"]): string => {
   let out = text;
   for (const entity of entities?.urls ?? []) {
     if (entity.url && entity.display_url) {
@@ -56,13 +53,11 @@ const formatText = (
 
 // Mirrors react-tweet's token derivation for the syndication API.
 const getToken = (id: string): string =>
-  ((Number(id) / 1e15) * Math.PI)
-    .toString(36)
-    .replaceAll(/(?<zerosOrDot>0+|\.)/gu, "");
+  ((Number(id) / 1e15) * Math.PI).toString(36).replaceAll(/(?<zerosOrDot>0+|\.)/gu, "");
 
 export const getTweet = async (id: string): Promise<TweetData | null> => {
   const url = `https://cdn.syndication.twimg.com/tweet-result?id=${id}&lang=en&token=${getToken(
-    id
+    id,
   )}`;
 
   try {

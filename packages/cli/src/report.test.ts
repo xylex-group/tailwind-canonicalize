@@ -1,11 +1,7 @@
-import { describe, expect, it } from "vitest";
 import type { ClassStringDiagnostic } from "@tailwind-canonicalize/resolver";
+import { describe, expect, it } from "vitest";
 import { formatHelp, HELP } from "./args.js";
-import {
-  formatDiagnosticSummary,
-  formatTransformationBlock,
-  formatNum,
-} from "./report.js";
+import { formatDiagnosticSummary, formatNum, formatTransformationBlock } from "./report.js";
 
 describe("formatDiagnosticSummary", () => {
   it("groups repeated conflict diagnostics", () => {
@@ -102,25 +98,29 @@ describe("formatNum", () => {
   });
 });
 
+const ESC = String.fromCharCode(27);
+const ANSI_CSI = `${ESC}[`;
+const ANSI_SGR = new RegExp(`${ESC}\\[[0-9;]*m`, "g");
+
 describe("formatHelp", () => {
   it("returns plain HELP when color is disabled", () => {
     expect(formatHelp(false)).toBe(HELP);
-    expect(formatHelp(false)).not.toMatch(/\u001b\[/);
+    expect(formatHelp(false)).not.toContain(ANSI_CSI);
   });
 
   it("applies ANSI to title, sections, and flags when color is enabled", () => {
     const out = formatHelp(true);
-    expect(out).toMatch(/\u001b\[/);
+    expect(out).toContain(ANSI_CSI);
     // bold/cyan title name
-    expect(out).toContain("\u001b[1m");
-    expect(out).toContain("\u001b[36m");
+    expect(out).toContain(`${ESC}[1m`);
+    expect(out).toContain(`${ESC}[36m`);
     // yellow section headers
-    expect(out).toContain("\u001b[33m");
+    expect(out).toContain(`${ESC}[33m`);
     // flag tokens
     expect(out).toContain("--write");
     expect(out).toContain("USAGE");
     // strip codes still contains plain content
-    const plain = out.replace(/\u001b\[[0-9;]*m/g, "");
+    const plain = out.replace(ANSI_SGR, "");
     expect(plain).toContain("tailwind-canonicalize");
     expect(plain).toContain("--check");
     expect(plain).toContain("EXIT CODES");

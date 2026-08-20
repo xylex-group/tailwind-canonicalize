@@ -2,7 +2,7 @@
   "name": "@tailwind-canonicalize/compiler",
   "private": true,
   "version": "0.1.0",
-  "description": "Public API and project orchestration for tailwind-canonicalize",
+  "description": "In-repo project orchestration for tailwind-canonicalize",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -13,7 +13,9 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "engines": {
     "node": ">=20"
@@ -31,8 +33,5 @@
   },
   "devDependencies": {
     "typescript": "^5.9.2"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

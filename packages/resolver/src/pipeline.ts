@@ -1,21 +1,10 @@
-import type {
-  ClassStringDiagnostic,
-  PipelineResult,
-  TransformationRecord,
-} from "./categories.js";
-import {
-  collapseDarkPairs,
-  type ThemePairMapping,
-} from "./dark-pairs.js";
+import type { ClassStringDiagnostic, PipelineResult, TransformationRecord } from "./categories.js";
+import { collapseDarkPairs, type ThemePairMapping } from "./dark-pairs.js";
 import { dedupeClassTokens } from "./dedupe.js";
 import { findCanonicalEquivalent } from "./find-canonical.js";
-import { migrateUtility, type ApplyMigrationOptions } from "./migrations/apply.js";
+import { type ApplyMigrationOptions, migrateUtility } from "./migrations/apply.js";
 import { parseUtility } from "./parse-utility.js";
-import {
-  BUILTIN_RECIPES,
-  resolveRecipeOverrides,
-  type SemanticColorRecipe,
-} from "./recipes.js";
+import { BUILTIN_RECIPES, resolveRecipeOverrides, type SemanticColorRecipe } from "./recipes.js";
 import type { FindCanonicalOptions } from "./types.js";
 
 export type PipelineMode = "safe" | "review" | "aggressive";
@@ -90,13 +79,11 @@ export function transformClassString(
 
   const migrateOpts = resolveMigrateOptions(options, mode);
 
-  const runCanonical =
-    !options.migrationsOnly && options.arbitraryValues !== false;
+  const runCanonical = !options.migrationsOnly && options.arbitraryValues !== false;
 
   // Semantic is opt-in: only when mappings/pairs provided
   const approved = options.tokenMappings ?? [];
-  const inferred =
-    mode === "aggressive" ? (options.inferredMappings ?? []) : [];
+  const inferred = mode === "aggressive" ? (options.inferredMappings ?? []) : [];
   const effectiveMappings = mergeMappings(approved, inferred, mode);
 
   const runSemantic =
@@ -105,9 +92,7 @@ export function transformClassString(
     effectiveMappings.length > 0 &&
     mode !== "review";
 
-  const recipes =
-    options.recipes ??
-    (options.enableBuiltinRecipes ? BUILTIN_RECIPES : []);
+  const recipes = options.recipes ?? (options.enableBuiltinRecipes ? BUILTIN_RECIPES : []);
 
   // Recipe overrides (only when semantic is active or recipes explicitly set)
   let recipeOverrides = new Map<string, string>();
@@ -169,11 +154,7 @@ export function transformClassString(
   tokens = tokenOut;
 
   // Dark-pair collapse after individual mappings
-  if (
-    !options.migrationsOnly &&
-    mode !== "review" &&
-    (options.themePairs?.length ?? 0) > 0
-  ) {
+  if (!options.migrationsOnly && mode !== "review" && (options.themePairs?.length ?? 0) > 0) {
     const collapsed = collapseDarkPairs(tokens, {
       pairs: options.themePairs,
       requireProven: true,
@@ -255,9 +236,9 @@ function applyTokenMapping(
 
   // Recipe override takes precedence for coherent surfaces
   let target = recipeOverrides.get(base);
-  let mapping = mappings.find((m) => m.source === base);
+  const mapping = mappings.find((m) => m.source === base);
   let tokenVar = mapping?.token;
-  let category = mapping?.category ?? "semantic-color-token";
+  const category = mapping?.category ?? "semantic-color-token";
   let confidence: TransformationRecord["confidence"] = "exact";
   let notes = "Approved token mapping";
 
@@ -309,10 +290,7 @@ function rebuildPreservingWhitespace(originalParts: string[], newTokens: string[
   const oldTokens = originalParts.filter((p) => p !== "" && !/^\s+$/.test(p));
   // Zero token mutations → keep source class string byte-for-byte (incl. trailing spaces).
   // Avoids no-op whitespace-only rewrites when diagnostics fire but nothing changed.
-  if (
-    oldTokens.length === newTokens.length &&
-    oldTokens.every((t, i) => t === newTokens[i])
-  ) {
+  if (oldTokens.length === newTokens.length && oldTokens.every((t, i) => t === newTokens[i])) {
     return originalParts.join("");
   }
 

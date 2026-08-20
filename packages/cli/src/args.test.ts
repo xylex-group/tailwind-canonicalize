@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  looksLikeFlag,
-  parseArgs,
-  requireOptionValue,
-} from "./args.js";
+import { looksLikeFlag, parseArgs, requireOptionValue } from "./args.js";
 
 describe("looksLikeFlag", () => {
   it("detects CLI flags", () => {
@@ -25,24 +21,17 @@ describe("looksLikeFlag", () => {
 
 describe("requireOptionValue", () => {
   it("rejects --report -h (original found case)", () => {
-    expect(() =>
-      requireOptionValue("--report", ["--report", "-h"], 0, "report.txt"),
-    ).toThrow(/--report.*"-h".*-h\/--help/s);
+    expect(() => requireOptionValue("--report", ["--report", "-h"], 0, "report.txt")).toThrow(
+      /--report.*"-h".*-h\/--help/s,
+    );
   });
 
   it("rejects missing value at end of argv", () => {
-    expect(() => requireOptionValue("--report", ["--report"], 0)).toThrow(
-      /end of arguments/,
-    );
+    expect(() => requireOptionValue("--report", ["--report"], 0)).toThrow(/end of arguments/);
   });
 
   it("accepts a normal path", () => {
-    const r = requireOptionValue(
-      "--report",
-      ["--report", "out.txt", "--check"],
-      0,
-      "report.txt",
-    );
+    const r = requireOptionValue("--report", ["--report", "out.txt", "--check"], 0, "report.txt");
     expect(r.value).toBe("out.txt");
     expect(r.nextIndex).toBe(1);
   });
@@ -50,15 +39,13 @@ describe("requireOptionValue", () => {
 
 describe("parseArgs --report", () => {
   it("throws when --report is followed by -h (original found case)", () => {
-    expect(() =>
-      parseArgs(["--check", "--verbose", "--report", "-h"]),
-    ).toThrow(/Option --report requires a value \(got "-h"\)/);
+    expect(() => parseArgs(["--check", "--verbose", "--report", "-h"])).toThrow(
+      /Option --report requires a value \(got "-h"\)/,
+    );
   });
 
   it("throws when --report is followed by another flag", () => {
-    expect(() => parseArgs(["--report", "--verbose"])).toThrow(
-      /Option --report requires a value/,
-    );
+    expect(() => parseArgs(["--report", "--verbose"])).toThrow(/Option --report requires a value/);
   });
 
   it("throws when --report has no value", () => {

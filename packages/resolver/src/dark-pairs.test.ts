@@ -12,10 +12,9 @@ describe("dark-pair collapse", () => {
   };
 
   it("collapses bg-white dark:bg-slate-950 → bg-background", () => {
-    const { tokens, transformations } = collapseDarkPairs(
-      ["bg-white", "dark:bg-slate-950"],
-      { pairs: [pair] },
-    );
+    const { tokens, transformations } = collapseDarkPairs(["bg-white", "dark:bg-slate-950"], {
+      pairs: [pair],
+    });
     expect(tokens).toEqual(["bg-background"]);
     expect(transformations[0]?.category).toBe("semantic-color-token");
     expect(transformations[0]?.token).toBe("--color-background");
@@ -37,10 +36,9 @@ describe("dark-pair collapse", () => {
   });
 
   it("does not collapse hover:bg-white with dark:bg-slate-950", () => {
-    const { tokens } = collapseDarkPairs(
-      ["hover:bg-white", "dark:bg-slate-950"],
-      { pairs: [pair] },
-    );
+    const { tokens } = collapseDarkPairs(["hover:bg-white", "dark:bg-slate-950"], {
+      pairs: [pair],
+    });
     expect(tokens).toEqual(["hover:bg-white", "dark:bg-slate-950"]);
   });
 
@@ -66,8 +64,6 @@ describe("dark-pair collapse", () => {
     const first = transformClassString("bg-white dark:bg-slate-950", opts);
     const second = transformClassString(first.result, opts);
     expect(second.result).toBe(first.result);
-    expect(second.transformations.filter((t) => t.replacement !== "")).toHaveLength(
-      0,
-    );
+    expect(second.transformations.filter((t) => t.replacement !== "")).toHaveLength(0);
   });
 });

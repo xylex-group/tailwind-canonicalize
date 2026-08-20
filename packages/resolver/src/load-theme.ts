@@ -181,7 +181,7 @@ export async function loadThemeFromProject(
     try {
       const css = await readFile(full, "utf8");
       if (
-        css.includes("@import") && css.includes("tailwind") ||
+        (css.includes("@import") && css.includes("tailwind")) ||
         css.includes("@theme") ||
         css.includes("@tailwind")
       ) {

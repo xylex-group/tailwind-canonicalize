@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { createDefaultTheme } from "./default-theme.js";
 import { findCanonicalEquivalent } from "./find-canonical.js";
-import { DEFAULT_COLOR_PALETTE } from "./palette-default.js";
 import { resolveSpacingMultiplier, valuesEqual } from "./length.js";
 import { migrateUtility } from "./migrations/apply.js";
 import { usesContainerScale } from "./namespace.js";
+import { DEFAULT_COLOR_PALETTE } from "./palette-default.js";
 import { transformClassString } from "./pipeline.js";
 
 function expectedSpacingCanonical(
@@ -35,8 +35,8 @@ describe("generated matrix (thousands)", () => {
   const theme = createDefaultTheme();
   const unit = theme.spacingUnit!;
   const numericKeys = [
-    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20,
-    24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 72, 80, 96,
+    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40,
+    44, 48, 52, 56, 60, 64, 72, 80, 96,
   ];
   const namespaces = [
     "w",
@@ -107,10 +107,7 @@ describe("generated matrix (thousands)", () => {
       for (const key of continuous) {
         const css = resolveSpacingMultiplier(key, unit);
         const token = `${ns}-[${css}]`;
-        expect(
-          findCanonicalEquivalent(token, { theme })?.canonical,
-          token,
-        ).toBe(`${ns}-${key}`);
+        expect(findCanonicalEquivalent(token, { theme })?.canonical, token).toBe(`${ns}-${key}`);
       }
     }
   });

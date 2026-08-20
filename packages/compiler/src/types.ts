@@ -94,10 +94,4 @@ export interface ProjectSummary {
   themePath?: string | null;
 }
 
-export type {
-  Rewrite,
-  Theme,
-  TransformResult,
-  TransformationRecord,
-  ClassStringDiagnostic,
-};
+export type { ClassStringDiagnostic, Rewrite, Theme, TransformationRecord, TransformResult };

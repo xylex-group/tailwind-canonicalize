@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { colorsEqual, normalizeColor } from "./color-normalize.js";
-import {
-  buildTargetUtility,
-  extractStructuralHints,
-  proposeSemanticToken,
-} from "./context.js";
+import { buildTargetUtility, extractStructuralHints, proposeSemanticToken } from "./context.js";
 import { findAliasCycles, findDuplicateValueTokens } from "./css-scan.js";
 import { generateThemeCss } from "./generate-theme.js";
 import { parseColorUtility } from "./palette.js";
@@ -105,9 +101,7 @@ describe("token graph", () => {
       },
     ];
     const dups = findDuplicateValueTokens(tokens);
-    expect(dups[0]?.tokens).toEqual(
-      expect.arrayContaining(["--color-background", "--color-card"]),
-    );
+    expect(dups[0]?.tokens).toEqual(expect.arrayContaining(["--color-background", "--color-card"]));
     expect(dups[0]?.note).toMatch(/Do not auto-merge/);
   });
 

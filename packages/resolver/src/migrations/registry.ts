@@ -54,8 +54,7 @@ export const TAILWIND_MIGRATIONS: readonly TailwindMigration[] = [
     deprecatedClass: "shadow",
     canonicalClass: "shadow-sm",
     safety: "review",
-    notes:
-      "v4 restyles default shadow; not auto-applied in safe mode (identity collision risk)",
+    notes: "v4 restyles default shadow; not auto-applied in safe mode (identity collision risk)",
   },
   {
     id: "flex-shrink-0-to-shrink-0",

@@ -15,9 +15,7 @@ export interface WatchOptions extends ProjectOptions {
  * Watch paths and re-run canonicalizeProject on changes (incremental via cache).
  * Returns a dispose function.
  */
-export async function watchProject(
-  options: WatchOptions,
-): Promise<{ close: () => void }> {
+export async function watchProject(options: WatchOptions): Promise<{ close: () => void }> {
   const { canonicalizeProject } = await import("./canonicalize.js");
   const debounceMs = options.debounceMs ?? 150;
   const paths = options.paths ?? ["."];
@@ -41,9 +39,7 @@ export async function watchProject(
       });
       options.onRun?.(summary);
     } catch (error) {
-      options.onError?.(
-        error instanceof Error ? error : new Error(String(error)),
-      );
+      options.onError?.(error instanceof Error ? error : new Error(String(error)));
     } finally {
       running = false;
       if (pending) {
@@ -58,29 +54,25 @@ export async function watchProject(
 
   const watchers = paths.map((p) => {
     const abs = path.isAbsolute(p) ? p : path.resolve(cwd, p);
-    return watch(
-      abs,
-      { recursive: true },
-      (_event, filename) => {
-        if (!filename) {
-          return;
-        }
-        const name = filename.toString();
-        if (
-          name.includes("node_modules") ||
-          name.includes(".git") ||
-          name.endsWith(".tailwind-canonicalize-cache.json")
-        ) {
-          return;
-        }
-        if (timer) {
-          clearTimeout(timer);
-        }
-        timer = setTimeout(() => {
-          void run();
-        }, debounceMs);
-      },
-    );
+    return watch(abs, { recursive: true }, (_event, filename) => {
+      if (!filename) {
+        return;
+      }
+      const name = filename.toString();
+      if (
+        name.includes("node_modules") ||
+        name.includes(".git") ||
+        name.endsWith(".tailwind-canonicalize-cache.json")
+      ) {
+        return;
+      }
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        void run();
+      }, debounceMs);
+    });
   });
 
   return {

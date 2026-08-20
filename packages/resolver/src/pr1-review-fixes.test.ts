@@ -20,9 +20,7 @@ describe("PR #1 review fixes", () => {
 
     // v4 still rewrites continuous keys
     const v4 = createDefaultTheme();
-    expect(findCanonicalEquivalent("w-[140px]", { theme: v4 })?.canonical).toBe(
-      "w-35",
-    );
+    expect(findCanonicalEquivalent("w-[140px]", { theme: v4 })?.canonical).toBe("w-35");
   });
 
   it("P1: Avoid overriding explicit spacing keys", () => {
@@ -34,9 +32,7 @@ describe("PR #1 review fixes", () => {
 
     // When explicit key matches the inverted length, allow rewrite
     theme.spacing.values.set("35", "8.75rem"); // 140px at 16px root
-    expect(findCanonicalEquivalent("w-[140px]", { theme })?.canonical).toBe(
-      "w-35",
-    );
+    expect(findCanonicalEquivalent("w-[140px]", { theme })?.canonical).toBe("w-35");
   });
 
   it("P1: Exclude border widths from spacing inversion", () => {
@@ -46,38 +42,26 @@ describe("PR #1 review fixes", () => {
     expect(findCanonicalEquivalent("border-t-[13px]", { theme })).toBeNull();
 
     // Spacing-based namespaces still invert
-    expect(findCanonicalEquivalent("w-[13px]", { theme })?.canonical).toBe(
-      "w-3.25",
-    );
+    expect(findCanonicalEquivalent("w-[13px]", { theme })?.canonical).toBe("w-3.25");
     // border-spacing uses --spacing multipliers
-    expect(
-      findCanonicalEquivalent("border-spacing-[13px]", { theme })?.canonical,
-    ).toBe("border-spacing-3.25");
+    expect(findCanonicalEquivalent("border-spacing-[13px]", { theme })?.canonical).toBe(
+      "border-spacing-3.25",
+    );
   });
 
   it("P1: Border width uses px scale not spacing (border-b-[8px] → border-b-8)", () => {
     // Original found case: border-b-[8px] must NOT become border-b-2 (spacing).
     // Tailwind border-2 = 2px; border-8 = 8px.
     const theme = createDefaultTheme();
-    expect(findCanonicalEquivalent("border-b-[8px]", { theme })?.canonical).toBe(
-      "border-b-8",
-    );
-    expect(findCanonicalEquivalent("border-[8px]", { theme })?.canonical).toBe(
-      "border-8",
-    );
-    expect(findCanonicalEquivalent("border-b-[2px]", { theme })?.canonical).toBe(
-      "border-b-2",
-    );
-    expect(findCanonicalEquivalent("border-x-[4px]", { theme })?.canonical).toBe(
-      "border-x-4",
-    );
+    expect(findCanonicalEquivalent("border-b-[8px]", { theme })?.canonical).toBe("border-b-8");
+    expect(findCanonicalEquivalent("border-[8px]", { theme })?.canonical).toBe("border-8");
+    expect(findCanonicalEquivalent("border-b-[2px]", { theme })?.canonical).toBe("border-b-2");
+    expect(findCanonicalEquivalent("border-x-[4px]", { theme })?.canonical).toBe("border-x-4");
     // Non-scale widths stay arbitrary
     expect(findCanonicalEquivalent("md:border-b-[10px]", { theme })).toBeNull();
     expect(findCanonicalEquivalent("md:border-l-[6px]", { theme })).toBeNull();
     // Never map 8px → spacing key 2
-    expect(findCanonicalEquivalent("border-b-[8px]", { theme })?.canonical).not.toBe(
-      "border-b-2",
-    );
+    expect(findCanonicalEquivalent("border-b-[8px]", { theme })?.canonical).not.toBe("border-b-2");
   });
 
   it("P2: Distinguish text property families before reporting conflicts", () => {
@@ -92,9 +76,7 @@ describe("PR #1 review fixes", () => {
     expect(r.diagnostics.some((d) => d.kind === "conflict")).toBe(false);
 
     // Same-family colors still conflict (existing safety)
-    expect(
-      utilitiesConflict("text-foreground", "text-muted-foreground"),
-    ).toBe(true);
+    expect(utilitiesConflict("text-foreground", "text-muted-foreground")).toBe(true);
     const r2 = transformClassString("text-foreground text-muted-foreground", {
       theme: createDefaultTheme(),
     });

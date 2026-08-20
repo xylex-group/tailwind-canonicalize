@@ -1,11 +1,7 @@
 import type { PipelineMode } from "@tailwind-canonicalize/resolver";
-import { makePaint, useColor, type PaintKit } from "./ansi.js";
+import { makePaint, type PaintKit, useColor } from "./ansi.js";
 
-export type CliCommand =
-  | "run"
-  | "tokens-analyze"
-  | "tokens-apply"
-  | "tokens-report";
+export type CliCommand = "run" | "tokens-analyze" | "tokens-apply" | "tokens-report";
 
 export interface CliArgs {
   command: CliCommand;
@@ -147,9 +143,7 @@ export function parseArgs(argv: string[]): CliArgs {
       args.command = "tokens-report";
       i = 2;
     } else {
-      throw new Error(
-        "Usage: tailwind-canonicalize tokens <analyze|apply|report> ...",
-      );
+      throw new Error("Usage: tailwind-canonicalize tokens <analyze|apply|report> ...");
     }
   }
 
@@ -158,17 +152,11 @@ export function parseArgs(argv: string[]): CliArgs {
 
     // --flag=value forms
     if (a.startsWith("--report=")) {
-      args.reportPath = requireEqualsValue(
-        "--report",
-        a.slice("--report=".length),
-        "report.txt",
-      );
+      args.reportPath = requireEqualsValue("--report", a.slice("--report=".length), "report.txt");
       continue;
     }
     if (a.startsWith("--md=") || a.startsWith("--markdown=")) {
-      const raw = a.startsWith("--md=")
-        ? a.slice("--md=".length)
-        : a.slice("--markdown=".length);
+      const raw = a.startsWith("--md=") ? a.slice("--md=".length) : a.slice("--markdown=".length);
       args.styleReportMarkdown = requireEqualsValue("--md", raw, "styles.md");
       continue;
     }
@@ -188,27 +176,17 @@ export function parseArgs(argv: string[]): CliArgs {
     }
     if (a.startsWith("--root-font-size=")) {
       args.rootFontSizePx = Number(
-        requireEqualsValue(
-          "--root-font-size",
-          a.slice("--root-font-size=".length),
-          "16",
-        ),
+        requireEqualsValue("--root-font-size", a.slice("--root-font-size=".length), "16"),
       );
       continue;
     }
     if (a.startsWith("--ignore=")) {
-      args.ignore.push(
-        requireEqualsValue("--ignore", a.slice("--ignore=".length), "dist"),
-      );
+      args.ignore.push(requireEqualsValue("--ignore", a.slice("--ignore=".length), "dist"));
       continue;
     }
     if (a.startsWith("--from-tailwind=")) {
       args.fromTailwind = Number(
-        requireEqualsValue(
-          "--from-tailwind",
-          a.slice("--from-tailwind=".length),
-          "3",
-        ),
+        requireEqualsValue("--from-tailwind", a.slice("--from-tailwind=".length), "3"),
       );
       args.migrate = true;
       continue;
@@ -237,11 +215,7 @@ export function parseArgs(argv: string[]): CliArgs {
       continue;
     }
     if (a.startsWith("--out=")) {
-      args.outManifest = requireEqualsValue(
-        "--out",
-        a.slice("--out=".length),
-        "manifest.json",
-      );
+      args.outManifest = requireEqualsValue("--out", a.slice("--out=".length), "manifest.json");
       if (args.command === "tokens-apply" && !args.manifestPath) {
         args.manifestPath = args.outManifest;
       }
@@ -549,9 +523,7 @@ const SECTION =
  * Colorized help for terminals (stdout). Plain when `color === false` or
  * when NO_COLOR / non-TTY applies (default auto-detect on stdout).
  */
-export function formatHelp(
-  color: boolean = useColor(process.stdout),
-): string {
+export function formatHelp(color: boolean = useColor(process.stdout)): string {
   if (!color) {
     return HELP;
   }
@@ -583,17 +555,12 @@ function paintHelpLine(line: string, c: PaintKit): string {
   }
 
   // Example commands (indented, not a flag row)
-  if (
-    /^\s{2}tailwind-canonicalize\b/.test(line) &&
-    !/^\s{2}-/.test(line)
-  ) {
+  if (/^\s{2}tailwind-canonicalize\b/.test(line) && !/^\s{2}-/.test(line)) {
     return c.green(line);
   }
 
   // Flag rows: "  --flag …" or "  -w, --write …"
-  const flagRow = line.match(
-    /^(\s+)(-[^\s].*?)(\s{2,})(.*)$/,
-  );
+  const flagRow = line.match(/^(\s+)(-[^\s].*?)(\s{2,})(.*)$/);
   if (flagRow) {
     const [, indent, flags, gap, desc] = flagRow;
     return `${indent}${paintFlags(flags!, c)}${gap}${desc}`;
@@ -636,8 +603,5 @@ function paintHelpLine(line: string, c: PaintKit): string {
 
 /** Highlight flag tokens inside a flags column (e.g. `-w, --write`). */
 function paintFlags(flags: string, c: PaintKit): string {
-  return flags.replace(
-    /(-{1,2}[a-zA-Z][\w-]*)/g,
-    (m) => c.cyan(m),
-  );
+  return flags.replace(/(-{1,2}[a-zA-Z][\w-]*)/g, (m) => c.cyan(m));
 }

@@ -1,7 +1,7 @@
 import { cpus } from "node:os";
-import { Worker } from "node:worker_threads";
-import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { Worker } from "node:worker_threads";
 import type { FileResult } from "./types.js";
 
 export interface WorkerTask {
@@ -67,10 +67,7 @@ export async function runWithWorkerPool(
     return [];
   }
 
-  const workers = Math.max(
-    1,
-    Math.min(concurrency, tasks.length, Math.max(1, cpus().length - 1)),
-  );
+  const workers = Math.max(1, Math.min(concurrency, tasks.length, Math.max(1, cpus().length - 1)));
 
   // Resolve worker file next to this module (dist/worker.js after build)
   const workerUrl = new URL("./worker.js", import.meta.url);
@@ -174,9 +171,7 @@ export function serializeTheme(theme: {
     spacingUnit: theme.spacingUnit,
     spacing: [...theme.spacing.values],
     colors: [...theme.colors.values],
-    borderWidth: theme.borderWidth
-      ? [...theme.borderWidth.values]
-      : DEFAULT_BORDER_WIDTH,
+    borderWidth: theme.borderWidth ? [...theme.borderWidth.values] : DEFAULT_BORDER_WIDTH,
     borderRadius: [...theme.borderRadius.values],
     fontSize: [...theme.fontSize.values],
     lineHeight: [...theme.lineHeight.values],

@@ -12,18 +12,12 @@ describe("pipeline categories", () => {
   });
 
   it("preserves variants on max-w-[160px]", () => {
-    expect(transformClassString("hover:max-w-[160px]", { theme }).result).toBe(
-      "hover:max-w-40",
-    );
-    expect(transformClassString("md:max-w-[160px]", { theme }).result).toBe(
-      "md:max-w-40",
-    );
+    expect(transformClassString("hover:max-w-[160px]", { theme }).result).toBe("hover:max-w-40");
+    expect(transformClassString("md:max-w-[160px]", { theme }).result).toBe("md:max-w-40");
     expect(transformClassString("dark:md:max-w-[160px]", { theme }).result).toBe(
       "dark:md:max-w-40",
     );
-    expect(transformClassString("max-w-[160px]!", { theme }).result).toBe(
-      "max-w-40!",
-    );
+    expect(transformClassString("max-w-[160px]!", { theme }).result).toBe("max-w-40!");
   });
 
   it("applies approved semantic mappings", () => {
@@ -39,9 +33,7 @@ describe("pipeline categories", () => {
       ],
     });
     expect(r.result).toBe("bg-background text-foreground");
-    expect(r.transformations.every((t) => t.category === "semantic-color-token")).toBe(
-      true,
-    );
+    expect(r.transformations.every((t) => t.category === "semantic-color-token")).toBe(true);
   });
 
   it("does not apply semantic mappings unless provided (opt-in)", () => {
@@ -75,9 +67,7 @@ describe("pipeline categories", () => {
   it("collapses equivalent duplicates max-w-40 max-w-[160px]", () => {
     const r = transformClassString("max-w-40 max-w-[160px]", { theme });
     expect(r.result.trim()).toBe("max-w-40");
-    expect(
-      r.transformations.some((t) => t.category === "duplicate-token-removal"),
-    ).toBe(true);
+    expect(r.transformations.some((t) => t.category === "duplicate-token-removal")).toBe(true);
   });
 
   it("reports conflict for max-w-40 max-w-44 without rewriting", () => {
@@ -107,9 +97,7 @@ describe("pipeline categories", () => {
   it("does not collapse different variants", () => {
     const r = transformClassString("bg-white hover:bg-white", {
       theme,
-      tokenMappings: [
-        { source: "bg-white", target: "bg-background", token: "--color-background" },
-      ],
+      tokenMappings: [{ source: "bg-white", target: "bg-background", token: "--color-background" }],
     });
     expect(r.result).toBe("bg-background hover:bg-background");
   });
@@ -127,9 +115,7 @@ describe("pipeline categories", () => {
     const opts = {
       theme,
       migrations: true as const,
-      tokenMappings: [
-        { source: "bg-white", target: "bg-background", token: "--color-background" },
-      ],
+      tokenMappings: [{ source: "bg-white", target: "bg-background", token: "--color-background" }],
     };
     const first = transformClassString(input, opts);
     const second = transformClassString(first.result, opts);

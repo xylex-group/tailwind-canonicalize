@@ -149,12 +149,9 @@ export const cliSnippets = {
   install: "pnpm add -D tailwind-canonicalize",
   write: "pnpm exec tailwind-canonicalize . --write --safe",
   check: "pnpm exec tailwind-canonicalize . --check --json",
-  migrate:
-    "pnpm exec tailwind-canonicalize . --migrate --from-tailwind 3 --to-tailwind 4 --write",
-  tokensAnalyze:
-    "pnpm exec tailwind-canonicalize tokens analyze . --out proposed.json",
-  tokensApply:
-    "pnpm exec tailwind-canonicalize tokens apply tailwind-tokens.json --write",
+  migrate: "pnpm exec tailwind-canonicalize . --migrate --from-tailwind 3 --to-tailwind 4 --write",
+  tokensAnalyze: "pnpm exec tailwind-canonicalize tokens analyze . --out proposed.json",
+  tokensApply: "pnpm exec tailwind-canonicalize tokens apply tailwind-tokens.json --write",
   watch: "pnpm exec tailwind-canonicalize . --watch --write",
 };
 

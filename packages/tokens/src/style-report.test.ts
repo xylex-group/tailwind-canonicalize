@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
 import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { describe, expect, it } from "vitest";
 import {
   buildStyleUsageReport,
   formatStyleUsageReportMarkdown,
@@ -29,9 +29,7 @@ describe("toReportPath", () => {
 describe("semanticBareFromBase", () => {
   it("strips channel prefixes for semantic bases", () => {
     expect(semanticBareFromBase("bg-background")).toBe("background");
-    expect(semanticBareFromBase("text-muted-foreground")).toBe(
-      "muted-foreground",
-    );
+    expect(semanticBareFromBase("text-muted-foreground")).toBe("muted-foreground");
     expect(semanticBareFromBase("border-border")).toBe("border");
   });
 
@@ -85,9 +83,7 @@ export function Card() {
 
     expect(report.utilities.some((u) => u.base === "text-sm")).toBe(false);
 
-    const muted = report.utilities.find(
-      (u) => u.base === "text-muted-foreground",
-    );
+    const muted = report.utilities.find((u) => u.base === "text-muted-foreground");
     expect(muted?.kind).toBe("semantic");
 
     const buttonTag = report.byTag.find((t) => t.tag === "button");
@@ -217,9 +213,7 @@ export function Card() {
     expect(semReport.summary.health.semanticRatio).toBeGreaterThan(
       palReport.summary.health.semanticRatio,
     );
-    expect(semReport.summary.health.score).toBeGreaterThanOrEqual(
-      palReport.summary.health.score,
-    );
+    expect(semReport.summary.health.score).toBeGreaterThanOrEqual(palReport.summary.health.score);
   });
 
   it("analyzes theme CSS and emits missing-token suggestions", async () => {
@@ -254,18 +248,14 @@ export function Card() {
       // allow theme scan of this temp tree
     });
 
-    expect(report.theme.filesScanned.some((f) => f.endsWith("globals.css"))).toBe(
-      true,
-    );
+    expect(report.theme.filesScanned.some((f) => f.endsWith("globals.css"))).toBe(true);
     const bgToken = report.theme.colorTokens.find(
       (t) => t.bare === "background" || t.name === "--color-background",
     );
     expect(bgToken?.usageCount).toBeGreaterThanOrEqual(1);
     expect(bgToken?.usedAs.some((u) => u.includes("background"))).toBe(true);
 
-    expect(
-      report.theme.unusedColorTokens.some((n) => n.includes("orphan")),
-    ).toBe(true);
+    expect(report.theme.unusedColorTokens.some((n) => n.includes("orphan"))).toBe(true);
 
     expect(
       report.theme.missingForSemanticUtilities.some(
@@ -276,14 +266,9 @@ export function Card() {
       ),
     ).toBe(true);
 
+    expect(report.suggestions.some((s) => s.kind === "add-css-color-token")).toBe(true);
     expect(
-      report.suggestions.some((s) => s.kind === "add-css-color-token"),
-    ).toBe(true);
-    expect(
-      report.drift.some(
-        (d) =>
-          d.kind === "missing-theme-token" || d.kind === "unused-theme-token",
-      ),
+      report.drift.some((d) => d.kind === "missing-theme-token" || d.kind === "unused-theme-token"),
     ).toBe(true);
 
     const md = formatStyleUsageReportMarkdown(report);

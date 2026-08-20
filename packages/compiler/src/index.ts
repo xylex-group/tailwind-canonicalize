@@ -1,4 +1,21 @@
 export {
+  extractClassOccurrences,
+  tokenizeClasses,
+} from "@tailwind-canonicalize/parser";
+export {
+  createDefaultTheme,
+  createTailwindCompileEqual,
+  DEFAULT_COLOR_PALETTE,
+  loadProjectTheme,
+  loadThemeFromCss,
+  loadThemeFromProject,
+  loadThemeFromV3Config,
+  migrateUtility,
+  parseUtility,
+  TAILWIND_MIGRATIONS,
+  utilityIdentity,
+} from "@tailwind-canonicalize/resolver";
+export {
   canonicalizeClass,
   canonicalizeClasses,
   canonicalizeFile,
@@ -18,9 +35,9 @@ export {
   emptyCache,
   hashContent,
   hashOptions,
+  type IncrementalCache,
   loadCache,
   saveCache,
-  type IncrementalCache,
 } from "./hash-cache.js";
 export { collectFiles } from "./scan.js";
 export type {
@@ -34,23 +51,5 @@ export type {
   TransformationRecord,
   TransformResult,
 } from "./types.js";
-export { watchProject, type WatchOptions } from "./watch.js";
-export { runWithWorkerPool, serializeTheme, reviveTheme } from "./worker-pool.js";
-
-export {
-  createDefaultTheme,
-  createTailwindCompileEqual,
-  loadProjectTheme,
-  loadThemeFromCss,
-  loadThemeFromProject,
-  loadThemeFromV3Config,
-  parseUtility,
-  TAILWIND_MIGRATIONS,
-  migrateUtility,
-  utilityIdentity,
-  DEFAULT_COLOR_PALETTE,
-} from "@tailwind-canonicalize/resolver";
-export {
-  extractClassOccurrences,
-  tokenizeClasses,
-} from "@tailwind-canonicalize/parser";
+export { type WatchOptions, watchProject } from "./watch.js";
+export { reviveTheme, runWithWorkerPool, serializeTheme } from "./worker-pool.js";

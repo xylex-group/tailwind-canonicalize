@@ -1,14 +1,4 @@
 export {
-  HELP,
-  formatHelp,
-  parseArgs,
-  type CliArgs,
-  type CliCommand,
-} from "./args.js";
-export { run } from "./run.js";
-export { makePaint, useColor, type PaintKit } from "./ansi.js";
-
-export {
   canonicalizeClass,
   canonicalizeClasses,
   canonicalizeFile,
@@ -16,8 +6,8 @@ export {
   canonicalizeSource,
   createDefaultTheme,
   createTailwindCompileEqual,
-  defineConfig,
   DEFAULT_COLOR_PALETTE,
+  defineConfig,
   extractClassOccurrences,
   findCanonicalEquivalent,
   loadConfig,
@@ -28,3 +18,12 @@ export {
   TAILWIND_MIGRATIONS,
   watchProject,
 } from "@tailwind-canonicalize/compiler";
+export { makePaint, type PaintKit, useColor } from "./ansi.js";
+export {
+  type CliArgs,
+  type CliCommand,
+  formatHelp,
+  HELP,
+  parseArgs,
+} from "./args.js";
+export { run } from "./run.js";

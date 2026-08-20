@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 export interface FileHashEntry {
@@ -61,10 +61,7 @@ export function emptyCache(optionsHash: string): IncrementalCache {
   return { version: CACHE_VERSION, optionsHash, files: {} };
 }
 
-export async function saveCache(
-  filePath: string,
-  cache: IncrementalCache,
-): Promise<void> {
+export async function saveCache(filePath: string, cache: IncrementalCache): Promise<void> {
   await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(filePath, `${JSON.stringify(cache, null, 2)}\n`, "utf8");
 }

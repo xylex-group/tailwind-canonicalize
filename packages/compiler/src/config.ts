@@ -31,18 +31,14 @@ export interface TailwindCanonicalizeConfig {
   concurrency?: number;
 }
 
-export function defineConfig(
-  config: TailwindCanonicalizeConfig,
-): TailwindCanonicalizeConfig {
+export function defineConfig(config: TailwindCanonicalizeConfig): TailwindCanonicalizeConfig {
   return config;
 }
 
 /**
  * Load config from tailwind-canonicalize.config.{ts,js,mjs,cjs} or package field.
  */
-export async function loadConfig(
-  cwd: string,
-): Promise<TailwindCanonicalizeConfig> {
+export async function loadConfig(cwd: string): Promise<TailwindCanonicalizeConfig> {
   const candidates = [
     "tailwind-canonicalize.config.ts",
     "tailwind-canonicalize.config.mts",

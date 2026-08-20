@@ -2,6 +2,8 @@
 
 Canonicalize is a **check tool** with Prettier/Biome-style exit codes. Run it as its own step beside Biome, ESLint, or Oxlint — never as a hidden side effect of lint.
 
+This repository’s own CI ([`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)) uses root [`package.json#packageManager`](../../package.json) (`pnpm@9.15.0`) and invokes `pnpm check`, `pnpm typecheck`, `pnpm test`, and `pnpm build`. It does not pin a competing pnpm major. Publish on `main` is Changesets (`changesets/action` → `pnpm release`). Consumer examples below may pin pnpm for *their* repos.
+
 ## Exit codes
 
 | Code | Meaning | Typical CI |

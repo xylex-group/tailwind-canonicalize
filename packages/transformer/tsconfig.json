@@ -7,8 +7,5 @@
   },
   "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.test.ts", "dist"],
-  "references": [
-    { "path": "../parser" },
-    { "path": "../resolver" }
-  ]
+  "references": [{ "path": "../parser" }, { "path": "../resolver" }]
 }

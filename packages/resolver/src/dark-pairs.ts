@@ -77,11 +77,7 @@ export function collapseDarkPairs(
       if (base === pair.light && variants.length === 0) {
         lightIdx.push(i);
       }
-      if (
-        base === pair.dark &&
-        variants.length === 1 &&
-        variants[0] === "dark"
-      ) {
+      if (base === pair.dark && variants.length === 1 && variants[0] === "dark") {
         darkIdx.push(i);
       }
     }

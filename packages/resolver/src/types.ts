@@ -72,12 +72,7 @@ export interface UtilityParts {
   isArbitraryProperty: boolean;
 }
 
-export type EquivalenceReason =
-  | "theme-exact"
-  | "keyword"
-  | "fraction"
-  | "compile-equal"
-  | "none";
+export type EquivalenceReason = "theme-exact" | "keyword" | "fraction" | "compile-equal" | "none";
 
 export interface CanonicalMatch {
   /** Canonical utility including variants and important. */

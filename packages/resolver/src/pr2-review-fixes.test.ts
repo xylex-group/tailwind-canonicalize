@@ -17,9 +17,7 @@ describe("PR #2 review fixes", () => {
     // Original found case: override --ease-in-out must not rewrite bezier to ease-in-out
     const theme = createDefaultTheme();
     theme.cssVariables.set("--ease-in-out", "cubic-bezier(0.1,0.2,0.3,0.4)");
-    expect(
-      findCanonicalEquivalent("ease-[cubic-bezier(0.4,0,0.2,1)]", { theme }),
-    ).toBeNull();
+    expect(findCanonicalEquivalent("ease-[cubic-bezier(0.4,0,0.2,1)]", { theme })).toBeNull();
 
     // Default theme (no override) still rewrites
     const defaults = createDefaultTheme();
@@ -30,14 +28,10 @@ describe("PR #2 review fixes", () => {
     ).toBe("ease-in-out");
 
     // Override that matches the arbitrary value still rewrites
-    theme.cssVariables.set(
-      "--ease-in-out",
-      "cubic-bezier(0.4, 0, 0.2, 1)",
+    theme.cssVariables.set("--ease-in-out", "cubic-bezier(0.4, 0, 0.2, 1)");
+    expect(findCanonicalEquivalent("ease-[cubic-bezier(0.4,0,0.2,1)]", { theme })?.canonical).toBe(
+      "ease-in-out",
     );
-    expect(
-      findCanonicalEquivalent("ease-[cubic-bezier(0.4,0,0.2,1)]", { theme })
-        ?.canonical,
-    ).toBe("ease-in-out");
   });
 
   it("P1: Gate bare z-index synthesis on Tailwind v4", () => {
@@ -47,13 +41,9 @@ describe("PR #2 review fixes", () => {
 
     // v4 still synthesizes bare integer z utilities
     const v4 = createDefaultTheme();
-    expect(findCanonicalEquivalent("z-[5]", { theme: v4 })?.canonical).toBe(
-      "z-5",
-    );
+    expect(findCanonicalEquivalent("z-[5]", { theme: v4 })?.canonical).toBe("z-5");
     // auto keyword remains safe on both
-    expect(findCanonicalEquivalent("z-[auto]", { theme: v3 })?.canonical).toBe(
-      "z-auto",
-    );
+    expect(findCanonicalEquivalent("z-[auto]", { theme: v3 })?.canonical).toBe("z-auto");
   });
 
   it("P2: Reject context-relative spacing during absolute inversion", () => {

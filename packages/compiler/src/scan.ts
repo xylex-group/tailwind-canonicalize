@@ -1,6 +1,7 @@
+import type { Dirent, Stats } from "node:fs";
 import { readdir, stat } from "node:fs/promises";
 import path from "node:path";
-import { isSupportedExtension, extensionOf } from "@tailwind-canonicalize/parser";
+import { extensionOf, isSupportedExtension } from "@tailwind-canonicalize/parser";
 
 const DEFAULT_IGNORE = new Set([
   "node_modules",
@@ -59,12 +60,8 @@ export async function collectFiles(
   return [...new Set(results)].sort();
 }
 
-async function walk(
-  target: string,
-  ignore: Set<string>,
-  out: string[],
-): Promise<void> {
-  let info;
+async function walk(target: string, ignore: Set<string>, out: string[]): Promise<void> {
+  let info: Stats;
   try {
     info = await stat(target);
   } catch {
@@ -87,7 +84,7 @@ async function walk(
     return;
   }
 
-  let entries;
+  let entries: Dirent[];
   try {
     entries = await readdir(target, { withFileTypes: true });
   } catch {

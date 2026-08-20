@@ -13,7 +13,9 @@ describe("idempotence by category", () => {
     const second = transformClassString(first.result, opts);
     expect(second.result).toBe(first.result);
     expect(
-      second.transformations.filter((t) => t.replacement !== "" || t.category === "duplicate-token-removal"),
+      second.transformations.filter(
+        (t) => t.replacement !== "" || t.category === "duplicate-token-removal",
+      ),
     ).toHaveLength(0);
     return first;
   }
@@ -21,9 +23,7 @@ describe("idempotence by category", () => {
   it("canonical-class", () => {
     const r = twice("max-w-[160px] hover:max-w-[160px] max-w-[160px]!", { theme });
     expect(r.result).toBe("max-w-40 hover:max-w-40 max-w-40!");
-    expect(r.transformations.every((t) => t.category === "canonical-class")).toBe(
-      true,
-    );
+    expect(r.transformations.every((t) => t.category === "canonical-class")).toBe(true);
   });
 
   it("tailwind-migration", () => {
@@ -32,9 +32,7 @@ describe("idempotence by category", () => {
       arbitraryValues: false,
     });
     expect(r.result).toBe("hover:bg-linear-to-br bg-linear-to-br!");
-    expect(
-      r.transformations.every((t) => t.category === "tailwind-migration"),
-    ).toBe(true);
+    expect(r.transformations.every((t) => t.category === "tailwind-migration")).toBe(true);
   });
 
   it("semantic-color-token", () => {
@@ -62,25 +60,22 @@ describe("idempotence by category", () => {
   });
 
   it("combined pipeline", () => {
-    twice(
-      "max-w-[160px] bg-gradient-to-br bg-white text-slate-800 max-w-40",
-      {
-        theme,
-        migrations: true,
-        tokenMappings: [
-          {
-            source: "bg-white",
-            target: "bg-background",
-            token: "--color-background",
-          },
-          {
-            source: "text-slate-800",
-            target: "text-foreground",
-            token: "--color-foreground",
-          },
-        ],
-      },
-    );
+    twice("max-w-[160px] bg-gradient-to-br bg-white text-slate-800 max-w-40", {
+      theme,
+      migrations: true,
+      tokenMappings: [
+        {
+          source: "bg-white",
+          target: "bg-background",
+          token: "--color-background",
+        },
+        {
+          source: "text-slate-800",
+          target: "text-foreground",
+          token: "--color-foreground",
+        },
+      ],
+    });
   });
 
   it("safe mode does not apply semantic without mappings", () => {

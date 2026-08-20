@@ -4,8 +4,8 @@ import {
   canonicalizeProject,
   canonicalizeSource,
   collectFiles,
-  loadConfig,
   configToPipelineFlags,
+  loadConfig,
   watchProject,
 } from "@tailwind-canonicalize/compiler";
 import type { TransformationRecord } from "@tailwind-canonicalize/resolver";
@@ -22,13 +22,9 @@ import {
   writeThemeCss,
   writeTokenManifest,
 } from "@tailwind-canonicalize/tokens";
-import { formatHelp, parseArgs, type CliArgs } from "./args.js";
+import { type CliArgs, formatHelp, parseArgs } from "./args.js";
 import { lineDiff } from "./diff.js";
-import {
-  formatTransformation,
-  printError,
-  printProjectReport,
-} from "./report.js";
+import { formatTransformation, printError, printProjectReport } from "./report.js";
 
 const VERSION = "0.1.18";
 
@@ -84,8 +80,7 @@ async function runTokensAnalyze(args: CliArgs): Promise<number> {
     files,
   });
 
-  const out =
-    args.outManifest ?? path.join(args.cwd, "tailwind-tokens.proposed.json");
+  const out = args.outManifest ?? path.join(args.cwd, "tailwind-tokens.proposed.json");
   await writeTokenManifest(out, result.proposedManifest);
 
   if (args.json) {
@@ -115,15 +110,9 @@ async function runTokensAnalyze(args: CliArgs): Promise<number> {
       console.error(
         "! No source files matched — palette proposals need TS/TSX/JS/HTML/Vue/… under the given paths.",
       );
-      console.error(
-        `  Paths: ${args.paths.join(", ") || "."}`,
-      );
-      console.error(
-        "  Tip: Next.js App Router projects usually use app/ (not src/). Try:",
-      );
-      console.error(
-        "    tailwind-canonicalize tokens analyze . --out tailwind-tokens.json",
-      );
+      console.error(`  Paths: ${args.paths.join(", ") || "."}`);
+      console.error("  Tip: Next.js App Router projects usually use app/ (not src/). Try:");
+      console.error("    tailwind-canonicalize tokens analyze . --out tailwind-tokens.json");
       console.error(
         "    tailwind-canonicalize tokens analyze app components --out tailwind-tokens.json",
       );
@@ -152,13 +141,8 @@ async function runTokensReport(args: CliArgs): Promise<number> {
     files,
   });
 
-  const outJson =
-    args.outManifest ??
-    args.reportPath ??
-    path.join(args.cwd, "styles-report.json");
-  const jsonPath = path.isAbsolute(outJson)
-    ? outJson
-    : path.join(args.cwd, outJson);
+  const outJson = args.outManifest ?? args.reportPath ?? path.join(args.cwd, "styles-report.json");
+  const jsonPath = path.isAbsolute(outJson) ? outJson : path.join(args.cwd, outJson);
   await writeStyleUsageReport(jsonPath, report);
 
   if (args.styleReportMarkdown) {
@@ -207,9 +191,7 @@ async function runTokensReport(args: CliArgs): Promise<number> {
       console.error("");
       console.error("Top files:");
       for (const f of report.summary.topFiles.slice(0, 5)) {
-        console.error(
-          `  ${String(f.count).padStart(5)}  ${f.file} (${f.uniqueUtilities} unique)`,
-        );
+        console.error(`  ${String(f.count).padStart(5)}  ${f.file} (${f.uniqueUtilities} unique)`);
       }
     }
     if (report.suggestions.length > 0) {
@@ -219,9 +201,7 @@ async function runTokensReport(args: CliArgs): Promise<number> {
         console.error(`  · [${s.severity}] ${s.title}`);
       }
       if (report.suggestions.length > 5) {
-        console.error(
-          `  … and ${report.suggestions.length - 5} more (see JSON)`,
-        );
+        console.error(`  … and ${report.suggestions.length - 5} more (see JSON)`);
       }
     }
     if (report.drift.length > 0) {
@@ -250,9 +230,7 @@ async function runTokensApply(args: CliArgs): Promise<number> {
     return 2;
   }
   const manifest = await loadTokenManifest(
-    path.isAbsolute(args.manifestPath)
-      ? args.manifestPath
-      : path.join(args.cwd, args.manifestPath),
+    path.isAbsolute(args.manifestPath) ? args.manifestPath : path.join(args.cwd, args.manifestPath),
   );
   const mappings = manifestToMappings(manifest);
   const pairs = manifestToPairs(manifest);
@@ -366,9 +344,7 @@ async function runPaths(args: CliArgs): Promise<number> {
       );
       // Approved-only by default; aggressive may use confidence-tagged mappings as inferred
       if (args.mode === "aggressive") {
-        inferredMappings = manifestToMappings(manifest).filter(
-          (m) => (m.confidence ?? 1) >= 0.8,
-        );
+        inferredMappings = manifestToMappings(manifest).filter((m) => (m.confidence ?? 1) >= 0.8);
         tokenMappings = manifestToMappings(manifest).filter(
           (m) => m.confidence === undefined || m.confidence >= 1,
         );
@@ -477,10 +453,7 @@ function projectOpts(
   };
 }
 
-function resolveMigrations(
-  args: CliArgs,
-  flags: ReturnType<typeof configToPipelineFlags>,
-) {
+function resolveMigrations(args: CliArgs, flags: ReturnType<typeof configToPipelineFlags>) {
   if (!args.migrate && !flags.migrations) {
     return false as const;
   }
@@ -511,9 +484,7 @@ async function printSummary(
       parseErrors: summary.parseErrors,
       errors: summary.errors,
       elapsedMs: summary.elapsedMs,
-      records: args.verbose
-        ? summary.results.flatMap((r) => r.transformations)
-        : undefined,
+      records: args.verbose ? summary.results.flatMap((r) => r.transformations) : undefined,
     };
     console.log(JSON.stringify(payload, null, args.verbose ? 2 : 0));
     if (args.reportPath) {
@@ -564,12 +535,11 @@ async function printSummary(
       ? path.relative(args.cwd, summary.themePath) || summary.themePath
       : null,
     // In review/check without --verbose, still show a small sample of rewrites
-    sampleTransformations:
-      args.verbose
-        ? Number.POSITIVE_INFINITY
-        : args.mode === "review" || args.check
-          ? 8
-          : 0,
+    sampleTransformations: args.verbose
+      ? Number.POSITIVE_INFINITY
+      : args.mode === "review" || args.check
+        ? 8
+        : 0,
   };
 
   printProjectReport(relativized, { ...reportOpts, version: VERSION });
@@ -626,5 +596,3 @@ function readStdin(): Promise<string> {
     }
   });
 }
-
-

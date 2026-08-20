@@ -81,10 +81,7 @@ export function scaleForNamespace(namespace: string, theme: Theme): ThemeScale |
     return theme.borderWidth;
   }
 
-  if (
-    namespace === "rounded" ||
-    namespace.startsWith("rounded-")
-  ) {
+  if (namespace === "rounded" || namespace.startsWith("rounded-")) {
     return theme.borderRadius;
   }
 

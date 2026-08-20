@@ -1,7 +1,8 @@
-import { readFile, readdir, stat } from "node:fs/promises";
+import type { Dirent } from "node:fs";
+import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { colorsEqual, normalizeColor } from "./color-normalize.js";
-import type { TokenAlias, ThemeToken, TokenSource } from "./types.js";
+import type { ThemeToken, TokenAlias, TokenSource } from "./types.js";
 
 const CSS_EXTS = new Set([".css", ".scss", ".pcss"]);
 
@@ -29,19 +30,11 @@ export async function scanProjectTokens(
 }
 
 async function collectCssFiles(cwd: string): Promise<string[]> {
-  const ignore = new Set([
-    "node_modules",
-    "dist",
-    "build",
-    ".git",
-    "coverage",
-    ".next",
-    ".turbo",
-  ]);
+  const ignore = new Set(["node_modules", "dist", "build", ".git", "coverage", ".next", ".turbo"]);
   const out: string[] = [];
 
   async function walk(dir: string): Promise<void> {
-    let entries;
+    let entries: Dirent[];
     try {
       entries = await readdir(dir, { withFileTypes: true });
     } catch {
@@ -184,7 +177,10 @@ function upsertToken(
 }
 
 function namespaceOf(name: string): ThemeToken["namespace"] {
-  if (name.includes("color") || /--(bg|text|border|foreground|background|muted|primary|warning)/.test(name)) {
+  if (
+    name.includes("color") ||
+    /--(bg|text|border|foreground|background|muted|primary|warning)/.test(name)
+  ) {
     return "color";
   }
   if (name.includes("spacing") || name.includes("space")) {

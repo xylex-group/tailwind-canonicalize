@@ -1,20 +1,21 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
-  canonicalizeClass as resolveCanonicalizeClass,
-  canonicalizeClasses as resolveCanonicalizeClasses,
   createDefaultTheme,
   createTailwindCompileEqual,
-  findCanonicalEquivalent as resolveFindCanonical,
+  type FindCanonicalOptions,
   loadProjectTheme,
   loadThemeFromProject,
-  transformClassString,
-  type FindCanonicalOptions,
+  canonicalizeClass as resolveCanonicalizeClass,
+  canonicalizeClasses as resolveCanonicalizeClasses,
+  findCanonicalEquivalent as resolveFindCanonical,
   type Theme,
+  transformClassString,
 } from "@tailwind-canonicalize/resolver";
 import { transformSource } from "@tailwind-canonicalize/transformer";
 import {
   cachePath,
+  emptyCache,
   hashContent,
   hashOptions,
   isFileFresh,
@@ -22,7 +23,6 @@ import {
   markFile,
   pruneCache,
   saveCache,
-  emptyCache,
 } from "./hash-cache.js";
 import { collectFiles } from "./scan.js";
 import type {
@@ -33,17 +33,11 @@ import type {
 } from "./types.js";
 import { runWithWorkerPool, serializeTheme } from "./worker-pool.js";
 
-export function findCanonicalEquivalent(
-  token: string,
-  options: FindCanonicalOptions = {},
-) {
+export function findCanonicalEquivalent(token: string, options: FindCanonicalOptions = {}) {
   return resolveFindCanonical(token, options);
 }
 
-export function canonicalizeClass(
-  token: string,
-  options: FindCanonicalOptions = {},
-): string {
+export function canonicalizeClass(token: string, options: FindCanonicalOptions = {}): string {
   return resolveCanonicalizeClass(token, options);
 }
 
@@ -57,10 +51,7 @@ export function canonicalizeClasses(
 /**
  * Canonicalize a single source string (does not touch the filesystem).
  */
-export function canonicalizeSource(
-  source: string,
-  options: CanonicalizeFileOptions = {},
-) {
+export function canonicalizeSource(source: string, options: CanonicalizeFileOptions = {}) {
   return transformSource(source, {
     ...options,
     filePath: options.filePath,
@@ -118,17 +109,13 @@ export async function canonicalizeFile(
  * Supports incremental hashing, worker_threads pool, v3/v4 theme load,
  * and optional Tailwind compile equality.
  */
-export async function canonicalizeProject(
-  options: ProjectOptions = {},
-): Promise<ProjectSummary> {
+export async function canonicalizeProject(options: ProjectOptions = {}): Promise<ProjectSummary> {
   const started = performance.now();
   const cwd = options.cwd ?? process.cwd();
   const paths = options.paths ?? ["."];
 
   let theme: Theme = options.theme ?? createDefaultTheme();
-  let themeSource: ProjectSummary["themeSource"] = options.theme
-    ? "provided"
-    : "default";
+  let themeSource: ProjectSummary["themeSource"] = options.theme ? "provided" : "default";
   let themePath: string | null = null;
 
   if (options.autoTheme !== false && !options.theme) {
@@ -258,10 +245,9 @@ export async function canonicalizeProject(
 
   const useWorkers =
     options.workers === true ||
-    (options.workers !== false &&
-      dirtyFiles.length >= (options.workerThreshold ?? 32));
+    (options.workers !== false && dirtyFiles.length >= (options.workerThreshold ?? 32));
 
-  let results: FileResult[] = [...skippedResults];
+  const results: FileResult[] = [...skippedResults];
 
   if (useWorkers && dirtyFiles.length > 0) {
     const serializable = {
@@ -276,11 +262,7 @@ export async function canonicalizeProject(
       write: options.write === true,
       optionsJson: JSON.stringify(serializable),
     }));
-    const workerResults = await runWithWorkerPool(
-      tasks,
-      concurrency,
-      options.onFile,
-    );
+    const workerResults = await runWithWorkerPool(tasks, concurrency, options.onFile);
     results.push(...workerResults);
   } else {
     let index = 0;
@@ -298,10 +280,7 @@ export async function canonicalizeProject(
       }
     }
     await Promise.all(
-      Array.from(
-        { length: Math.min(concurrency, Math.max(dirtyFiles.length, 1)) },
-        () => worker(),
-      ),
+      Array.from({ length: Math.min(concurrency, Math.max(dirtyFiles.length, 1)) }, () => worker()),
     );
   }
 
@@ -329,8 +308,7 @@ export async function canonicalizeProject(
   for (const r of results) {
     for (const t of r.transformations) {
       transformationCount += 1;
-      transformationsByCategory[t.category] =
-        (transformationsByCategory[t.category] ?? 0) + 1;
+      transformationsByCategory[t.category] = (transformationsByCategory[t.category] ?? 0) + 1;
       if (t.safety && t.safety !== "safe") {
         unsafeCount += 1;
       }
@@ -339,10 +317,7 @@ export async function canonicalizeProject(
 
   const diagnostics = results.flatMap((r) => r.diagnostics);
   const conflicts = diagnostics.filter((d) => d.kind === "conflict").length;
-  const parseErrors = results.reduce(
-    (n, r) => n + (r.parseErrors?.length ?? 0),
-    0,
-  );
+  const parseErrors = results.reduce((n, r) => n + (r.parseErrors?.length ?? 0), 0);
 
   return {
     files: results.length,

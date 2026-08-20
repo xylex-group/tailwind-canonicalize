@@ -118,10 +118,7 @@ export interface TokenManifest {
     preferAppAliases?: boolean;
     /** Emit :root / .dark app vars + @theme inline */
     dualTheme?: boolean;
-    values?: Record<
-      string,
-      { light?: string; dark?: string; default?: string }
-    >;
+    values?: Record<string, { light?: string; dark?: string; default?: string }>;
   };
 }
 

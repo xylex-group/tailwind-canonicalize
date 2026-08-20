@@ -1,5 +1,5 @@
-import { parseUtility } from "./parse-utility.js";
 import type { UtilityIdentity } from "./categories.js";
+import { parseUtility } from "./parse-utility.js";
 
 /**
  * Map utility namespaces to a conflict/dedupe property group.
@@ -172,15 +172,8 @@ function textPropertyGroup(namespace: string, value: string): string {
     // text-tremor-content* / brand* are colors.
     if (rest === "tremor" || rest.startsWith("tremor-")) {
       const role =
-        rest === "tremor"
-          ? value
-          : `${rest.slice("tremor-".length)}${value ? `-${value}` : ""}`;
-      const TREMOR_FONT_SIZE = new Set([
-        "default",
-        "title",
-        "label",
-        "metric",
-      ]);
+        rest === "tremor" ? value : `${rest.slice("tremor-".length)}${value ? `-${value}` : ""}`;
+      const TREMOR_FONT_SIZE = new Set(["default", "title", "label", "metric"]);
       if (TREMOR_FONT_SIZE.has(role)) {
         return "font-size";
       }
@@ -231,11 +224,7 @@ function textPropertyGroup(namespace: string, value: string): string {
       return "text-color";
     }
     // Typed arbitrary: text-[length:…] / text-[font-size:…]
-    if (
-      inner.startsWith("length:") ||
-      inner.startsWith("font-size:") ||
-      inner.startsWith("--")
-    ) {
+    if (inner.startsWith("length:") || inner.startsWith("font-size:") || inner.startsWith("--")) {
       return "font-size";
     }
     // clamp/min/max and CSS lengths → font-size
@@ -278,15 +267,7 @@ function textPropertyGroup(namespace: string, value: string): string {
     }
   }
   // Short type-scale aliases (text-m, text-s, text-small)
-  const TEXT_SIZE_ALIASES = new Set([
-    "m",
-    "s",
-    "l",
-    "small",
-    "large",
-    "tiny",
-    "micro",
-  ]);
+  const TEXT_SIZE_ALIASES = new Set(["m", "s", "l", "small", "large", "tiny", "micro"]);
   if (TEXT_SIZE_ALIASES.has(value)) {
     return "font-size";
   }
@@ -294,15 +275,7 @@ function textPropertyGroup(namespace: string, value: string): string {
   return "text-color";
 }
 
-const FONT_FAMILY = new Set([
-  "sans",
-  "serif",
-  "mono",
-  "body",
-  "display",
-  "heading",
-  "code",
-]);
+const FONT_FAMILY = new Set(["sans", "serif", "mono", "body", "display", "heading", "code"]);
 const FONT_WEIGHT = new Set([
   "thin",
   "extralight",
@@ -385,13 +358,7 @@ function fontPropertyGroup(namespace: string, value: string): string {
 }
 
 const DIVIDE_AXIS = new Set(["x", "y"]);
-const DIVIDE_STYLE = new Set([
-  "solid",
-  "dashed",
-  "dotted",
-  "double",
-  "none",
-]);
+const DIVIDE_STYLE = new Set(["solid", "dashed", "dotted", "double", "none"]);
 const DIVIDE_WIDTH_KEYS = new Set(["0", "2", "4", "8"]);
 
 /**
@@ -529,8 +496,9 @@ function backgroundPropertyGroup(namespace: string, value: string): string {
       inner.startsWith("length:") ||
       inner.startsWith("size:") ||
       // bare size pairs like 200%_100% / 50%_auto
-      /^\d/.test(inner) && (inner.includes("%") || inner.includes("px") || inner.includes("rem")) &&
-        (inner.includes("_") || inner.includes(" "))
+      (/^\d/.test(inner) &&
+        (inner.includes("%") || inner.includes("px") || inner.includes("rem")) &&
+        (inner.includes("_") || inner.includes(" ")))
     ) {
       return "background-size";
     }
@@ -605,14 +573,7 @@ function flexPropertyGroup(namespace: string, value: string): string {
   return "flex";
 }
 
-const BORDER_STYLE = new Set([
-  "solid",
-  "dashed",
-  "dotted",
-  "double",
-  "hidden",
-  "none",
-]);
+const BORDER_STYLE = new Set(["solid", "dashed", "dotted", "double", "hidden", "none"]);
 const BORDER_SIDE = new Set(["t", "r", "b", "l", "x", "y", "s", "e"]);
 // "px" is the named 1px width (border-px); sm/md/lg used by design systems as width
 const BORDER_WIDTH_KEYS = new Set([
@@ -683,9 +644,7 @@ function borderPropertyGroup(namespace: string, value: string): string {
   }
 
   // Directional: border-t, border-b-2, border-t-red-500
-  const sideMatch = namespace.match(
-    /^border-(t|r|b|l|x|y|s|e)$/,
-  );
+  const sideMatch = namespace.match(/^border-(t|r|b|l|x|y|s|e)$/);
   if (sideMatch) {
     const side = sideMatch[1]!;
     if (BORDER_STYLE.has(value)) {
@@ -742,14 +701,7 @@ function borderPropertyGroup(namespace: string, value: string): string {
   return "border-color";
 }
 
-
-const OBJECT_FIT = new Set([
-  "contain",
-  "cover",
-  "fill",
-  "none",
-  "scale-down",
-]);
+const OBJECT_FIT = new Set(["contain", "cover", "fill", "none", "scale-down"]);
 const OBJECT_POSITION = new Set([
   "center",
   "top",
@@ -810,11 +762,7 @@ function ringPropertyGroup(namespace: string, value: string): string {
   }
   if (namespace.startsWith("ring-offset")) {
     if (namespace === "ring-offset") {
-      if (
-        value === "" ||
-        RING_WIDTH_KEYS.has(value) ||
-        /^\d+(\.\d+)?$/.test(value)
-      ) {
+      if (value === "" || RING_WIDTH_KEYS.has(value) || /^\d+(\.\d+)?$/.test(value)) {
         return "ring-offset-width";
       }
       if (value.startsWith("[") && value.endsWith("]")) {
@@ -836,11 +784,7 @@ function ringPropertyGroup(namespace: string, value: string): string {
     if (value === "inset") {
       return "ring-inset";
     }
-    if (
-      value === "" ||
-      RING_WIDTH_KEYS.has(value) ||
-      /^\d+(\.\d+)?$/.test(value)
-    ) {
+    if (value === "" || RING_WIDTH_KEYS.has(value) || /^\d+(\.\d+)?$/.test(value)) {
       return "ring-width";
     }
     if (value.startsWith("[") && value.endsWith("]")) {
@@ -870,14 +814,7 @@ function ringPropertyGroup(namespace: string, value: string): string {
   return "ring-color";
 }
 const OUTLINE_WIDTH = new Set(["0", "1", "2", "4", "8"]);
-const OUTLINE_STYLE = new Set([
-  "none",
-  "solid",
-  "dashed",
-  "dotted",
-  "double",
-  "hidden",
-]);
+const OUTLINE_STYLE = new Set(["none", "solid", "dashed", "dotted", "double", "hidden"]);
 
 /**
  * outline-1 (width) vs outline-ring (color) never share a cascade slot.
@@ -915,11 +852,7 @@ function outlinePropertyGroup(namespace: string, value: string): string {
     ) {
       return "outline-color";
     }
-    if (
-      /^[-+]?\d/.test(inner) ||
-      inner.endsWith("px") ||
-      inner.endsWith("rem")
-    ) {
+    if (/^[-+]?\d/.test(inner) || inner.endsWith("px") || inner.endsWith("rem")) {
       return "outline-width";
     }
   }
@@ -1004,21 +937,10 @@ function dropShadowPropertyGroup(namespace: string, value: string): string {
 }
 
 function insetShadowPropertyGroup(namespace: string, value: string): string {
-  return shadowFamilyPropertyGroup(
-    "inset-shadow",
-    namespace,
-    value,
-    "inset-shadow",
-  );
+  return shadowFamilyPropertyGroup("inset-shadow", namespace, value, "inset-shadow");
 }
 
-const OVERFLOW_VALUES = new Set([
-  "auto",
-  "hidden",
-  "clip",
-  "visible",
-  "scroll",
-]);
+const OVERFLOW_VALUES = new Set(["auto", "hidden", "clip", "visible", "scroll"]);
 
 /**
  * Standard overflow-* share a slot; unknown values (overflow-stable, …) are
@@ -1035,10 +957,7 @@ function overflowPropertyGroup(namespace: string, value: string): string {
     return "overflow-y";
   }
   // overflow-ellipsis → text-overflow (Tailwind v2/v3 legacy alias)
-  if (
-    (namespace === "overflow" && value === "ellipsis") ||
-    namespace === "overflow-ellipsis"
-  ) {
+  if ((namespace === "overflow" && value === "ellipsis") || namespace === "overflow-ellipsis") {
     return "text-overflow";
   }
   if (namespace.startsWith("overflow-") && namespace !== "overflow") {
@@ -1094,13 +1013,7 @@ function gridPropertyGroup(namespace: string, value: string): string {
   return `plugin:grid:${value}`;
 }
 
-const DECORATION_STYLE = new Set([
-  "solid",
-  "double",
-  "dotted",
-  "dashed",
-  "wavy",
-]);
+const DECORATION_STYLE = new Set(["solid", "double", "dotted", "dashed", "wavy"]);
 const DECORATION_THICKNESS = new Set(["0", "1", "2", "4", "8", "auto", "from-font"]);
 
 /**
@@ -1383,26 +1296,17 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   // Known display classes compete on the same cascade slot.
   // Must run before plugin fallback (inline-flex parses as ns=inline, val=flex).
   const full = fullUtilityName(namespace, value);
-  if (
-    DISPLAY_UTILITIES.has(full) ||
-    (DISPLAY_UTILITIES.has(namespace) && !value)
-  ) {
+  if (DISPLAY_UTILITIES.has(full) || (DISPLAY_UTILITIES.has(namespace) && !value)) {
     return "display";
   }
 
   // space-x-reverse / space-y-reverse set --tw-space-*-reverse; they co-occur
   // with space amounts (e.g. -space-y-1 space-y-reverse) by design.
-  if (
-    (namespace === "space-x" || namespace === "space-y") &&
-    value === "reverse"
-  ) {
+  if ((namespace === "space-x" || namespace === "space-y") && value === "reverse") {
     return `${namespace}-reverse`;
   }
   // divide-x-reverse / divide-y-reverse same pattern
-  if (
-    (namespace === "divide-x" || namespace === "divide-y") &&
-    value === "reverse"
-  ) {
+  if ((namespace === "divide-x" || namespace === "divide-y") && value === "reverse") {
     return `${namespace}-reverse`;
   }
 
@@ -1515,9 +1419,7 @@ export function propertyGroupForNamespace(namespace: string, value = ""): string
   // Unknown / plugin utilities (icon, icon-tabler, btn-primary, …): do not
   // treat prefix siblings as competing cascade slots.
   if (!isKnownCompetingNamespace(namespace)) {
-    return value
-      ? `plugin:${namespace}:${value}`
-      : `plugin:${namespace || "unknown"}`;
+    return value ? `plugin:${namespace}:${value}` : `plugin:${namespace || "unknown"}`;
   }
 
   return namespace || "unknown";
@@ -1546,7 +1448,7 @@ function strokePropertyGroup(namespace: string, value: string): string {
       inner.startsWith("rgb") ||
       inner.startsWith("hsl") ||
       inner.startsWith("oklch") ||
-      inner.startsWith("var(") && inner.includes("color")
+      (inner.startsWith("var(") && inner.includes("color"))
     ) {
       return "stroke-color";
     }
@@ -1630,7 +1532,7 @@ function isGradientStopPosition(value: string): boolean {
     if (
       inner.startsWith("length:") ||
       inner.startsWith("percentage:") ||
-      inner.startsWith("--") && (inner.includes("position") || inner.includes("%"))
+      (inner.startsWith("--") && (inner.includes("position") || inner.includes("%")))
     ) {
       return true;
     }
@@ -1690,19 +1592,10 @@ function prosePropertyGroup(namespace: string, value: string): string {
  */
 export function utilityIdentity(token: string): UtilityIdentity {
   const parts = parseUtility(token);
-  const variantStr = parts.variants.endsWith(":")
-    ? parts.variants.slice(0, -1)
-    : parts.variants;
+  const variantStr = parts.variants.endsWith(":") ? parts.variants.slice(0, -1) : parts.variants;
   const variants = variantStr ? variantStr.split(":").filter(Boolean) : [];
-  const value = parts.isArbitrary
-    ? parts.value
-    : parts.value
-      ? parts.value
-      : parts.base;
-  const propertyGroup = propertyGroupForNamespace(
-    parts.namespace || parts.base,
-    parts.value || "",
-  );
+  const value = parts.isArbitrary ? parts.value : parts.value ? parts.value : parts.base;
+  const propertyGroup = propertyGroupForNamespace(parts.namespace || parts.base, parts.value || "");
 
   const normalized = [
     variants.join(":"),

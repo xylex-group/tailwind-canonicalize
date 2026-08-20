@@ -1,11 +1,8 @@
-import type {
-  ClassStringDiagnostic,
-  TransformationRecord,
-} from "@tailwind-canonicalize/resolver";
 import type { ProjectSummary } from "@tailwind-canonicalize/compiler";
-import { makePaint, useColor, type PaintKit } from "./ansi.js";
+import type { ClassStringDiagnostic, TransformationRecord } from "@tailwind-canonicalize/resolver";
+import { makePaint, type PaintKit, useColor } from "./ansi.js";
 
-export { makePaint, useColor, type PaintKit } from "./ansi.js";
+export { makePaint, type PaintKit, useColor } from "./ansi.js";
 
 export type ThemeBanner = {
   source?: ProjectSummary["themeSource"];
@@ -45,10 +42,7 @@ const THEME_LABEL: Record<NonNullable<ProjectSummary["themeSource"]>, string> = 
 /**
  * Pretty project run report (stderr).
  */
-export function printProjectReport(
-  summary: ProjectSummary,
-  options: ReportOptions,
-): void {
+export function printProjectReport(summary: ProjectSummary, options: ReportOptions): void {
   const stream = options.stream ?? process.stderr;
   const color = options.color ?? useColor(stream);
   const c = makePaint(color);
@@ -60,16 +54,12 @@ export function printProjectReport(
   if (summary.themeSource) {
     const label = THEME_LABEL[summary.themeSource] ?? summary.themeSource;
     const where = options.path ? ` from ${c.cyan(options.path)}` : "";
-    write(
-      `${c.cyan("●")} ${c.dim("Loaded theme")}${where} ${c.dim(`(${label})`)}`,
-    );
+    write(`${c.cyan("●")} ${c.dim("Loaded theme")}${where} ${c.dim(`(${label})`)}`);
   }
 
   // ── Transformations ────────────────────────────────────
   const records = collectTransformations(summary);
-  const sampleN = options.verbose
-    ? records.length
-    : (options.sampleTransformations ?? 0);
+  const sampleN = options.verbose ? records.length : (options.sampleTransformations ?? 0);
 
   if (sampleN > 0 && records.length > 0) {
     write(c.dim("│"));
@@ -106,18 +96,12 @@ export function printProjectReport(
 
   write(`${c.green("✓")} ${c.bold(formatNum(summary.files))} ${c.dim("files")}`);
   if (summary.filesSkipped > 0) {
-    write(
-      `${c.green("✓")} ${c.bold(formatNum(summary.filesSkipped))} ${c.dim("skipped (cache)")}`,
-    );
+    write(`${c.green("✓")} ${c.bold(formatNum(summary.filesSkipped))} ${c.dim("skipped (cache)")}`);
   }
   if (summary.filesChanged > 0) {
-    write(
-      `${c.green("✓")} ${c.bold(formatNum(summary.filesChanged))} ${c.dim("files changed")}`,
-    );
+    write(`${c.green("✓")} ${c.bold(formatNum(summary.filesChanged))} ${c.dim("files changed")}`);
   }
-  write(
-    `${c.green("✓")} ${c.bold(formatNum(summary.rewrites))} ${c.dim("replacements")}`,
-  );
+  write(`${c.green("✓")} ${c.bold(formatNum(summary.rewrites))} ${c.dim("replacements")}`);
 
   const conflicts = summary.conflicts ?? 0;
   if (conflicts > 0) {
@@ -168,12 +152,8 @@ export function formatTransformationBlock(
     lines.push(`  ${c.red("−")} ${c.red(t.original)} ${c.dim("(remove)")}`);
   }
 
-  const safetyLabel =
-    t.confidence === "exact" ? "exact" : (t.confidence ?? t.safety);
-  const meta: string[] = [
-    `category: ${t.category}`,
-    `safety: ${safetyLabel}`,
-  ];
+  const safetyLabel = t.confidence === "exact" ? "exact" : (t.confidence ?? t.safety);
+  const meta: string[] = [`category: ${t.category}`, `safety: ${safetyLabel}`];
   if (t.token) {
     meta.push(`token: ${t.token}`);
   }
@@ -193,10 +173,7 @@ export function formatTransformation(
   return formatTransformationBlock(rel, t, c);
 }
 
-function formatDiagnosticLine(
-  d: ClassStringDiagnostic,
-  c: PaintKit,
-): string {
+function formatDiagnosticLine(d: ClassStringDiagnostic, c: PaintKit): string {
   const icon =
     d.kind === "conflict"
       ? c.yellow("!")
@@ -215,26 +192,16 @@ export function formatDiagnosticSummary(
   maxGroups = 12,
 ): string {
   const conflicts = diags.filter((d) => d.kind === "conflict");
-  const parseLike = diags.filter(
-    (d) => d.kind === "info" && d.message.startsWith("parse error:"),
-  );
+  const parseLike = diags.filter((d) => d.kind === "info" && d.message.startsWith("parse error:"));
   const other = diags.filter(
-    (d) =>
-      d.kind !== "conflict" &&
-      !(d.kind === "info" && d.message.startsWith("parse error:")),
+    (d) => d.kind !== "conflict" && !(d.kind === "info" && d.message.startsWith("parse error:")),
   );
 
   const lines: string[] = [];
   lines.push(
     `  ${c.yellow("!")} ${c.bold(formatNum(diags.length))} ${c.dim("diagnostics")}${
-      conflicts.length
-        ? c.dim(` · ${formatNum(conflicts.length)} conflicts`)
-        : ""
-    }${
-      parseLike.length
-        ? c.dim(` · ${formatNum(parseLike.length)} parse errors`)
-        : ""
-    }`,
+      conflicts.length ? c.dim(` · ${formatNum(conflicts.length)} conflicts`) : ""
+    }${parseLike.length ? c.dim(` · ${formatNum(parseLike.length)} parse errors`) : ""}`,
   );
 
   // Group conflicts by property group when message matches known shape
@@ -265,19 +232,13 @@ export function formatDiagnosticSummary(
     const topPairs = [...g.pairs.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 2)
-      .map(([pair, n]) =>
-        n > 1 ? `${pair} ${c.dim(`×${n}`)}` : pair,
-      )
+      .map(([pair, n]) => (n > 1 ? `${pair} ${c.dim(`×${n}`)}` : pair))
       .join(c.dim(", "));
     const pairBit = topPairs ? c.dim("  ") + topPairs : "";
-    lines.push(
-      `  ${c.dim("·")} ${c.yellow(g.label)} ${c.bold(String(g.count))}${pairBit}`,
-    );
+    lines.push(`  ${c.dim("·")} ${c.yellow(g.label)} ${c.bold(String(g.count))}${pairBit}`);
   }
   if (sorted.length > maxGroups) {
-    lines.push(
-      `  ${c.dim(`· … ${sorted.length - maxGroups} more conflict groups`)}`,
-    );
+    lines.push(`  ${c.dim(`· … ${sorted.length - maxGroups} more conflict groups`)}`);
   }
 
   // Collapse parse-error spam by exact message
@@ -289,14 +250,10 @@ export function formatDiagnosticSummary(
     const msgSorted = [...byMsg.entries()].sort((a, b) => b[1] - a[1]);
     for (const [msg, n] of msgSorted.slice(0, 5)) {
       const short = msg.replace(/^parse error:\s*/i, "");
-      lines.push(
-        `  ${c.dim("·")} ${c.yellow("parse")} ${c.bold(String(n))} ${c.dim(short)}`,
-      );
+      lines.push(`  ${c.dim("·")} ${c.yellow("parse")} ${c.bold(String(n))} ${c.dim(short)}`);
     }
     if (msgSorted.length > 5) {
-      lines.push(
-        `  ${c.dim(`· … ${msgSorted.length - 5} more parse-error messages`)}`,
-      );
+      lines.push(`  ${c.dim(`· … ${msgSorted.length - 5} more parse-error messages`)}`);
     }
   }
 
@@ -311,14 +268,10 @@ export function formatDiagnosticSummary(
   }
 
   if (conflicts.length > 0) {
-    lines.push(
-      `  ${c.dim("(conflicts: no automatic resolution · --verbose for samples)")}`,
-    );
+    lines.push(`  ${c.dim("(conflicts: no automatic resolution · --verbose for samples)")}`);
   }
   if (parseLike.length > 0) {
-    lines.push(
-      `  ${c.dim("(parse errors: file left untouched · often MDX/markdown not TSX)")}`,
-    );
+    lines.push(`  ${c.dim("(parse errors: file left untouched · often MDX/markdown not TSX)")}`);
   }
 
   return lines.join("\n");
@@ -340,9 +293,7 @@ export function formatDiagnosticVerbose(
     byMessage.set(d.message, list);
   }
 
-  const sorted = [...byMessage.entries()].sort(
-    (a, b) => b[1].length - a[1].length,
-  );
+  const sorted = [...byMessage.entries()].sort((a, b) => b[1].length - a[1].length);
 
   for (const [, group] of sorted) {
     const sample = group.slice(0, samplePerGroup);
@@ -368,9 +319,7 @@ function parseConflictMessage(
   utilities: string[],
 ): { group: string; pair: string | null } {
   // "Conflicting border-color-or-width utilities: border and border-border. ..."
-  const m = message.match(
-    /^Conflicting\s+(.+?)\s+utilities:\s+(\S+)\s+and\s+(\S+)/i,
-  );
+  const m = message.match(/^Conflicting\s+(.+?)\s+utilities:\s+(\S+)\s+and\s+(\S+)/i);
   if (m) {
     return {
       group: m[1]!,
@@ -422,7 +371,5 @@ export function printThemeBanner(
   const c = makePaint(useColor(stream));
   const label = THEME_LABEL[themeSource] ?? themeSource;
   const where = path ? ` from ${c.cyan(path)}` : "";
-  stream.write(
-    `${c.cyan("●")} ${c.dim("Loaded theme")}${where} ${c.dim(`(${label})`)}\n`,
-  );
+  stream.write(`${c.cyan("●")} ${c.dim("Loaded theme")}${where} ${c.dim(`(${label})`)}\n`);
 }

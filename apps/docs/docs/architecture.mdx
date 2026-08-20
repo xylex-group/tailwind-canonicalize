@@ -15,12 +15,12 @@ Parser  →  Extract class candidates (oxc AST)
 
 | Package | Role |
 |---------|------|
-| `@tailwind-canonicalize/parser` | AST extraction |
-| `@tailwind-canonicalize/resolver` | Theme, migrations, pipeline |
-| `@tailwind-canonicalize/tokens` | Semantic analyze / apply |
-| `@tailwind-canonicalize/transformer` | MagicString |
-| `@tailwind-canonicalize/compiler` | Project scan, workers, watch |
-| `tailwind-canonicalize` | CLI |
+| `@tailwind-canonicalize/parser` | AST extraction (internal workspace package) |
+| `@tailwind-canonicalize/resolver` | Theme, migrations, pipeline (internal) |
+| `@tailwind-canonicalize/tokens` | Semantic analyze / apply (internal) |
+| `@tailwind-canonicalize/transformer` | MagicString (internal) |
+| `@tailwind-canonicalize/compiler` | Project scan, workers, watch (internal; not on npm) |
+| `tailwind-canonicalize` | CLI + library — **sole published npm package** |
 
 ## Pipeline order
 

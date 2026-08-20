@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import type { TokenMapping, ThemePairMapping } from "@tailwind-canonicalize/resolver";
+import type { ThemePairMapping, TokenMapping } from "@tailwind-canonicalize/resolver";
 import type { SemanticColorRecipe, TokenManifest } from "./types.js";
 
 /**
@@ -48,9 +48,6 @@ export function manifestToRecipes(manifest: TokenManifest): SemanticColorRecipe[
 /**
  * Write analysis proposal to a manifest file (no source rewrites).
  */
-export async function writeTokenManifest(
-  filePath: string,
-  manifest: TokenManifest,
-): Promise<void> {
+export async function writeTokenManifest(filePath: string, manifest: TokenManifest): Promise<void> {
   await writeFile(filePath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 }

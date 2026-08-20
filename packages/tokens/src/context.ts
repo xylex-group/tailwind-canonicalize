@@ -149,20 +149,14 @@ export function proposeSemanticToken(
     if (palette === "black" && property === "bg") {
       return { token: "foreground", cssVariable: "--color-foreground" };
     }
-    if (
-      (palette === "slate" || palette === "gray" || palette === "zinc") &&
-      property === "text"
-    ) {
+    if ((palette === "slate" || palette === "gray" || palette === "zinc") && property === "text") {
       const n = shade ? Number(shade) : 500;
       if (n >= 700) {
         return { token: "foreground", cssVariable: "--color-foreground" };
       }
       return { token: "muted-foreground", cssVariable: "--color-muted-foreground" };
     }
-    if (
-      (palette === "slate" || palette === "gray") &&
-      property.startsWith("border")
-    ) {
+    if ((palette === "slate" || palette === "gray") && property.startsWith("border")) {
       return { token: "border", cssVariable: "--color-border" };
     }
     if (palette === "red" && property === "ring") {

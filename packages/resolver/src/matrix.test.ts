@@ -36,8 +36,8 @@ describe("spacing matrix", () => {
   }
 
   const keys = [
-    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20,
-    24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 72, 80, 96,
+    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40,
+    44, 48, 52, 56, 60, 64, 72, 80, 96,
   ];
 
   const namespaces = [
@@ -110,9 +110,7 @@ describe("continuous spacing matrix", () => {
   }
 
   // Keys beyond the classic discrete table — exact --spacing multiples only
-  const continuousKeys = [
-    3.25, 25, 35, 50, 62.5, 65, 75, 120, 140, 160, 310,
-  ];
+  const continuousKeys = [3.25, 25, 35, 50, 62.5, 65, 75, 120, 140, 160, 310];
   const namespaces = ["w", "h", "min-w", "max-w", "max-h", "size"];
 
   for (const ns of namespaces) {

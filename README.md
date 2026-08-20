@@ -1,7 +1,5 @@
 # tailwind-canonicalize
 
-current version: `0.2.0`
-
 [![npm](https://img.shields.io/npm/v/tailwind-canonicalize.svg)](https://www.npmjs.com/package/tailwind-canonicalize)
 [![license](https://img.shields.io/npm/l/tailwind-canonicalize.svg)](./LICENSE)
 [![node](https://img.shields.io/node/v/tailwind-canonicalize.svg)](https://www.npmjs.com/package/tailwind-canonicalize)
@@ -174,7 +172,7 @@ Internal monorepo packages (not published; bundled into the CLI package):
 | `@tailwind-canonicalize/resolver` | Theme, migrations, pipeline, dedupe |
 | `@tailwind-canonicalize/tokens` | Semantic token analyze/apply/registry |
 | `@tailwind-canonicalize/transformer` | MagicString rewrites |
-| `@tailwind-canonicalize/compiler` | Public orchestration API + config |
+| `@tailwind-canonicalize/compiler` | In-repo orchestration (scan, workers, watch); not published |
 | `packages/vscode` | Editor diagnostics + Quick Fix |
 
 ---
@@ -255,6 +253,8 @@ Also in-repo (source of truth for the docs app):
 ---
 
 ## Development
+
+Workspace/release ownership: [contributing](./docs/guides/contributing.md) · [ADR 0001](./docs/adr/0001-workspace-release-ownership.md)
 
 ```bash
 pnpm install

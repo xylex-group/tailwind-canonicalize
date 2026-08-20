@@ -91,9 +91,7 @@ function findCanonicalUncached(
 
   // Keyword map (exact string match on inner; ease uses normalized bezier)
   const keywordLookup =
-    parts.namespace === "ease"
-      ? normalizeEaseValue(inner)
-      : inner.toLowerCase();
+    parts.namespace === "ease" ? normalizeEaseValue(inner) : inner.toLowerCase();
   const keywordSuffix = KEYWORD_MAP[parts.namespace]?.[keywordLookup];
   if (keywordSuffix) {
     // Named easing must match the active theme when --ease-* is overridden.
@@ -138,19 +136,12 @@ function findCanonicalUncached(
     scaleForNamespace(parts.namespace, theme) === theme.spacing &&
     allowsContinuousSpacingInvert(parts.namespace)
   ) {
-    const mult = invertSpacingMultiplier(
-      inner,
-      theme.spacingUnit,
-      rootFontSizePx,
-    );
+    const mult = invertSpacingMultiplier(inner, theme.spacingUnit, rootFontSizePx);
     if (mult !== null) {
       const key = formatScaleKey(mult);
       const explicit = theme.spacing.values.get(key);
       // Reject when theme defines this key to a different absolute length.
-      if (
-        explicit === undefined ||
-        valuesEqual(inner, explicit, rootFontSizePx)
-      ) {
+      if (explicit === undefined || valuesEqual(inner, explicit, rootFontSizePx)) {
         unique = [key];
       }
     }
@@ -202,8 +193,7 @@ function findCanonicalUncached(
     return null;
   }
 
-  const reason =
-    options.compileEqual && options.strictCompile ? "compile-equal" : "theme-exact";
+  const reason = options.compileEqual && options.strictCompile ? "compile-equal" : "theme-exact";
   return buildMatch(partsForFormat, unique[0]!, reason, unique);
 }
 
@@ -288,13 +278,8 @@ function isUnsafeValue(inner: string): boolean {
   return false;
 }
 
-
 /** True when hard-coded ease keyword is safe for this theme (no conflicting --ease-* override). */
-function easeKeywordMatchesTheme(
-  suffix: string,
-  normalizedInner: string,
-  theme: Theme,
-): boolean {
+function easeKeywordMatchesTheme(suffix: string, normalizedInner: string, theme: Theme): boolean {
   const fromTheme = theme.cssVariables.get(`--ease-${suffix}`);
   if (fromTheme === undefined) {
     return true;
@@ -365,10 +350,7 @@ function buildMatch(
 /**
  * Public helper: canonicalize a single class token or return the original.
  */
-export function canonicalizeClass(
-  token: string,
-  options: FindCanonicalOptions = {},
-): string {
+export function canonicalizeClass(token: string, options: FindCanonicalOptions = {}): string {
   return findCanonicalEquivalent(token, options)?.canonical ?? token;
 }
 

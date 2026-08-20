@@ -1,7 +1,6 @@
 import type { LengthUnit, ParsedLength } from "./types.js";
 
-const LENGTH_RE =
-  /^(-?(?:\d+(?:\.\d+)?|\.\d+))(px|rem|em|%|vh|vw|svh|dvh|lvh)?$/i;
+const LENGTH_RE = /^(-?(?:\d+(?:\.\d+)?|\.\d+))(px|rem|em|%|vh|vw|svh|dvh|lvh)?$/i;
 
 /**
  * Parse a CSS length or number. Returns null for calc(), var(), or unknown.
@@ -56,10 +55,7 @@ export function toPx(length: ParsedLength, rootFontSizePx = 16): number | null {
  * Normalize two CSS values for exact semantic comparison.
  * Returns a canonical comparison key, or null if either side is non-comparable.
  */
-export function normalizeCssValue(
-  raw: string,
-  rootFontSizePx = 16,
-): string | null {
+export function normalizeCssValue(raw: string, rootFontSizePx = 16): string | null {
   const trimmed = raw.trim().toLowerCase().replace(/\s+/g, " ");
 
   // Keywords
@@ -119,11 +115,7 @@ export function normalizeCssValue(
   return `px:${round(px, 6)}`;
 }
 
-export function valuesEqual(
-  a: string,
-  b: string,
-  rootFontSizePx = 16,
-): boolean {
+export function valuesEqual(a: string, b: string, rootFontSizePx = 16): boolean {
   const na = normalizeCssValue(a, rootFontSizePx);
   const nb = normalizeCssValue(b, rootFontSizePx);
   if (na === null || nb === null) {
@@ -206,8 +198,7 @@ export function invertSpacingMultiplier(
     const snapped = round(mult, 6);
     const reconstructed = spacingUnit.value * snapped;
     const absTol = 1e-6;
-    const relTol =
-      1e-9 * Math.max(Math.abs(len.value), Math.abs(reconstructed), 1);
+    const relTol = 1e-9 * Math.max(Math.abs(len.value), Math.abs(reconstructed), 1);
     if (Math.abs(reconstructed - len.value) > absTol + relTol) {
       return null;
     }

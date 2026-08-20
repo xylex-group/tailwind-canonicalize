@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { createDefaultTheme } from "@tailwind-canonicalize/resolver";
+import { describe, expect, it } from "vitest";
 import { isSafeStaticQuasi, transformSource } from "./transform.js";
 
 describe("isSafeStaticQuasi", () => {
@@ -20,8 +20,7 @@ describe("transformSource safety", () => {
   const theme = createDefaultTheme();
 
   it("does not rewrite incomplete interpolated template stems", () => {
-    const source =
-      'export const el = <div className={`text-${color} bg-[${value}px]`} />;';
+    const source = "export const el = <div className={`text-${color} bg-[${value}px]`} />;";
     const result = transformSource(source, {
       filePath: "file.tsx",
       theme,
@@ -33,8 +32,7 @@ describe("transformSource safety", () => {
   });
 
   it("rewrites complete static quasis next to interpolations", () => {
-    const source =
-      'export const el = <div className={`foo ${bar} w-[40px] p-4`} />;';
+    const source = "export const el = <div className={`foo ${bar} w-[40px] p-4`} />;";
     const result = transformSource(source, {
       filePath: "file.tsx",
       theme,
@@ -45,8 +43,7 @@ describe("transformSource safety", () => {
 
   it("skips rewrites when the parser reports errors", () => {
     // Unclosed JSX / broken source
-    const source =
-      'export function Broken( { return <div className="w-[40px]">';
+    const source = 'export function Broken( { return <div className="w-[40px]">';
     const result = transformSource(source, {
       filePath: "broken.tsx",
       theme,
@@ -60,7 +57,7 @@ describe("transformSource safety", () => {
   });
 
   it("validates template spans before overwrite", () => {
-    const source = 'export const el = <div className={`p-[16px]`} />;';
+    const source = "export const el = <div className={`p-[16px]`} />;";
     const result = transformSource(source, {
       filePath: "file.tsx",
       theme,

@@ -70,12 +70,8 @@ describe("findCanonicalEquivalent", () => {
   });
 
   it("continuous invert accepts any exact px multiple (39px → 9.75)", () => {
-    expect(findCanonicalEquivalent("w-[39px]", { theme })?.canonical).toBe(
-      "w-9.75",
-    );
-    expect(findCanonicalEquivalent("w-[1.5px]", { theme })?.canonical).toBe(
-      "w-0.375",
-    );
+    expect(findCanonicalEquivalent("w-[39px]", { theme })?.canonical).toBe("w-9.75");
+    expect(findCanonicalEquivalent("w-[1.5px]", { theme })?.canonical).toBe("w-0.375");
   });
 
   it("rewrites continuous spacing multipliers (v4 IntelliSense parity)", () => {
@@ -106,13 +102,11 @@ describe("findCanonicalEquivalent", () => {
   });
 
   it("rewrites ease cubic-bezier to named timing", () => {
+    expect(findCanonicalEquivalent("ease-[cubic-bezier(0.4,0,0.2,1)]", { theme })?.canonical).toBe(
+      "ease-in-out",
+    );
     expect(
-      findCanonicalEquivalent("ease-[cubic-bezier(0.4,0,0.2,1)]", { theme })
-        ?.canonical,
-    ).toBe("ease-in-out");
-    expect(
-      findCanonicalEquivalent("ease-[cubic-bezier(0.4, 0, 0.2, 1)]", { theme })
-        ?.canonical,
+      findCanonicalEquivalent("ease-[cubic-bezier(0.4, 0, 0.2, 1)]", { theme })?.canonical,
     ).toBe("ease-in-out");
     expect(
       findCanonicalEquivalent("hover:ease-[cubic-bezier(0.4,0,0.2,1)]", {
@@ -123,9 +117,7 @@ describe("findCanonicalEquivalent", () => {
 
   it("rewrites bare z-index integers", () => {
     expect(findCanonicalEquivalent("z-[5]", { theme })?.canonical).toBe("z-5");
-    expect(findCanonicalEquivalent("z-[auto]", { theme })?.canonical).toBe(
-      "z-auto",
-    );
+    expect(findCanonicalEquivalent("z-[auto]", { theme })?.canonical).toBe("z-auto");
     expect(findCanonicalEquivalent("z-[5px]", { theme })).toBeNull();
   });
 
@@ -148,24 +140,14 @@ describe("findCanonicalEquivalent", () => {
 
   it("rewrites spacing-multiplier min-w to container tokens", () => {
     // Tailwind v4 suggestCanonicalClasses: min-w-112 → min-w-md (28rem)
-    expect(findCanonicalEquivalent("min-w-112", { theme })?.canonical).toBe(
-      "min-w-md",
-    );
-    expect(findCanonicalEquivalent("min-w-144", { theme })?.canonical).toBe(
-      "min-w-xl",
-    );
-    expect(findCanonicalEquivalent("min-w-[28rem]", { theme })?.canonical).toBe(
-      "min-w-md",
-    );
-    expect(findCanonicalEquivalent("min-w-[36rem]", { theme })?.canonical).toBe(
-      "min-w-xl",
-    );
+    expect(findCanonicalEquivalent("min-w-112", { theme })?.canonical).toBe("min-w-md");
+    expect(findCanonicalEquivalent("min-w-144", { theme })?.canonical).toBe("min-w-xl");
+    expect(findCanonicalEquivalent("min-w-[28rem]", { theme })?.canonical).toBe("min-w-md");
+    expect(findCanonicalEquivalent("min-w-[36rem]", { theme })?.canonical).toBe("min-w-xl");
     expect(findCanonicalEquivalent("hover:min-w-112!", { theme })?.canonical).toBe(
       "hover:min-w-md!",
     );
-    expect(findCanonicalEquivalent("max-w-[28rem]", { theme })?.canonical).toBe(
-      "max-w-md",
-    );
+    expect(findCanonicalEquivalent("max-w-[28rem]", { theme })?.canonical).toBe("max-w-md");
     expect(findCanonicalEquivalent("w-[28rem]", { theme })?.canonical).toBe("w-md");
   });
 

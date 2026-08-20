@@ -18,17 +18,19 @@
 | [Tokens](./guides/tokens.md) | Semantic design-token analyze/apply |
 | [Performance](./guides/performance.md) | Incremental, workers, watch |
 | [Benchmarks](./guides/benchmarks.md) | Methodology |
-| [Contributing](./guides/contributing.md) | Dev setup |
+| [Contributing](./guides/contributing.md) | Dev setup, workspace classes, releases |
 | [Roadmap](./guides/roadmap.md) | Future work |
 
 ## Architecture
 
 | Doc | Description |
 |-----|-------------|
-| [Overview](./architecture/overview.md) | Package layers |
+| [Overview](./architecture/overview.md) | Package layers and workspace classes |
 | [Algorithm](./architecture/algorithm.md) | Equivalence rules |
 | [Safety](./architecture/safety.md) | Zero unsafe rewrites |
 | [Transformations](./architecture/transformations.md) | Categories and pipeline |
+| [Debt inventory](./architecture/debt.md) | Closed ownership debt + 2026-10-01 compatibility |
+| [ADR 0001](./adr/0001-workspace-release-ownership.md) | Changesets-only npm versioning; one class per member |
 
 ## API
 

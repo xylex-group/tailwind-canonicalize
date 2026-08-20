@@ -18,8 +18,8 @@ export function createDefaultTheme(): Theme {
 
   // Numeric scale 0–96 (common subset) + fractions handled separately
   const numericKeys = [
-    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20,
-    24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 72, 80, 96,
+    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40,
+    44, 48, 52, 56, 60, 64, 72, 80, 96,
   ];
 
   if (spacingUnit) {
@@ -139,8 +139,7 @@ export function createDefaultTheme(): Theme {
     "2xs": "0 1px rgb(0 0 0 / 0.05)",
     xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
     sm: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-    DEFAULT:
-      "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+    DEFAULT: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
     md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
     lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
     xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
@@ -219,9 +218,7 @@ export function createDefaultTheme(): Theme {
     width: { values: new Map(spacingValues) },
     height: { values: new Map(spacingValues) },
     container,
-    cssVariables: new Map([
-      ["--spacing", "0.25rem"],
-    ]),
+    cssVariables: new Map([["--spacing", "0.25rem"]]),
     source: "default",
     tailwindVersion: 4,
   };

@@ -1,7 +1,4 @@
-import {
-  extractClassOccurrences,
-  type ExtractOptions,
-} from "@tailwind-canonicalize/parser";
+import { type ExtractOptions, extractClassOccurrences } from "@tailwind-canonicalize/parser";
 import { transformClassString } from "@tailwind-canonicalize/resolver";
 import MagicString from "magic-string";
 import type { Rewrite, TransformOptions, TransformResult } from "./types.js";
@@ -14,10 +11,7 @@ import type { Rewrite, TransformOptions, TransformResult } from "./types.js";
  * - Interpolated template quasis → only complete static utility tokens.
  * - Span content must match occurrence.raw before overwrite.
  */
-export function transformSource(
-  source: string,
-  options: TransformOptions = {},
-): TransformResult {
+export function transformSource(source: string, options: TransformOptions = {}): TransformResult {
   const extractOptions: ExtractOptions = {
     filePath: options.filePath,
   };
@@ -57,8 +51,7 @@ export function transformSource(
     if (slice !== occurrence.raw) {
       allDiagnostics.push({
         kind: "info",
-        message:
-          "Skipped rewrite: occurrence span does not match source slice (unsafe offset)",
+        message: "Skipped rewrite: occurrence span does not match source slice (unsafe offset)",
         utilities: [],
       });
       continue;
@@ -189,10 +182,7 @@ export function isSafeStaticQuasi(raw: string): boolean {
   return true;
 }
 
-function offsetToLineCol(
-  source: string,
-  offset: number,
-): { line: number; column: number } {
+function offsetToLineCol(source: string, offset: number): { line: number; column: number } {
   let line = 1;
   let column = 1;
   for (let i = 0; i < offset && i < source.length; i++) {

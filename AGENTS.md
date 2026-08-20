@@ -21,6 +21,7 @@ Consumer integration docs: `docs/guides/integrations.md`, `docs/guides/biome.md`
 4. **Preserve formatting** via MagicString.
 5. Packages stay layered: parser → resolver → transformer → compiler → cli.
 6. **Do not** implement Biome/ESLint “style” ownership inside this tool — integrate via CLI steps.
+7. **Workspace / release** — root `package.json` owns scripts and `packageManager`; Changesets is the only npm version authority; XBP is ledger/workers only; one class per pnpm member (`internal` \| `publishable` \| `integration` \| `app` \| `tooling`). See `docs/adr/0001-workspace-release-ownership.md`.
 
 ## Working on rewrites
 

@@ -97,10 +97,8 @@ export function dedupeClassTokens(
           continue;
         }
 
-        const ca =
-          findCanonicalEquivalent(a.token, options)?.canonical ?? a.token;
-        const cb =
-          findCanonicalEquivalent(b.token, options)?.canonical ?? b.token;
+        const ca = findCanonicalEquivalent(a.token, options)?.canonical ?? a.token;
+        const cb = findCanonicalEquivalent(b.token, options)?.canonical ?? b.token;
 
         const aIsArb = a.token.includes("[");
         const bIsArb = b.token.includes("[");

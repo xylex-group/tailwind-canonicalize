@@ -1,17 +1,10 @@
 /**
  * Minimal unified diff for a single file.
  */
-export function unifiedDiff(
-  filePath: string,
-  original: string,
-  next: string,
-): string {
+export function unifiedDiff(filePath: string, original: string, next: string): string {
   const a = original.split("\n");
   const b = next.split("\n");
-  const lines: string[] = [
-    `--- a/${filePath}`,
-    `+++ b/${filePath}`,
-  ];
+  const lines: string[] = [`--- a/${filePath}`, `+++ b/${filePath}`];
 
   // Simple LCS-free line diff: emit hunks for contiguous changes
   let i = 0;
@@ -39,10 +32,6 @@ export function unifiedDiff(
       i++;
     }
     while (j < b.length && (startI >= a.length || (i < a.length ? b[j] !== a[i] : true))) {
-      let found = -1;
-      for (let k = startI; k < Math.min(i + 1, a.length); k++) {
-        // keep simple
-      }
       if (i < a.length && b[j] === a[i]) {
         break;
       }
@@ -84,7 +73,9 @@ export function unifiedDiff(
       }
       continue;
     }
-    lines.push(`@@ -${startI + 1},${Math.max(removed.length, 1)} +${startJ + 1},${Math.max(added.length, 1)} @@`);
+    lines.push(
+      `@@ -${startI + 1},${Math.max(removed.length, 1)} +${startJ + 1},${Math.max(added.length, 1)} @@`,
+    );
     for (const line of removed) {
       lines.push(`-${line}`);
     }

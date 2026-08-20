@@ -8,11 +8,7 @@ import {
   inferContextSignals,
   proposeSemanticToken,
 } from "./context.js";
-import {
-  findAliasCycles,
-  findDuplicateValueTokens,
-  scanProjectTokens,
-} from "./css-scan.js";
+import { findAliasCycles, findDuplicateValueTokens, scanProjectTokens } from "./css-scan.js";
 import { parseColorUtility } from "./palette.js";
 import type {
   ColorAnalysisEntry,
@@ -36,9 +32,7 @@ export interface AnalyzeOptions {
  * Phase 1: analyze color utilities project-wide. Never writes source.
  * Semantic meaning is architectural — proposals only, never applied here.
  */
-export async function analyzeColorTokens(
-  options: AnalyzeOptions,
-): Promise<TokenAnalyzeResult> {
+export async function analyzeColorTokens(options: AnalyzeOptions): Promise<TokenAnalyzeResult> {
   const cwd = options.cwd ?? process.cwd();
   const minConfidence = options.minConfidence ?? 0.75;
 
@@ -59,7 +53,9 @@ export async function analyzeColorTokens(
       const tokens = tokenizeClasses(occ.raw);
       const colorTokens = tokens
         .map((t) => ({ token: t, color: parseColorUtility(t) }))
-        .filter((x): x is { token: string; color: NonNullable<typeof x.color> } => x.color !== null);
+        .filter(
+          (x): x is { token: string; color: NonNullable<typeof x.color> } => x.color !== null,
+        );
 
       const siblingBases = colorTokens.map((c) => c.color.base);
       if (siblingBases.length >= 2) {
@@ -143,10 +139,7 @@ export async function analyzeColorTokens(
 
     if (
       samples.some(
-        (s) =>
-          s.componentHint &&
-          dominant &&
-          s.componentHint.toLowerCase().includes(dominant),
+        (s) => s.componentHint && dominant && s.componentHint.toLowerCase().includes(dominant),
       )
     ) {
       confidence = Math.min(1, confidence + 0.15);
@@ -169,12 +162,7 @@ export async function analyzeColorTokens(
     }
 
     const first = samples[0]!;
-    const proposal = proposeSemanticToken(
-      first.property,
-      first.palette,
-      first.shade,
-      dominant,
-    );
+    const proposal = proposeSemanticToken(first.property, first.palette, first.shade, dominant);
 
     const conflictFiles = new Map<string, string>();
     if (roleCount > 1) {
@@ -190,9 +178,7 @@ export async function analyzeColorTokens(
       sourceUtility,
       occurrences: samples.length,
       contexts,
-      proposal: proposal
-        ? { token: proposal.token, cssVariable: proposal.cssVariable }
-        : null,
+      proposal: proposal ? { token: proposal.token, cssVariable: proposal.cssVariable } : null,
       confidence: Math.round(confidence * 100) / 100,
       conflicts: [...conflictFiles].map(([file, reason]) => ({ file, reason })),
       samples: samples.slice(0, 5),
@@ -328,9 +314,7 @@ export async function analyzeColorTokens(
   };
 }
 
-function proposeDarkPairs(
-  byUtility: Map<string, ColorOccurrence[]>,
-): ThemePairMapping[] {
+function proposeDarkPairs(byUtility: Map<string, ColorOccurrence[]>): ThemePairMapping[] {
   const pairs: ThemePairMapping[] = [];
 
   // Common surface pair
@@ -394,10 +378,7 @@ function guessComponentName(file: string, source: string): string | undefined {
   return base;
 }
 
-function offsetToLineCol(
-  source: string,
-  offset: number,
-): { line: number; column: number } {
+function offsetToLineCol(source: string, offset: number): { line: number; column: number } {
   let line = 1;
   let column = 1;
   for (let i = 0; i < offset && i < source.length; i++) {

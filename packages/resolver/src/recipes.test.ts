@@ -14,33 +14,28 @@ describe("semantic recipes", () => {
   });
 
   it("applies coherent recipe instead of independent foreground mapping", () => {
-    const r = transformClassString(
-      "border-amber-200 bg-amber-200 text-slate-800",
-      {
-        recipes: BUILTIN_RECIPES,
-        tokenMappings: [
-          {
-            source: "bg-amber-200",
-            target: "bg-warning-subtle",
-            token: "--color-warning-subtle",
-          },
-          {
-            source: "border-amber-200",
-            target: "border-warning-subtle",
-            token: "--color-warning-subtle",
-          },
-          {
-            // Without recipe, this would become text-foreground
-            source: "text-slate-800",
-            target: "text-foreground",
-            token: "--color-foreground",
-          },
-        ],
-      },
-    );
-    expect(r.result).toBe(
-      "border-warning-subtle bg-warning-subtle text-warning-foreground",
-    );
+    const r = transformClassString("border-amber-200 bg-amber-200 text-slate-800", {
+      recipes: BUILTIN_RECIPES,
+      tokenMappings: [
+        {
+          source: "bg-amber-200",
+          target: "bg-warning-subtle",
+          token: "--color-warning-subtle",
+        },
+        {
+          source: "border-amber-200",
+          target: "border-warning-subtle",
+          token: "--color-warning-subtle",
+        },
+        {
+          // Without recipe, this would become text-foreground
+          source: "text-slate-800",
+          target: "text-foreground",
+          token: "--color-foreground",
+        },
+      ],
+    });
+    expect(r.result).toBe("border-warning-subtle bg-warning-subtle text-warning-foreground");
   });
 
   it("is idempotent", () => {

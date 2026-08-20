@@ -1,35 +1,27 @@
 import { describe, expect, it } from "vitest";
-import { createDefaultTheme } from "./default-theme.js";
 import { dedupeClassTokens } from "./dedupe.js";
+import { createDefaultTheme } from "./default-theme.js";
 import { transformClassString } from "./pipeline.js";
 import { utilitiesConflict, utilityIdentity } from "./utility-identity.js";
 
 describe("safety review fixes", () => {
   describe("text property families", () => {
     it("does not conflict alignment vs size vs color", () => {
-      expect(utilitiesConflict("text-center", "text-muted-foreground")).toBe(
-        false,
-      );
+      expect(utilitiesConflict("text-center", "text-muted-foreground")).toBe(false);
       expect(utilitiesConflict("text-body-sm", "text-foreground")).toBe(false);
-      expect(utilitiesConflict("text-caption", "text-muted-foreground")).toBe(
-        false,
-      );
+      expect(utilitiesConflict("text-caption", "text-muted-foreground")).toBe(false);
       expect(utilitiesConflict("text-xs", "text-foreground")).toBe(false);
       expect(utilitiesConflict("text-balance", "text-sm")).toBe(false);
 
       expect(utilityIdentity("text-center").propertyGroup).toBe("text-align");
       expect(utilityIdentity("text-body-sm").propertyGroup).toBe("font-size");
       expect(utilityIdentity("text-caption").propertyGroup).toBe("font-size");
-      expect(utilityIdentity("text-muted-foreground").propertyGroup).toBe(
-        "text-color",
-      );
+      expect(utilityIdentity("text-muted-foreground").propertyGroup).toBe("text-color");
       expect(utilityIdentity("text-foreground").propertyGroup).toBe("text-color");
     });
 
     it("still conflicts same-family colors", () => {
-      expect(
-        utilitiesConflict("text-foreground", "text-muted-foreground"),
-      ).toBe(true);
+      expect(utilitiesConflict("text-foreground", "text-muted-foreground")).toBe(true);
     });
   });
 
@@ -112,9 +104,7 @@ describe("safety review fixes", () => {
   describe("object-fit vs object-position / bg size vs position / plugins", () => {
     it("does not conflict object-cover with object-center", () => {
       expect(utilityIdentity("object-cover").propertyGroup).toBe("object-fit");
-      expect(utilityIdentity("object-center").propertyGroup).toBe(
-        "object-position",
-      );
+      expect(utilityIdentity("object-center").propertyGroup).toBe("object-position");
       expect(utilityIdentity("object-top").propertyGroup).toBe("object-position");
       expect(utilitiesConflict("object-cover", "object-center")).toBe(false);
       expect(utilitiesConflict("object-top", "object-cover")).toBe(false);
@@ -122,9 +112,7 @@ describe("safety review fixes", () => {
     });
 
     it("does not conflict bg-center with bg-cover", () => {
-      expect(utilityIdentity("bg-center").propertyGroup).toBe(
-        "background-position",
-      );
+      expect(utilityIdentity("bg-center").propertyGroup).toBe("background-position");
       expect(utilityIdentity("bg-cover").propertyGroup).toBe("background-size");
       expect(utilitiesConflict("bg-center", "bg-cover")).toBe(false);
       expect(utilitiesConflict("bg-background", "bg-primary")).toBe(true);
@@ -150,22 +138,16 @@ describe("safety review fixes", () => {
     });
 
     it("does not conflict list-inside (position) with list-disc/decimal (type)", () => {
-      expect(utilityIdentity("list-inside").propertyGroup).toBe(
-        "list-style-position",
-      );
+      expect(utilityIdentity("list-inside").propertyGroup).toBe("list-style-position");
       expect(utilityIdentity("list-disc").propertyGroup).toBe("list-style-type");
-      expect(utilityIdentity("list-decimal").propertyGroup).toBe(
-        "list-style-type",
-      );
+      expect(utilityIdentity("list-decimal").propertyGroup).toBe("list-style-type");
       expect(utilitiesConflict("list-inside", "list-disc")).toBe(false);
       expect(utilitiesConflict("list-inside", "list-decimal")).toBe(false);
       expect(utilitiesConflict("list-disc", "list-decimal")).toBe(true);
     });
 
     it("does not conflict border-collapse with border-border color", () => {
-      expect(utilityIdentity("border-collapse").propertyGroup).toBe(
-        "border-collapse",
-      );
+      expect(utilityIdentity("border-collapse").propertyGroup).toBe("border-collapse");
       expect(utilityIdentity("border-border").propertyGroup).toBe("border-color");
       expect(utilitiesConflict("border-collapse", "border-border")).toBe(false);
       expect(utilitiesConflict("border-separate", "border-collapse")).toBe(true);
@@ -178,22 +160,18 @@ describe("safety review fixes", () => {
     it("does not conflict outline width with outline color", () => {
       expect(utilityIdentity("outline-1").propertyGroup).toBe("outline-width");
       expect(utilityIdentity("outline-ring").propertyGroup).toBe("outline-color");
-      expect(utilityIdentity("outline-hidden").propertyGroup).toBe(
-        "outline-style",
-      );
+      expect(utilityIdentity("outline-hidden").propertyGroup).toBe("outline-style");
       expect(utilityIdentity("outline-0").propertyGroup).toBe("outline-width");
-      expect(
-        utilitiesConflict("focus-visible:outline-1", "focus-visible:outline-ring"),
-      ).toBe(false);
+      expect(utilitiesConflict("focus-visible:outline-1", "focus-visible:outline-ring")).toBe(
+        false,
+      );
       // width vs style — independent cascade slots
       expect(utilitiesConflict("outline-hidden", "outline-0")).toBe(false);
     });
 
     it("does not conflict shadow size with shadow color", () => {
       expect(utilityIdentity("shadow-sm").propertyGroup).toBe("box-shadow");
-      expect(utilityIdentity("shadow-border/10").propertyGroup).toBe(
-        "box-shadow-color",
-      );
+      expect(utilityIdentity("shadow-border/10").propertyGroup).toBe("box-shadow-color");
       expect(utilitiesConflict("shadow-sm", "shadow-border/10")).toBe(false);
       // both elevations still conflict
       expect(utilitiesConflict("shadow-sm", "shadow-lg")).toBe(true);
@@ -209,66 +187,39 @@ describe("safety review fixes", () => {
 
     it("does not conflict overflow-stable (plugin) with overflow-auto", () => {
       expect(utilityIdentity("overflow-auto").propertyGroup).toBe("overflow");
-      expect(utilityIdentity("overflow-stable").propertyGroup).toMatch(
-        /^plugin:overflow:/,
-      );
+      expect(utilityIdentity("overflow-stable").propertyGroup).toMatch(/^plugin:overflow:/);
       expect(utilitiesConflict("overflow-stable", "overflow-auto")).toBe(false);
       expect(utilitiesConflict("overflow-auto", "overflow-hidden")).toBe(true);
     });
 
     it("classifies text-[clamp]/length:] as font-size not color", () => {
-      expect(
-        utilityIdentity("text-[clamp(32px,7vw,64px)]").propertyGroup,
-      ).toBe("font-size");
-      expect(
-        utilityIdentity("text-[length:var(--heading-size)]").propertyGroup,
-      ).toBe("font-size");
-      expect(
-        utilitiesConflict(
-          "text-text-primary",
-          "text-[clamp(32px,7vw,64px)]",
-        ),
-      ).toBe(false);
-      expect(
-        utilitiesConflict(
-          "text-[length:var(--heading-size)]",
-          "text-text-primary",
-        ),
-      ).toBe(false);
+      expect(utilityIdentity("text-[clamp(32px,7vw,64px)]").propertyGroup).toBe("font-size");
+      expect(utilityIdentity("text-[length:var(--heading-size)]").propertyGroup).toBe("font-size");
+      expect(utilitiesConflict("text-text-primary", "text-[clamp(32px,7vw,64px)]")).toBe(false);
+      expect(utilitiesConflict("text-[length:var(--heading-size)]", "text-text-primary")).toBe(
+        false,
+      );
     });
 
     it("does not conflict border-px (width) with border-current (color)", () => {
       expect(utilityIdentity("border-px").propertyGroup).toBe("border-width");
-      expect(utilityIdentity("border-current").propertyGroup).toBe(
-        "border-color",
-      );
+      expect(utilityIdentity("border-current").propertyGroup).toBe("border-color");
       expect(utilitiesConflict("border-px", "border-current")).toBe(false);
     });
 
     it("does not conflict bg-gray-100 with legacy bg-opacity-30", () => {
-      expect(utilityIdentity("bg-opacity-30").propertyGroup).toBe(
-        "background-opacity",
-      );
-      expect(
-        utilitiesConflict("hover:bg-gray-100", "hover:bg-opacity-30"),
-      ).toBe(false);
+      expect(utilityIdentity("bg-opacity-30").propertyGroup).toBe("background-opacity");
+      expect(utilitiesConflict("hover:bg-gray-100", "hover:bg-opacity-30")).toBe(false);
     });
 
     it("does not conflict bare outline with outline-2 / outline-white", () => {
       expect(utilityIdentity("outline").propertyGroup).toBe("outline-style");
       expect(utilityIdentity("outline-2").propertyGroup).toBe("outline-width");
-      expect(utilityIdentity("outline-white").propertyGroup).toBe(
-        "outline-color",
+      expect(utilityIdentity("outline-white").propertyGroup).toBe("outline-color");
+      expect(utilitiesConflict("focus-visible:outline", "focus-visible:outline-2")).toBe(false);
+      expect(utilitiesConflict("focus-visible:outline-2", "focus-visible:outline-white")).toBe(
+        false,
       );
-      expect(
-        utilitiesConflict("focus-visible:outline", "focus-visible:outline-2"),
-      ).toBe(false);
-      expect(
-        utilitiesConflict(
-          "focus-visible:outline-2",
-          "focus-visible:outline-white",
-        ),
-      ).toBe(false);
     });
 
     it("classifies font-small / font-smaller as font-size keywords", () => {
@@ -280,25 +231,15 @@ describe("safety review fixes", () => {
     });
 
     it("does not conflict border-bottom-color with border-left-color", () => {
-      expect(utilityIdentity("border-bottom-color").propertyGroup).toBe(
-        "border-bottom-color",
-      );
-      expect(utilityIdentity("border-left-color").propertyGroup).toBe(
-        "border-left-color",
-      );
-      expect(
-        utilitiesConflict("border-bottom-color", "border-left-color"),
-      ).toBe(false);
+      expect(utilityIdentity("border-bottom-color").propertyGroup).toBe("border-bottom-color");
+      expect(utilityIdentity("border-left-color").propertyGroup).toBe("border-left-color");
+      expect(utilitiesConflict("border-bottom-color", "border-left-color")).toBe(false);
     });
 
     it("does not conflict ring-black with legacy ring-opacity-5", () => {
-      expect(utilityIdentity("ring-opacity-5").propertyGroup).toBe(
-        "ring-opacity",
-      );
+      expect(utilityIdentity("ring-opacity-5").propertyGroup).toBe("ring-opacity");
       expect(utilitiesConflict("ring-black", "ring-opacity-5")).toBe(false);
-      expect(
-        utilitiesConflict("ring-purple-600", "ring-opacity-100"),
-      ).toBe(false);
+      expect(utilitiesConflict("ring-purple-600", "ring-opacity-100")).toBe(false);
     });
 
     it("classifies text-bold as weight and text-m/text-small as size", () => {
@@ -314,9 +255,7 @@ describe("safety review fixes", () => {
       expect(utilityIdentity("border-md").propertyGroup).toBe("border-width");
       expect(utilityIdentity("border-small").propertyGroup).toBe("border-width");
       expect(utilitiesConflict("border-md", "border-gray-500")).toBe(false);
-      expect(utilitiesConflict("border-small", "border-default-200")).toBe(
-        false,
-      );
+      expect(utilitiesConflict("border-small", "border-default-200")).toBe(false);
     });
 
     it("classifies text-2sm as font-size not color", () => {
@@ -325,15 +264,9 @@ describe("safety review fixes", () => {
     });
 
     it("does not conflict decoration-dashed (style) with decoration-1 (thickness)", () => {
-      expect(utilityIdentity("decoration-dashed").propertyGroup).toBe(
-        "text-decoration-style",
-      );
-      expect(utilityIdentity("decoration-1").propertyGroup).toBe(
-        "text-decoration-thickness",
-      );
-      expect(utilitiesConflict("decoration-dashed", "decoration-1")).toBe(
-        false,
-      );
+      expect(utilityIdentity("decoration-dashed").propertyGroup).toBe("text-decoration-style");
+      expect(utilityIdentity("decoration-1").propertyGroup).toBe("text-decoration-thickness");
+      expect(utilitiesConflict("decoration-dashed", "decoration-1")).toBe(false);
     });
 
     it("classifies shadow-xs as elevation not color", () => {
@@ -349,20 +282,14 @@ describe("safety review fixes", () => {
     });
 
     it("does not conflict snap-x with snap-mandatory", () => {
-      expect(utilityIdentity("snap-x").propertyGroup).toBe(
-        "scroll-snap-type-axis",
-      );
-      expect(utilityIdentity("snap-mandatory").propertyGroup).toBe(
-        "scroll-snap-type-strictness",
-      );
+      expect(utilityIdentity("snap-x").propertyGroup).toBe("scroll-snap-type-axis");
+      expect(utilityIdentity("snap-mandatory").propertyGroup).toBe("scroll-snap-type-strictness");
       expect(utilitiesConflict("snap-x", "snap-mandatory")).toBe(false);
       expect(utilitiesConflict("snap-start", "snap-x")).toBe(false);
     });
 
     it("does not conflict text-primary with legacy text-opacity-80", () => {
-      expect(utilityIdentity("text-opacity-80").propertyGroup).toBe(
-        "text-opacity",
-      );
+      expect(utilityIdentity("text-opacity-80").propertyGroup).toBe("text-opacity");
       expect(utilitiesConflict("text-primary", "text-opacity-80")).toBe(false);
     });
 
@@ -379,15 +306,9 @@ describe("safety review fixes", () => {
 
     it("does not conflict gradient stop position with gradient color (from-50% vs from-popover)", () => {
       // Original found case: before:from-50% + before:from-popover must not conflict
-      expect(utilityIdentity("before:from-50%").propertyGroup).toBe(
-        "gradient-from-position",
-      );
-      expect(utilityIdentity("before:from-popover").propertyGroup).toBe(
-        "gradient-from",
-      );
-      expect(
-        utilitiesConflict("before:from-50%", "before:from-popover"),
-      ).toBe(false);
+      expect(utilityIdentity("before:from-50%").propertyGroup).toBe("gradient-from-position");
+      expect(utilityIdentity("before:from-popover").propertyGroup).toBe("gradient-from");
+      expect(utilitiesConflict("before:from-50%", "before:from-popover")).toBe(false);
       expect(utilitiesConflict("from-10%", "from-red-500")).toBe(false);
       expect(utilitiesConflict("via-30%", "via-black")).toBe(false);
       expect(utilitiesConflict("to-90%", "to-white")).toBe(false);
@@ -418,9 +339,7 @@ describe("safety review fixes", () => {
   describe("extended type scale / font / divide / bg subproperties", () => {
     it("does not conflict text-2xs (font-size) with text-muted-foreground (color)", () => {
       expect(utilityIdentity("text-2xs").propertyGroup).toBe("font-size");
-      expect(utilityIdentity("text-muted-foreground").propertyGroup).toBe(
-        "text-color",
-      );
+      expect(utilityIdentity("text-muted-foreground").propertyGroup).toBe("text-color");
       expect(utilitiesConflict("text-2xs", "text-muted-foreground")).toBe(false);
       expect(utilitiesConflict("text-2xs", "text-primary")).toBe(false);
     });
@@ -437,9 +356,7 @@ describe("safety review fixes", () => {
     it("does not conflict divide-y (axis) with divide-border (color)", () => {
       expect(utilityIdentity("divide-y").propertyGroup).toBe("divide-y");
       expect(utilityIdentity("divide-border").propertyGroup).toBe("divide-color");
-      expect(utilityIdentity("divide-border/50").propertyGroup).toBe(
-        "divide-color",
-      );
+      expect(utilityIdentity("divide-border/50").propertyGroup).toBe("divide-color");
       expect(utilitiesConflict("divide-y", "divide-border")).toBe(false);
       expect(utilitiesConflict("divide-y", "divide-border/50")).toBe(false);
       expect(utilitiesConflict("divide-border", "divide-primary")).toBe(true);
@@ -448,34 +365,20 @@ describe("safety review fixes", () => {
     it("does not conflict overflow-hidden with overflow-ellipsis (text-overflow legacy)", () => {
       // Original found case: overflow-hidden + overflow-ellipsis (truncate pattern)
       expect(utilityIdentity("overflow-hidden").propertyGroup).toBe("overflow");
-      expect(utilityIdentity("overflow-ellipsis").propertyGroup).toBe(
-        "text-overflow",
-      );
-      expect(utilityIdentity("text-ellipsis").propertyGroup).toBe(
-        "text-overflow",
-      );
-      expect(
-        utilitiesConflict("overflow-hidden", "overflow-ellipsis"),
-      ).toBe(false);
-      expect(utilitiesConflict("overflow-hidden", "text-ellipsis")).toBe(
-        false,
-      );
+      expect(utilityIdentity("overflow-ellipsis").propertyGroup).toBe("text-overflow");
+      expect(utilityIdentity("text-ellipsis").propertyGroup).toBe("text-overflow");
+      expect(utilitiesConflict("overflow-hidden", "overflow-ellipsis")).toBe(false);
+      expect(utilitiesConflict("overflow-hidden", "text-ellipsis")).toBe(false);
       // real overflow conflicts remain
-      expect(utilitiesConflict("overflow-hidden", "overflow-auto")).toBe(
-        true,
-      );
+      expect(utilitiesConflict("overflow-hidden", "overflow-auto")).toBe(true);
       expect(utilitiesConflict("overflow-ellipsis", "text-clip")).toBe(true);
     });
 
     it("does not conflict space-*-reverse with space amount (co-occur by design)", () => {
       // Original found case: -space-y-1 + space-y-reverse
-      expect(utilityIdentity("space-y-reverse").propertyGroup).toBe(
-        "space-y-reverse",
-      );
+      expect(utilityIdentity("space-y-reverse").propertyGroup).toBe("space-y-reverse");
       expect(utilityIdentity("-space-y-1").propertyGroup).toBe("space-y");
-      expect(utilityIdentity("space-x-reverse").propertyGroup).toBe(
-        "space-x-reverse",
-      );
+      expect(utilityIdentity("space-x-reverse").propertyGroup).toBe("space-x-reverse");
       expect(utilityIdentity("-space-x-1").propertyGroup).toBe("space-x");
       expect(utilitiesConflict("-space-y-1", "space-y-reverse")).toBe(false);
       expect(utilitiesConflict("-space-x-1", "space-x-reverse")).toBe(false);
@@ -487,111 +390,52 @@ describe("safety review fixes", () => {
 
     it("does not conflict Tremor text size with text color (text-tremor-default vs content)", () => {
       // Original found case: text-tremor-default + text-tremor-content
-      expect(utilityIdentity("text-tremor-default").propertyGroup).toBe(
-        "font-size",
-      );
-      expect(utilityIdentity("text-tremor-metric").propertyGroup).toBe(
-        "font-size",
-      );
-      expect(utilityIdentity("text-tremor-title").propertyGroup).toBe(
-        "font-size",
-      );
-      expect(utilityIdentity("text-tremor-label").propertyGroup).toBe(
-        "font-size",
-      );
-      expect(utilityIdentity("text-tremor-content").propertyGroup).toBe(
-        "text-color",
-      );
-      expect(
-        utilityIdentity("text-tremor-content-strong").propertyGroup,
-      ).toBe("text-color");
-      expect(
-        utilitiesConflict("text-tremor-default", "text-tremor-content"),
-      ).toBe(false);
-      expect(
-        utilitiesConflict(
-          "text-tremor-default",
-          "text-tremor-content-strong",
-        ),
-      ).toBe(false);
-      expect(
-        utilitiesConflict("text-tremor-metric", "text-foreground"),
-      ).toBe(false);
-      expect(utilitiesConflict("text-tremor-default", "text-white")).toBe(
-        false,
-      );
-      expect(utilitiesConflict("text-tremor-default", "text-brand")).toBe(
-        false,
-      );
+      expect(utilityIdentity("text-tremor-default").propertyGroup).toBe("font-size");
+      expect(utilityIdentity("text-tremor-metric").propertyGroup).toBe("font-size");
+      expect(utilityIdentity("text-tremor-title").propertyGroup).toBe("font-size");
+      expect(utilityIdentity("text-tremor-label").propertyGroup).toBe("font-size");
+      expect(utilityIdentity("text-tremor-content").propertyGroup).toBe("text-color");
+      expect(utilityIdentity("text-tremor-content-strong").propertyGroup).toBe("text-color");
+      expect(utilitiesConflict("text-tremor-default", "text-tremor-content")).toBe(false);
+      expect(utilitiesConflict("text-tremor-default", "text-tremor-content-strong")).toBe(false);
+      expect(utilitiesConflict("text-tremor-metric", "text-foreground")).toBe(false);
+      expect(utilitiesConflict("text-tremor-default", "text-white")).toBe(false);
+      expect(utilitiesConflict("text-tremor-default", "text-brand")).toBe(false);
       // same family still conflicts
-      expect(
-        utilitiesConflict("text-tremor-default", "text-tremor-metric"),
-      ).toBe(true);
-      expect(
-        utilitiesConflict(
-          "text-tremor-content",
-          "text-tremor-content-strong",
-        ),
-      ).toBe(true);
+      expect(utilitiesConflict("text-tremor-default", "text-tremor-metric")).toBe(true);
+      expect(utilitiesConflict("text-tremor-content", "text-tremor-content-strong")).toBe(true);
     });
 
     it("does not conflict text-[13px]/3 (font-size+opacity) with text-foreground/70 (color)", () => {
       // Original found case: opacity on arbitrary size misparsed as color
       expect(utilityIdentity("text-[13px]/3").propertyGroup).toBe("font-size");
-      expect(utilityIdentity("text-[0.80rem]/6").propertyGroup).toBe(
-        "font-size",
-      );
-      expect(utilityIdentity("text-foreground/70").propertyGroup).toBe(
-        "text-color",
-      );
-      expect(
-        utilitiesConflict("text-[13px]/3", "text-foreground/70"),
-      ).toBe(false);
-      expect(
-        utilitiesConflict("text-[13px]/3", "text-muted-foreground/50"),
-      ).toBe(false);
+      expect(utilityIdentity("text-[0.80rem]/6").propertyGroup).toBe("font-size");
+      expect(utilityIdentity("text-foreground/70").propertyGroup).toBe("text-color");
+      expect(utilitiesConflict("text-[13px]/3", "text-foreground/70")).toBe(false);
+      expect(utilitiesConflict("text-[13px]/3", "text-muted-foreground/50")).toBe(false);
       // size vs size still conflicts
       expect(utilitiesConflict("text-xs", "text-[13px]")).toBe(true);
     });
 
     it("does not conflict inset-shadow / drop-shadow size with color", () => {
       // Original found case: inset-shadow-sm + inset-shadow-white/20
-      expect(utilityIdentity("inset-shadow-sm").propertyGroup).toBe(
-        "inset-shadow",
-      );
-      expect(utilityIdentity("inset-shadow-white/20").propertyGroup).toBe(
-        "inset-shadow-color",
-      );
-      expect(
-        utilitiesConflict("inset-shadow-sm", "inset-shadow-white/20"),
-      ).toBe(false);
-      expect(utilityIdentity("drop-shadow-2xl").propertyGroup).toBe(
-        "drop-shadow",
-      );
-      expect(utilityIdentity("drop-shadow-white/20").propertyGroup).toBe(
-        "drop-shadow-color",
-      );
-      expect(
-        utilitiesConflict("drop-shadow-2xl", "drop-shadow-white/20"),
-      ).toBe(false);
+      expect(utilityIdentity("inset-shadow-sm").propertyGroup).toBe("inset-shadow");
+      expect(utilityIdentity("inset-shadow-white/20").propertyGroup).toBe("inset-shadow-color");
+      expect(utilitiesConflict("inset-shadow-sm", "inset-shadow-white/20")).toBe(false);
+      expect(utilityIdentity("drop-shadow-2xl").propertyGroup).toBe("drop-shadow");
+      expect(utilityIdentity("drop-shadow-white/20").propertyGroup).toBe("drop-shadow-color");
+      expect(utilitiesConflict("drop-shadow-2xl", "drop-shadow-white/20")).toBe(false);
       // same-slot elevations still conflict
-      expect(utilitiesConflict("inset-shadow-sm", "inset-shadow-lg")).toBe(
-        true,
-      );
-      expect(utilitiesConflict("drop-shadow-sm", "drop-shadow-2xl")).toBe(
-        true,
-      );
+      expect(utilitiesConflict("inset-shadow-sm", "inset-shadow-lg")).toBe(true);
+      expect(utilitiesConflict("drop-shadow-sm", "drop-shadow-2xl")).toBe(true);
     });
 
     it("does not conflict bg-[length:…] (size) with bg-[linear-gradient(…)] (image)", () => {
       // Original found case: shimmer size + gradient image co-occur
+      expect(utilityIdentity("bg-[length:200%_100%]").propertyGroup).toBe("background-size");
       expect(
-        utilityIdentity("bg-[length:200%_100%]").propertyGroup,
-      ).toBe("background-size");
-      expect(
-        utilityIdentity(
-          "bg-[linear-gradient(110deg,#404040,35%,#fff,50%,#404040,75%,#404040)]",
-        ).propertyGroup,
+        utilityIdentity("bg-[linear-gradient(110deg,#404040,35%,#fff,50%,#404040,75%,#404040)]")
+          .propertyGroup,
       ).toBe("background-image");
       expect(
         utilitiesConflict(
@@ -599,32 +443,17 @@ describe("safety review fixes", () => {
           "bg-[linear-gradient(110deg,#404040,35%,#fff,50%,#404040,75%,#404040)]",
         ),
       ).toBe(false);
-      expect(
-        utilitiesConflict("bg-[url(/x.png)]", "bg-background"),
-      ).toBe(false);
+      expect(utilitiesConflict("bg-[url(/x.png)]", "bg-background")).toBe(false);
       // same-slot colors still conflict
       expect(utilitiesConflict("bg-red-500", "bg-blue-500")).toBe(true);
-      expect(
-        utilitiesConflict(
-          "bg-[linear-gradient(red,blue)]",
-          "bg-[url(/y.png)]",
-        ),
-      ).toBe(true);
+      expect(utilitiesConflict("bg-[linear-gradient(red,blue)]", "bg-[url(/y.png)]")).toBe(true);
     });
 
     it("does not conflict bg color with bg-clip-*", () => {
-      expect(utilityIdentity("bg-clip-padding").propertyGroup).toBe(
-        "background-clip",
-      );
-      expect(utilityIdentity("bg-background").propertyGroup).toBe(
-        "background-color",
-      );
-      expect(utilityIdentity("bg-(--frame-panel-bg)").propertyGroup).toBe(
-        "background-color",
-      );
-      expect(
-        utilitiesConflict("bg-(--frame-panel-bg)", "bg-clip-padding"),
-      ).toBe(false);
+      expect(utilityIdentity("bg-clip-padding").propertyGroup).toBe("background-clip");
+      expect(utilityIdentity("bg-background").propertyGroup).toBe("background-color");
+      expect(utilityIdentity("bg-(--frame-panel-bg)").propertyGroup).toBe("background-color");
+      expect(utilitiesConflict("bg-(--frame-panel-bg)", "bg-clip-padding")).toBe(false);
       expect(utilitiesConflict("bg-background", "bg-clip-padding")).toBe(false);
       expect(utilitiesConflict("bg-background", "bg-primary")).toBe(true);
     });

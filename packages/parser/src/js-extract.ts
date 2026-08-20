@@ -51,11 +51,7 @@ function spanOf(node: unknown): Span | null {
   return null;
 }
 
-function pushLiteral(
-  ctx: WalkerContext,
-  node: unknown,
-  kind: ClassOccurrence["kind"],
-): void {
+function pushLiteral(ctx: WalkerContext, node: unknown, kind: ClassOccurrence["kind"]): void {
   if (!isRecord(node)) {
     return;
   }
@@ -72,8 +68,7 @@ function pushLiteral(
     // Skip quote characters for rewrite targets.
     const raw = ctx.source.slice(span.start, span.end);
     const quote = raw[0];
-    const quoted =
-      (quote === '"' || quote === "'" || quote === "`") && raw.endsWith(quote);
+    const quoted = (quote === '"' || quote === "'" || quote === "`") && raw.endsWith(quote);
     const start = quoted ? span.start + 1 : span.start;
     const end = quoted ? span.end - 1 : span.end;
     ctx.occurrences.push({
@@ -140,11 +135,7 @@ function pushTemplate(
  * Map a TemplateElement span to the exact cooked content range in source.
  * Returns null when the slice cannot be validated (unsafe to overwrite).
  */
-function resolveTemplateQuasiSpan(
-  source: string,
-  span: Span,
-  cooked: string,
-): Span | null {
+function resolveTemplateQuasiSpan(source: string, span: Span, cooked: string): Span | null {
   if (cooked.length === 0) {
     // Empty quasi between ${} — nothing to rewrite; skip safely.
     return null;
@@ -296,9 +287,7 @@ function walkExpr(ctx: WalkerContext, node: unknown, kind: ClassOccurrence["kind
     case "CallExpression": {
       const name = calleeName(getNode(node, "callee"));
       const nextKind =
-        name && ctx.classFunctions.has(name)
-          ? (name as ClassOccurrence["kind"])
-          : kind;
+        name && ctx.classFunctions.has(name) ? (name as ClassOccurrence["kind"]) : kind;
       // cva base + variants object
       for (const arg of getArray(node, "arguments")) {
         walkExpr(ctx, arg, nextKind);
@@ -373,9 +362,9 @@ function walkProgram(ctx: WalkerContext, node: unknown): void {
   if (type === "CallExpression") {
     const name = calleeName(getNode(node, "callee"));
     if (name && ctx.classFunctions.has(name)) {
-      const kind = (["clsx", "cn", "cva", "twMerge", "classnames"].includes(name)
-        ? name
-        : "clsx") as ClassOccurrence["kind"];
+      const kind = (
+        ["clsx", "cn", "cva", "twMerge", "classnames"].includes(name) ? name : "clsx"
+      ) as ClassOccurrence["kind"];
       for (const arg of getArray(node, "arguments")) {
         walkExpr(ctx, arg, kind);
       }
@@ -436,10 +425,7 @@ export function extractFromJavaScript(
   options: ExtractOptions = {},
 ): { occurrences: ClassOccurrence[]; errors: ExtractError[] } {
   const errors: ExtractError[] = [];
-  const classFunctions = new Set([
-    ...defaultClassFunctions(),
-    ...(options.classFunctions ?? []),
-  ]);
+  const classFunctions = new Set([...defaultClassFunctions(), ...(options.classFunctions ?? [])]);
   const taggedTemplates = new Set([
     ...defaultTaggedTemplates(),
     ...(options.taggedTemplates ?? []),

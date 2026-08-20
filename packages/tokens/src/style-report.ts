@@ -1,18 +1,9 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import {
-  extractClassOccurrences,
-  tokenizeClasses,
-} from "@tailwind-canonicalize/parser";
-import {
-  parseUtility,
-  utilityIdentity,
-} from "@tailwind-canonicalize/resolver";
+import { extractClassOccurrences, tokenizeClasses } from "@tailwind-canonicalize/parser";
+import { parseUtility, utilityIdentity } from "@tailwind-canonicalize/resolver";
 import { extractStructuralHints } from "./context.js";
-import {
-  findDuplicateValueTokens,
-  scanProjectTokens,
-} from "./css-scan.js";
+import { findDuplicateValueTokens, scanProjectTokens } from "./css-scan.js";
 import { parseColorUtility } from "./palette.js";
 import type { ThemeToken, TokenAlias } from "./types.js";
 
@@ -266,11 +257,7 @@ export interface StyleReportOptions {
 /**
  * Normalize paths for portable JSON reports (always `/`, never `\`).
  */
-export function toReportPath(
-  file: string,
-  cwd: string,
-  relative = true,
-): string {
+export function toReportPath(file: string, cwd: string, relative = true): string {
   const raw = relative ? path.relative(cwd, file) || file : file;
   return raw.replace(/\\/g, "/");
 }
@@ -330,11 +317,7 @@ function classifyKind(
   if (tokenBase.includes("[")) {
     return "arbitrary";
   }
-  if (
-    group.endsWith("-color") ||
-    group === "fill" ||
-    group.startsWith("gradient-")
-  ) {
+  if (group.endsWith("-color") || group === "fill" || group.startsWith("gradient-")) {
     return "semantic";
   }
   return "other";
@@ -400,10 +383,7 @@ function emptyKindCounts(): Record<StyleUtilityKind, number> {
   return { palette: 0, semantic: 0, arbitrary: 0, other: 0 };
 }
 
-function offsetToLineCol(
-  source: string,
-  offset: number,
-): { line: number; column: number } {
+function offsetToLineCol(source: string, offset: number): { line: number; column: number } {
   let line = 1;
   let col = 1;
   const end = Math.min(offset, source.length);
@@ -481,9 +461,7 @@ function computeHealth(input: {
 
   if (input.highCardinalityChannels.length > 0) {
     score -= Math.min(15, input.highCardinalityChannels.length * 5);
-    notes.push(
-      `High-cardinality channels: ${input.highCardinalityChannels.join(", ")}`,
-    );
+    notes.push(`High-cardinality channels: ${input.highCardinalityChannels.join(", ")}`);
   }
 
   if (input.unusedThemeCount > 0) {
@@ -493,9 +471,7 @@ function computeHealth(input: {
 
   if (input.missingThemeCount > 0) {
     score -= Math.min(15, input.missingThemeCount * 2);
-    notes.push(
-      `${input.missingThemeCount} semantic utilit(y/ies) missing CSS vars`,
-    );
+    notes.push(`${input.missingThemeCount} semantic utilit(y/ies) missing CSS vars`);
   }
 
   if (input.hotspotFileCount > 0) {
@@ -567,19 +543,14 @@ function buildThemeSection(
         },
         aliases: aliasByFrom.get(t.name) ?? [],
         sources: t.sources.map((s) => ({
-          file: s.file
-            ? toReportPath(s.file, cwd, relativePaths)
-            : "",
+          file: s.file ? toReportPath(s.file, cwd, relativePaths) : "",
           selector: s.selector,
         })),
         usageCount: usage?.count ?? 0,
         usedAs: usage ? [...usage.usedAs].sort() : [],
       };
     })
-    .sort(
-      (a, b) =>
-        b.usageCount - a.usageCount || a.name.localeCompare(b.name),
-    );
+    .sort((a, b) => b.usageCount - a.usageCount || a.name.localeCompare(b.name));
 
   const knownBares = new Set(colorTokens.map((t) => t.bare));
   // Also index --foo when --color-foo exists
@@ -587,12 +558,9 @@ function buildThemeSection(
     knownBares.add(t.bare);
   }
 
-  const unusedColorTokens = colorTokens
-    .filter((t) => t.usageCount === 0)
-    .map((t) => t.name);
+  const unusedColorTokens = colorTokens.filter((t) => t.usageCount === 0).map((t) => t.name);
 
-  const missingForSemanticUtilities: StyleThemeSection["missingForSemanticUtilities"] =
-    [];
+  const missingForSemanticUtilities: StyleThemeSection["missingForSemanticUtilities"] = [];
   for (const u of utilities) {
     if (u.kind !== "semantic") {
       continue;
@@ -825,15 +793,8 @@ export async function buildStyleUsageReport(
         const tag = structural.elementName ?? null;
 
         const palette = parseColorUtility(token);
-        const kind = classifyKind(
-          classified.base,
-          classified.propertyGroup,
-          palette,
-        );
-        const channel = channelFromGroup(
-          classified.propertyGroup,
-          classified.base,
-        );
+        const kind = classifyKind(classified.base, classified.propertyGroup, palette);
+        const channel = channelFromGroup(classified.propertyGroup, classified.base);
         const variantKeys = parseVariantKeys(token);
 
         const key = classified.utility;
@@ -874,19 +835,13 @@ export async function buildStyleUsageReport(
         fileAcc.count++;
         fileAcc.utilities.set(key, (fileAcc.utilities.get(key) ?? 0) + 1);
         fileAcc.bases.add(classified.base);
-        fileAcc.byChannel.set(
-          channel,
-          (fileAcc.byChannel.get(channel) ?? 0) + 1,
-        );
+        fileAcc.byChannel.set(channel, (fileAcc.byChannel.get(channel) ?? 0) + 1);
         fileAcc.byKind[kind]++;
         fileAcc.tags.set(tagKey, (fileAcc.tags.get(tagKey) ?? 0) + 1);
 
         // Global rollups
         if (palette?.palette) {
-          byPalette.set(
-            palette.palette,
-            (byPalette.get(palette.palette) ?? 0) + 1,
-          );
+          byPalette.set(palette.palette, (byPalette.get(palette.palette) ?? 0) + 1);
         }
         if (palette?.shade) {
           byShade.set(palette.shade, (byShade.get(palette.shade) ?? 0) + 1);
@@ -1004,9 +959,7 @@ export async function buildStyleUsageReport(
         tag,
         count: t.count,
         utilities: sortRecordDesc(t.utilities),
-        groups: Object.fromEntries(
-          [...t.groups.entries()].map(([g, set]) => [g, [...set].sort()]),
-        ),
+        groups: Object.fromEntries([...t.groups.entries()].map(([g, set]) => [g, [...set].sort()])),
         drift: tagDrift,
       };
     })
@@ -1054,9 +1007,7 @@ export async function buildStyleUsageReport(
   // byFile export
   const byFile: StyleFileUsage[] = [...byFileMap.entries()]
     .map(([file, f]) => {
-      const sortedUtils = [...f.utilities.entries()].sort(
-        (a, b) => b[1] - a[1],
-      );
+      const sortedUtils = [...f.utilities.entries()].sort((a, b) => b[1] - a[1]);
       const truncated = sortedUtils.length > MAX_UTILS_PER_FILE;
       const topUtils = sortedUtils.slice(0, MAX_UTILS_PER_FILE);
       return {
@@ -1077,10 +1028,7 @@ export async function buildStyleUsageReport(
     .sort((a, b) => b.count - a.count || a.file.localeCompare(b.file));
 
   // byDirectory
-  const dirMap = new Map<
-    string,
-    { count: number; files: Set<string>; utilities: Set<string> }
-  >();
+  const dirMap = new Map<string, { count: number; files: Set<string>; utilities: Set<string> }>();
   for (const f of byFile) {
     const dir = directoryOf(f.file);
     let d = dirMap.get(dir);
@@ -1233,9 +1181,7 @@ export async function writeStyleUsageReport(
 }
 
 /** Compact markdown summary for PRs / notes. */
-export function formatStyleUsageReportMarkdown(
-  report: StyleUsageReport,
-): string {
+export function formatStyleUsageReportMarkdown(report: StyleUsageReport): string {
   const h = report.summary.health;
   const lines: string[] = [
     `# Style usage report`,
@@ -1254,36 +1200,17 @@ export function formatStyleUsageReportMarkdown(
     lines.push(``);
   }
 
-  lines.push(
-    `## Top utilities`,
-    ``,
-    `| Utility | Count |`,
-    `|---------|------:|`,
-  );
+  lines.push(`## Top utilities`, ``, `| Utility | Count |`, `|---------|------:|`);
   for (const u of report.summary.topUtilities.slice(0, 20)) {
     lines.push(`| \`${u.utility}\` | ${u.count} |`);
   }
 
-  lines.push(
-    ``,
-    `## Top files`,
-    ``,
-    `| File | Hits | Unique |`,
-    `|------|-----:|-------:|`,
-  );
+  lines.push(``, `## Top files`, ``, `| File | Hits | Unique |`, `|------|-----:|-------:|`);
   for (const f of report.summary.topFiles.slice(0, 20)) {
-    lines.push(
-      `| \`${f.file}\` | ${f.count} | ${f.uniqueUtilities} |`,
-    );
+    lines.push(`| \`${f.file}\` | ${f.count} | ${f.uniqueUtilities} |`);
   }
 
-  lines.push(
-    ``,
-    `## Top tags`,
-    ``,
-    `| Tag | Color hits |`,
-    `|-----|----------:|`,
-  );
+  lines.push(``, `## Top tags`, ``, `| Tag | Color hits |`, `|-----|----------:|`);
   for (const t of report.summary.topTags.slice(0, 15)) {
     lines.push(`| \`<${t.tag}>\` | ${t.count} |`);
   }
@@ -1320,9 +1247,7 @@ export function formatStyleUsageReportMarkdown(
         `|---------|---------------|------:|`,
       );
       for (const m of report.theme.missingForSemanticUtilities.slice(0, 20)) {
-        lines.push(
-          `| \`${m.utility}\` | \`${m.suggestedCssVar}\` | ${m.count} |`,
-        );
+        lines.push(`| \`${m.utility}\` | \`${m.suggestedCssVar}\` | ${m.count} |`);
       }
       lines.push(``);
     }
@@ -1338,9 +1263,7 @@ export function formatStyleUsageReportMarkdown(
   if (report.suggestions.length > 0) {
     lines.push(``, `## Workflow suggestions`, ``);
     for (const s of report.suggestions.slice(0, 25)) {
-      lines.push(
-        `- **${s.severity}** \`${s.kind}\` — ${s.title}: ${s.detail}`,
-      );
+      lines.push(`- **${s.severity}** \`${s.kind}\` — ${s.title}: ${s.detail}`);
     }
     lines.push(``);
   }

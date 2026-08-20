@@ -13,9 +13,14 @@
       "!**/coverage",
       "!**/.turbo",
       "!**/pnpm-lock.yaml",
-      "!**/fixtures/**",
+      "!**/fixtures",
       "!**/*.md",
-      "!**/*.astro"
+      "!**/*.astro",
+      "!**/*.svg",
+      "!**/apps/docs/public",
+      "!**/.sdd",
+      "!**/.grok",
+      "!**/.blume"
     ]
   },
   "formatter": {

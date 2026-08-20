@@ -12,9 +12,7 @@ describe("theme loading", () => {
       }
     `);
     expect(theme.colors.values.get("brand")).toBe("#ff00aa");
-    expect(findCanonicalEquivalent("text-[#ff00aa]", { theme })?.canonical).toBe(
-      "text-brand",
-    );
+    expect(findCanonicalEquivalent("text-[#ff00aa]", { theme })?.canonical).toBe("text-brand");
   });
 
   it("default theme has full palette red-500", () => {

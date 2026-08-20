@@ -1,5 +1,5 @@
-import { parentPort, workerData } from "node:worker_threads";
 import { readFile, writeFile } from "node:fs/promises";
+import { parentPort, workerData } from "node:worker_threads";
 import { transformSource } from "@tailwind-canonicalize/transformer";
 import { reviveTheme, type SerializedTheme } from "./worker-pool.js";
 

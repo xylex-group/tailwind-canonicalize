@@ -2,15 +2,6 @@
   "name": "tailwind-canonicalize-action",
   "version": "0.1.0",
   "private": true,
-  "description": "GitHub Action for tailwind-canonicalize --check",
-  "type": "module",
-  "scripts": {
-    "build": "tsc -p tsconfig.json"
-  },
-  "dependencies": {
-    "tailwind-canonicalize": "workspace:*"
-  },
-  "devDependencies": {
-    "typescript": "^5.9.2"
-  }
+  "description": "Composite GitHub Action for tailwind-canonicalize --check",
+  "type": "module"
 }

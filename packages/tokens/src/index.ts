@@ -1,4 +1,4 @@
-export { analyzeColorTokens, type AnalyzeOptions } from "./analyze.js";
+export { type AnalyzeOptions, analyzeColorTokens } from "./analyze.js";
 export {
   loadTokenManifest,
   manifestToMappings,
@@ -20,19 +20,16 @@ export {
   scanProjectTokens,
 } from "./css-scan.js";
 export {
+  type GenerateThemeOptions,
   generateDualThemeFromManifest,
   generateThemeCss,
   tokensFromManifest,
   writeThemeCss,
-  type GenerateThemeOptions,
 } from "./generate-theme.js";
 export { isColorUtility, parseColorUtility } from "./palette.js";
 export {
   buildStyleUsageReport,
   formatStyleUsageReportMarkdown,
-  semanticBareFromBase,
-  toReportPath,
-  writeStyleUsageReport,
   type StyleDirectoryUsage,
   type StyleDriftSignal,
   type StyleFileUsage,
@@ -46,6 +43,9 @@ export {
   type StyleUtilityKind,
   type StyleUtilityUsage,
   type StyleWorkflowSuggestion,
+  semanticBareFromBase,
+  toReportPath,
+  writeStyleUsageReport,
 } from "./style-report.js";
 export type {
   ColorAnalysisEntry,

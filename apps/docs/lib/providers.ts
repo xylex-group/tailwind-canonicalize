@@ -32,9 +32,7 @@ export const providers: Provider[] = [
   {
     configFiles: [
       {
-        code: (
-          presets: string[]
-        ) => `import { defineConfig } from "eslint/config";
+        code: (presets: string[]) => `import { defineConfig } from "eslint/config";
 ${presets.map((p) => `import ${p} from "ultracite/eslint/${p}";`).join("\n")}
 
 export default defineConfig([

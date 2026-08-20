@@ -1,16 +1,6 @@
 import type { SupportedExtension } from "./types.js";
 
-const JS_LIKE = new Set([
-  ".ts",
-  ".tsx",
-  ".js",
-  ".jsx",
-  ".mjs",
-  ".cjs",
-  ".mts",
-  ".cts",
-  ".mdx",
-]);
+const JS_LIKE = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts", ".mdx"]);
 
 export function extensionOf(filePath: string | undefined): string {
   if (!filePath) {
@@ -30,11 +20,7 @@ export function isJsLike(ext: string): boolean {
 
 export function isSupportedExtension(ext: string): ext is SupportedExtension {
   return (
-    JS_LIKE.has(ext) ||
-    ext === ".html" ||
-    ext === ".vue" ||
-    ext === ".astro" ||
-    ext === ".svelte"
+    JS_LIKE.has(ext) || ext === ".html" || ext === ".vue" || ext === ".astro" || ext === ".svelte"
   );
 }
 

@@ -1,8 +1,8 @@
 import {
   canonicalizeSource,
   createDefaultTheme,
-  findCanonicalEquivalent,
   extractClassOccurrences,
+  findCanonicalEquivalent,
   tokenizeClasses,
 } from "@tailwind-canonicalize/compiler";
 import * as vscode from "vscode";

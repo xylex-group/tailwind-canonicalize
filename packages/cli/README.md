@@ -8,7 +8,7 @@ Semantic canonicalizer for Tailwind CSS utility classes — rewrite arbitrary va
 |--|--|
 | **Homepage** | [https://tailwind-canonicalize.xbp.app](https://tailwind-canonicalize.xbp.app) |
 | **npm** | [tailwind-canonicalize](https://www.npmjs.com/package/tailwind-canonicalize) |
-| **Version** | `0.1.3` |
+| **Version** | `0.1.19` |
 | **Repository** | [xylex-group/tailwind-canonicalize](https://github.com/xylex-group/tailwind-canonicalize) |
 
 ## Install

@@ -165,3 +165,10 @@ vite.config.ts.timestamp-*
 # Cloudflare Wrangler local state
 **/.wrangler/
 **/worker-configuration.d.ts
+
+# Generated Blume/Astro state
+**/.blume/
+
+# Local SDD / agent run state
+.sdd/
+.grok/

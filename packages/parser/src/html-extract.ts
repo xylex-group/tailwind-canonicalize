@@ -21,7 +21,12 @@ function isNonJsScript(attrs: string): boolean {
     return true;
   }
   // Explicit non-JS MIME
-  if (!type.includes("javascript") && !type.includes("ecmascript") && type !== "module" && !type.includes("typescript")) {
+  if (
+    !type.includes("javascript") &&
+    !type.includes("ecmascript") &&
+    type !== "module" &&
+    !type.includes("typescript")
+  ) {
     // type="ts" / "text/typescript" handled above via typescript
     if (type === "ts" || type === "tsx" || type === "jsx") {
       return false;
@@ -41,7 +46,15 @@ function looksLikeScriptModule(src: string): boolean {
     return false;
   }
   // JSON-like
-  if (t.startsWith("{") && t.endsWith("}") && !t.includes("import") && !t.includes("export") && !t.includes("const ") && !t.includes("let ") && !t.includes("function")) {
+  if (
+    t.startsWith("{") &&
+    t.endsWith("}") &&
+    !t.includes("import") &&
+    !t.includes("export") &&
+    !t.includes("const ") &&
+    !t.includes("let ") &&
+    !t.includes("function")
+  ) {
     return false;
   }
   return (
@@ -119,16 +132,16 @@ function readBalanced(
   }
   let depth = 0;
   let quote: string | null = null;
-  let escape = false;
+  let escaped = false;
   for (let i = openIndex; i < source.length; i++) {
     const ch = source[i] ?? "";
     if (quote) {
-      if (escape) {
-        escape = false;
+      if (escaped) {
+        escaped = false;
         continue;
       }
       if (ch === "\\") {
-        escape = true;
+        escaped = true;
         continue;
       }
       if (ch === quote) {
@@ -212,7 +225,12 @@ export function extractFromHtml(
         });
       } else if (extractJs) {
         occurrences.push(
-          ...extractWrappedExpression(braced.inner, braced.innerStart, extractJs, kindForAttr(attr)),
+          ...extractWrappedExpression(
+            braced.inner,
+            braced.innerStart,
+            extractJs,
+            kindForAttr(attr),
+          ),
         );
       }
       attrRe.lastIndex = braced.end;
@@ -230,9 +248,7 @@ export function extractFromHtml(
  */
 export function extractFromMdx(
   source: string,
-  extractJs: (
-    src: string,
-  ) => { occurrences: ClassOccurrence[]; errors: ExtractError[] },
+  extractJs: (src: string) => { occurrences: ClassOccurrence[]; errors: ExtractError[] },
 ): { occurrences: ClassOccurrence[]; errors: ExtractError[] } {
   const occurrences: ClassOccurrence[] = [];
   const errors: ExtractError[] = [];
@@ -405,7 +421,7 @@ export function extractFromSfc(
       markupOffset = fm[0].length;
     }
     // Attribute scan on markup (class, className, class:list, `{expr}`)
-    const html = extractFromHtml(markup, extractJs);
+    const html = extractFromHtml(markup, (src) => extractJs(src, 0));
     for (const o of html.occurrences) {
       occurrences.push({
         ...o,
@@ -417,7 +433,7 @@ export function extractFromSfc(
     extractAstroExpressionIslands(markup, markupOffset, extractJs, occurrences);
     // Also scan full source for className/class in case fm regex missed
     if (html.occurrences.length === 0) {
-      const fullHtml = extractFromHtml(source, extractJs);
+      const fullHtml = extractFromHtml(source, (src) => extractJs(src, 0));
       occurrences.push(...fullHtml.occurrences);
     }
   }
@@ -432,7 +448,11 @@ export function extractFromSfc(
       sm = scriptRe.exec(source);
       continue;
     }
-    if (!looksLikeScriptModule(inner) && !inner.includes("className") && !inner.includes("class=")) {
+    if (
+      !looksLikeScriptModule(inner) &&
+      !inner.includes("className") &&
+      !inner.includes("class=")
+    ) {
       sm = scriptRe.exec(source);
       continue;
     }

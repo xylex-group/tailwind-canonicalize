@@ -68,11 +68,7 @@ export function generateThemeCss(options: GenerateThemeOptions): string {
     if (dual) {
       value = `var(--app-${stripColorPrefix(t.name)})`;
     } else if (prefer && options.existing) {
-      const existing = findExistingAlias(
-        options.existing,
-        t.name,
-        t.value ?? t.light ?? "",
-      );
+      const existing = findExistingAlias(options.existing, t.name, t.value ?? t.light ?? "");
       if (existing) {
         value = `var(${existing})`;
       } else if (t.preferVar) {
@@ -94,7 +90,10 @@ export function generateThemeCss(options: GenerateThemeOptions): string {
 }
 
 function stripColorPrefix(name: string): string {
-  return name.replace(/^--color-/, "").replace(/^--/, "").replace(/^color-/, "");
+  return name
+    .replace(/^--color-/, "")
+    .replace(/^--/, "")
+    .replace(/^color-/, "");
 }
 
 function findExistingAlias(

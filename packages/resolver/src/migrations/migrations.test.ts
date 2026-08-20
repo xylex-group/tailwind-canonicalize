@@ -14,22 +14,20 @@ describe("tailwind migrations", () => {
   });
 
   it("preserves variants and important", () => {
-    expect(
-      migrateUtility("hover:bg-gradient-to-br", { enabled: true }).token,
-    ).toBe("hover:bg-linear-to-br");
-    expect(
-      migrateUtility("dark:md:bg-gradient-to-br", { enabled: true }).token,
-    ).toBe("dark:md:bg-linear-to-br");
-    expect(migrateUtility("bg-gradient-to-br!", { enabled: true }).token).toBe(
-      "bg-linear-to-br!",
+    expect(migrateUtility("hover:bg-gradient-to-br", { enabled: true }).token).toBe(
+      "hover:bg-linear-to-br",
     );
+    expect(migrateUtility("dark:md:bg-gradient-to-br", { enabled: true }).token).toBe(
+      "dark:md:bg-linear-to-br",
+    );
+    expect(migrateUtility("bg-gradient-to-br!", { enabled: true }).token).toBe("bg-linear-to-br!");
   });
 
   it("migrates all gradient directions", () => {
     for (const dir of ["t", "tr", "r", "br", "b", "bl", "l", "tl"]) {
-      expect(
-        migrateUtility(`bg-gradient-to-${dir}`, { enabled: true }).token,
-      ).toBe(`bg-linear-to-${dir}`);
+      expect(migrateUtility(`bg-gradient-to-${dir}`, { enabled: true }).token).toBe(
+        `bg-linear-to-${dir}`,
+      );
     }
   });
 
@@ -50,12 +48,8 @@ describe("tailwind migrations", () => {
   });
 
   it("migrates break-words → wrap-break-word", () => {
-    expect(migrateUtility("break-words", { enabled: true }).token).toBe(
-      "wrap-break-word",
-    );
-    expect(
-      migrateUtility("sm:break-words!", { enabled: true }).token,
-    ).toBe("sm:wrap-break-word!");
+    expect(migrateUtility("break-words", { enabled: true }).token).toBe("wrap-break-word");
+    expect(migrateUtility("sm:break-words!", { enabled: true }).token).toBe("sm:wrap-break-word!");
     const again = migrateUtility("wrap-break-word", { enabled: true });
     expect(again.token).toBe("wrap-break-word");
     expect(again.transformation).toBeNull();
